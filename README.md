@@ -1,2 +1,6 @@
-# IJH-Android
-IJH for Android
+# IJH Android
+IJH for Android.
+UI is build with [Jetpack Compose](https://developer.android.com/jetpack/compose) and 
+[Material Design 3](https://m3.material.io)
+
+## WIP

@@ -4,9 +4,7 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightColorScheme = lightColorScheme(
     primary = md_theme_light_primary,
@@ -87,17 +85,6 @@ fun IJHTheme(
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
-    }
-
-    // Set System UI theme
-    val systemUiController = rememberSystemUiController()
-    val isDarkTheme = isSystemInDarkTheme()
-    LaunchedEffect(systemUiController, isDarkTheme) {
-        systemUiController.setSystemBarsColor(
-            color = colorScheme.background,
-            darkIcons = !isDarkTheme,
-        )
-        // setStatusBarColor() and setNavigationBarColor() also exist
     }
 
     MaterialTheme(

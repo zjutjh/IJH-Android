@@ -1,30 +1,36 @@
 package com.zjutjh.ijh.ui
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
+import androidx.core.view.WindowCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.zjutjh.ijh.ui.theme.IJHTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Make system bars inside the application's layout scope
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
-            IJHTheme {
+            // Set System UI theme
+            val isDarkTheme = isSystemInDarkTheme()
+            val systemUiController = rememberSystemUiController()
+
+            SideEffect {
+                systemUiController.setSystemBarsColor(
+                    color = Color.Transparent,
+                    darkIcons = !isDarkTheme,
+                )
+            }
+            IJHTheme(darkTheme = isDarkTheme) {
                 IJHApp()
             }
         }
-    }
-}
-
-@Preview(name = "Light", showBackground = true)
-@Preview(name = "Dark", showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-fun IJHAppPreview() {
-    IJHTheme(dynamicColor = false) {
-        IJHApp()
     }
 }

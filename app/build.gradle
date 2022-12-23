@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'com.google.dagger.hilt.android'
 }
 
 android {
@@ -61,6 +63,11 @@ dependencies {
     implementation 'com.google.accompanist:accompanist-systemuicontroller:0.28.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
 
+    // DI
+    implementation 'com.google.dagger:hilt-android:2.44.2'
+    kapt 'com.google.dagger:hilt-compiler:2.44.2'
+    implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
+
     testImplementation 'junit:junit:4.13.2'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
@@ -69,4 +76,9 @@ dependencies {
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes true
 }

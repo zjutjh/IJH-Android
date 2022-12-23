@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">IJH</string>
+    <string name="schedule">Schedule</string>
+    <string name="nothing_to_do">Nothing to do.</string>
+    <string name="navigation">Navigation</string>
+    <string name="account">Account</string>
+    <string name="teacher">Teacher</string>
+    <string name="course">Course</string>
+    <string name="time">Time</string>
+    <string name="place">Place</string>
 </resources>

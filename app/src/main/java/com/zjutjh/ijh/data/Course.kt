@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.model
+package com.zjutjh.ijh.data
 
 import androidx.compose.runtime.Immutable
 import java.time.DayOfWeek

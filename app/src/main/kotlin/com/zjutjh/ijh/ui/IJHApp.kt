@@ -1,6 +1,5 @@
 package com.zjutjh.ijh.ui
 
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -13,8 +12,6 @@ fun IJHApp() {
     IJHAppNavHost()
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IJHAppNavHost(
     modifier: Modifier = Modifier,

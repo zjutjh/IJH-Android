@@ -1,5 +1,6 @@
 package com.zjutjh.ijh.ui
 
+import android.content.res.Configuration.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zjutjh.ijh.R
@@ -22,11 +24,18 @@ import java.time.DayOfWeek
 
 @Composable
 fun ScheduleCard(courses: ImmutableList<Course>, modifier: Modifier = Modifier) {
-    OutlinedCard(modifier = modifier) {
+    OutlinedCard(
+        modifier = modifier,
+    ) {
         Text(
             text = stringResource(id = R.string.schedule),
             modifier = Modifier.padding(start = 24.dp, top = 16.dp),
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.headlineMedium,
+        )
+        Text(
+            text = stringResource(id = R.string.today_class_schedule),
+            modifier = Modifier.padding(horizontal = 24.dp),
+            style = MaterialTheme.typography.bodySmall
         )
         if (courses.isEmpty()) {
             Text(
@@ -65,7 +74,7 @@ fun CourseCard(course: Course, onClick: () -> Unit, modifier: Modifier = Modifie
                 text = course.name,
                 style = MaterialTheme.typography.titleMedium
             )
-            Divider(modifier = Modifier.padding(vertical = 4.dp))
+            Divider(modifier = Modifier.padding(vertical = 6.dp))
             IconText(
                 icon = Icons.Default.Place,
                 contentDescription = stringResource(id = R.string.place),
@@ -98,8 +107,8 @@ fun IconText(
             contentDescription = contentDescription,
             modifier = Modifier.size(15.dp)
         )
-        Spacer(modifier = Modifier.padding(horizontal = 1.dp))
-        Text(text, style = style)
+        Spacer(modifier = Modifier.padding(horizontal = 1.5.dp))
+        Text(text, style = style, overflow = TextOverflow.Ellipsis, maxLines = 1)
     }
 }
 
@@ -139,7 +148,8 @@ fun CourseCardPreview() {
     }
 }
 
-@Preview
+@Preview(name = "Light")
+@Preview(name = "Dark", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun ScheduleSurfacePreview() {
     IJHTheme {
@@ -156,7 +166,7 @@ fun ScheduleSurfacePreview() {
                         Section(1, 2),
                         DayOfWeek.MONDAY
                     ), Course(
-                        "Software Engineering",
+                        "Software Engineering and Information Technology",
                         "Mr. Hex",
                         "Information.B.101",
                         "9:55-11:35",

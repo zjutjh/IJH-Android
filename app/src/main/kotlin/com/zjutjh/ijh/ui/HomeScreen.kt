@@ -15,21 +15,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
+import com.zjutjh.ijh.data.mock.MockCourseRepository
 import com.zjutjh.ijh.ui.theme.IJHTheme
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)) {
-    HomeScaffold(drawerState = drawerState) { paddingValues ->
+fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
+    HomeScaffold { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             ScheduleCard(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                courses = persistentListOf()
+                courses = viewModel.uiState.courses
             )
         }
     }
@@ -42,7 +43,6 @@ fun HomeScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-
     ModalNavigationDrawer(
         drawerContent = {
             HomeDrawerContent(onCloseButtonClick = {
@@ -68,7 +68,7 @@ fun HomeScaffold(
 fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
     ModalDrawerSheet {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(12.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -98,7 +98,6 @@ fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
                 )
             }, selected = true, onClick = {})
         }
-
     }
 }
 
@@ -130,20 +129,20 @@ fun HomeTopBar(onMenuButtonClick: () -> Unit, onAccountButtonClick: () -> Unit) 
 
 @Preview(name = "Light")
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationDrawerPreview() {
     IJHTheme {
-        HomeScreen(rememberDrawerState(initialValue = DrawerValue.Open))
+        val viewModel = HomeViewModel(MockCourseRepository())
+        HomeScreen(viewModel)
     }
 }
 
 @Preview(name = "Light")
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenPreview() {
     IJHTheme {
-        HomeScreen()
+        val viewModel = HomeViewModel(MockCourseRepository())
+        HomeScreen(viewModel)
     }
 }

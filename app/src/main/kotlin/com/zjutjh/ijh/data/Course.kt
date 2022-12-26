@@ -3,6 +3,8 @@ package com.zjutjh.ijh.data
 import androidx.compose.runtime.Immutable
 import java.time.DayOfWeek
 
+data class Section(val left: Int, val right: Int)
+
 @Immutable
 data class Course(
     val name: String,
@@ -14,5 +16,3 @@ data class Course(
     val section: Section,
     val dayOfWeek: DayOfWeek,
 )
-
-data class Section(val left: Int, val right: Int)

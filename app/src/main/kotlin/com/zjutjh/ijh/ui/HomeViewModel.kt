@@ -14,20 +14,26 @@ import javax.inject.Inject
 
 @Stable
 interface HomeUiState {
+
     val courses: ImmutableList<Course>
+
 }
 
 private class MutableHomeUiState : HomeUiState {
+
     override var courses: ImmutableList<Course> by mutableStateOf(persistentListOf())
+
 }
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(courseRepository: CourseRepository) :
     ViewModel() {
+
     private val _uiState = MutableHomeUiState()
     val uiState: HomeUiState = _uiState
 
     init {
         _uiState.courses = courseRepository.fetchCourses()
     }
+
 }

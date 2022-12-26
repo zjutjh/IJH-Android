@@ -15,7 +15,9 @@ import javax.inject.Inject
  * Data layer Interface of [Course] repository
  */
 interface CourseRepository {
+
     fun fetchCourses(): ImmutableList<Course>
+
 }
 
 /**
@@ -25,6 +27,7 @@ class DefaultCourseRepository @Inject constructor(
     localDataSource: CourseLocalDataSource,
     remoteDataSource: CourseRemoteDataSource
 ) : CourseRepository {
+
     override fun fetchCourses(): ImmutableList<Course> {
         // TODO: unimplemented, just mock
         return persistentListOf(
@@ -49,6 +52,7 @@ class DefaultCourseRepository @Inject constructor(
             )
         )
     }
+
 }
 
 @Module
@@ -57,5 +61,4 @@ abstract class CourseModule {
 
     @Binds
     abstract fun bindCourseRepository(defaultCourseRepository: DefaultCourseRepository): CourseRepository
-
 }

@@ -1,3 +1,5 @@
 package com.zjutjh.ijh.data.remote
 
-class CourseRemoteDataSource
+import javax.inject.Inject
+
+class CourseRemoteDataSource @Inject constructor()

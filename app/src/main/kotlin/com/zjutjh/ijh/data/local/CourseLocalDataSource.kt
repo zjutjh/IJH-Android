@@ -1,3 +1,5 @@
 package com.zjutjh.ijh.data.local
 
-class CourseLocalDataSource
+import javax.inject.Inject
+
+class CourseLocalDataSource @Inject constructor()

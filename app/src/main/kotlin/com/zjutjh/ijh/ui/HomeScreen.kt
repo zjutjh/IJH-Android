@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.mock.MockCourseRepository
+import com.zjutjh.ijh.mock.CourseRepositoryMock
 import com.zjutjh.ijh.ui.theme.IJHTheme
 import kotlinx.coroutines.launch
 
@@ -30,7 +30,8 @@ fun HomeScreen(viewModel: HomeViewModel = hiltViewModel()) {
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                courses = viewModel.uiState.courses
+                courses = viewModel.uiState.courses,
+                onClick = {}
             )
         }
     }
@@ -132,7 +133,7 @@ fun HomeTopBar(onMenuButtonClick: () -> Unit, onAccountButtonClick: () -> Unit) 
 @Composable
 fun NavigationDrawerPreview() {
     IJHTheme {
-        val viewModel = HomeViewModel(MockCourseRepository())
+        val viewModel = HomeViewModel(CourseRepositoryMock())
         HomeScreen(viewModel)
     }
 }
@@ -142,7 +143,7 @@ fun NavigationDrawerPreview() {
 @Composable
 fun HomeScreenPreview() {
     IJHTheme {
-        val viewModel = HomeViewModel(MockCourseRepository())
+        val viewModel = HomeViewModel(CourseRepositoryMock())
         HomeScreen(viewModel)
     }
 }

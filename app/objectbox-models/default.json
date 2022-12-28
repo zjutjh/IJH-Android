@@ -1,0 +1,90 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:255095605926559524",
+      "lastPropertyId": "14:5693685629723486091",
+      "name": "Course",
+      "properties": [
+        {
+          "id": "1:4644478952191956289",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4422666440569758589",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:3069362966170022461",
+          "name": "teacher",
+          "type": 9
+        },
+        {
+          "id": "4:7254595966112449590",
+          "name": "place",
+          "type": 9
+        },
+        {
+          "id": "7:5824588018136859465",
+          "name": "credit",
+          "type": 9
+        },
+        {
+          "id": "8:9128672040704533020",
+          "name": "sectionStart",
+          "type": 5
+        },
+        {
+          "id": "9:524524674886979486",
+          "name": "sectionEnd",
+          "type": 5
+        },
+        {
+          "id": "10:846311095981876156",
+          "name": "dayOfWeek",
+          "type": 5
+        },
+        {
+          "id": "11:7249318958401694438",
+          "name": "campus",
+          "type": 9
+        },
+        {
+          "id": "12:895920365538761791",
+          "name": "className",
+          "type": 9
+        },
+        {
+          "id": "13:7615729980070997356",
+          "name": "weekStart",
+          "type": 5
+        },
+        {
+          "id": "14:5693685629723486091",
+          "name": "weekEnd",
+          "type": 5
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:255095605926559524",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [
+    6440729437134993174,
+    4478841387482861067
+  ],
+  "retiredRelationUids": [],
+  "version": 1
+}

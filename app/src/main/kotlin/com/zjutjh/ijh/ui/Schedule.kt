@@ -16,27 +16,44 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.Course
-import com.zjutjh.ijh.data.Section
+import com.zjutjh.ijh.mock.CourseRepositoryMock
 import com.zjutjh.ijh.ui.theme.IJHTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import java.time.DayOfWeek
+import java.time.format.DateTimeFormatter
 
 @Composable
-fun ScheduleCard(courses: ImmutableList<Course>, modifier: Modifier = Modifier) {
+fun ScheduleCard(
+    courses: ImmutableList<Course>,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     OutlinedCard(
         modifier = modifier,
     ) {
-        Text(
-            text = stringResource(id = R.string.schedule),
-            modifier = Modifier.padding(start = 24.dp, top = 16.dp),
-            style = MaterialTheme.typography.headlineMedium,
-        )
-        Text(
-            text = stringResource(id = R.string.today_class_schedule),
-            modifier = Modifier.padding(horizontal = 24.dp),
-            style = MaterialTheme.typography.bodySmall
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column {
+                Text(
+                    text = stringResource(id = R.string.schedule),
+                    modifier = Modifier.padding(start = 24.dp, top = 16.dp),
+                    style = MaterialTheme.typography.headlineMedium,
+                )
+                Text(
+                    text = stringResource(id = R.string.today_class_schedule),
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+
+            IconButton(modifier = Modifier.padding(top = 16.dp, end = 10.dp), onClick = onClick) {
+                Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null)
+            }
+        }
+
+
         if (courses.isEmpty()) {
             Text(
                 modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
@@ -83,7 +100,7 @@ fun CourseCard(course: Course, onClick: () -> Unit, modifier: Modifier = Modifie
             IconText(
                 icon = Icons.Default.Schedule,
                 contentDescription = stringResource(id = R.string.time),
-                text = course.shortTime
+                text = course.shortTime()
             )
             IconText(
                 icon = Icons.Default.Person,
@@ -92,6 +109,14 @@ fun CourseCard(course: Course, onClick: () -> Unit, modifier: Modifier = Modifie
             )
         }
     }
+}
+
+fun Course.shortTime(): String {
+    val (start, _) = Course.SECTIONS[sectionStart - 1]
+    val (_, end) = Course.SECTIONS[sectionEnd - 1]
+
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    return "${start.format(formatter)} - ${end.format(formatter)} | $sectionStart-$sectionEnd"
 }
 
 @Composable
@@ -132,16 +157,7 @@ fun CourseCardPreview() {
     IJHTheme {
         Surface {
             CourseCard(
-                course = Course(
-                    "Design pattern in practice",
-                    "Mr. Info",
-                    "A3C2",
-                    "8:00-9:40",
-                    "1-16 Week | Mon (1-2) | 8:00-9:40",
-                    "4.0",
-                    Section(1, 2),
-                    DayOfWeek.MONDAY
-                ),
+                course = CourseRepositoryMock.getCourse(),
                 onClick = {}
             )
         }
@@ -155,27 +171,9 @@ fun ScheduleSurfacePreview() {
     IJHTheme {
         Surface {
             ScheduleCard(
-                modifier = Modifier.padding(10.dp), courses = persistentListOf(
-                    Course(
-                        "Design pattern in practice",
-                        "Mr. Info",
-                        "Software.A.302",
-                        "8:00-9:40",
-                        "1-16 Week | Mon (1-2) | 8:00-9:40",
-                        "4.0",
-                        Section(1, 2),
-                        DayOfWeek.MONDAY
-                    ), Course(
-                        "Software Engineering and Information Technology",
-                        "Mr. Hex",
-                        "Information.B.101",
-                        "9:55-11:35",
-                        "1-16 Week | Mon (1-2) | 8:00-9:40",
-                        "4.0",
-                        Section(1, 2),
-                        DayOfWeek.MONDAY
-                    )
-                )
+                modifier = Modifier.padding(10.dp),
+                courses = CourseRepositoryMock().getCourses(),
+                onClick = {}
             )
         }
     }
@@ -187,7 +185,7 @@ fun ScheduleSurfaceEmptyPreview() {
     IJHTheme {
         Surface {
             ScheduleCard(
-                modifier = Modifier.padding(10.dp), courses = persistentListOf()
+                modifier = Modifier.padding(10.dp), courses = persistentListOf(), onClick = {}
             )
         }
     }

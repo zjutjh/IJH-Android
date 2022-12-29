@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.ui
+package com.zjutjh.ijh.ui.component
 
 import android.content.res.Configuration.*
 import androidx.compose.foundation.layout.*

@@ -71,9 +71,68 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:6193576314879061545",
+      "lastPropertyId": "10:518648119601672358",
+      "name": "WeJHUser",
+      "properties": [
+        {
+          "id": "1:5851349023871534991",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:4416345638613154417",
+          "name": "userID",
+          "type": 6
+        },
+        {
+          "id": "3:7674456536330853608",
+          "name": "studentID",
+          "type": 9
+        },
+        {
+          "id": "4:2502496946576719971",
+          "name": "createTime",
+          "type": 9
+        },
+        {
+          "id": "5:4636830836998338251",
+          "name": "phoneNum",
+          "type": 9
+        },
+        {
+          "id": "6:2941661384161891549",
+          "name": "username",
+          "type": 9
+        },
+        {
+          "id": "7:2069065439683552931",
+          "name": "userType",
+          "type": 5
+        },
+        {
+          "id": "8:2693218467211429314",
+          "name": "bindLib",
+          "type": 1
+        },
+        {
+          "id": "9:4193551617363616169",
+          "name": "bindYxy",
+          "type": 1
+        },
+        {
+          "id": "10:518648119601672358",
+          "name": "bindZf",
+          "type": 1
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:255095605926559524",
+  "lastEntityId": "2:6193576314879061545",
   "lastIndexId": "0:0",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

@@ -1,12 +1,12 @@
-package com.zjutjh.ijh.ui
+package com.zjutjh.ijh.ui.screen
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.zjutjh.ijh.data.CourseRepository
 import com.zjutjh.ijh.data.Course
+import com.zjutjh.ijh.data.CourseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

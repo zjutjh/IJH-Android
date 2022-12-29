@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.zjutjh.ijh.ui.screen.HomeScreen
+import com.zjutjh.ijh.ui.screen.LoginScreen
 
 @Composable
 fun IJHApp() {
@@ -24,7 +26,14 @@ fun IJHAppNavHost(
         startDestination = startDestination
     ) {
         composable(IJHRoute.HOME) {
-            HomeScreen()
+            HomeScreen {
+                navController.navigate(IJHRoute.LOGIN) {
+                    launchSingleTop = true
+                }
+            }
+        }
+        composable(IJHRoute.LOGIN) {
+            LoginScreen()
         }
     }
 }

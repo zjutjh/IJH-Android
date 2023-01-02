@@ -114,6 +114,9 @@ secrets {
 }
 
 protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$protobuf_version"
+    }
     // Generates the java Protobuf-lite code for the Protobuf in this project. See
     // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
     // for more information.

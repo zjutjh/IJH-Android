@@ -5,36 +5,34 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.zjutjh.ijh.data.Course
-import com.zjutjh.ijh.data.CourseRepository
+import androidx.lifecycle.viewModelScope
+import com.zjutjh.ijh.data.model.Course
+import com.zjutjh.ijh.data.repository.CourseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(courseRepository: CourseRepository) :
     ViewModel() {
 
-    private val _uiState = MutableHomeUiState()
-
-    val uiState: HomeUiState = _uiState
+    private val _uiState = MutableHomeUIState()
+    val uiState: HomeUIState = _uiState
 
     init {
-        _uiState.courses = courseRepository.getCourses()
+        viewModelScope.launch {
+            _uiState.courses = courseRepository.getCourses()
+        }
     }
-
 }
 
 @Stable
-interface HomeUiState {
-
+interface HomeUIState {
     val courses: ImmutableList<Course>
-
 }
 
-private class MutableHomeUiState : HomeUiState {
-
+private class MutableHomeUIState : HomeUIState {
     override var courses: ImmutableList<Course> by mutableStateOf(persistentListOf())
-
 }

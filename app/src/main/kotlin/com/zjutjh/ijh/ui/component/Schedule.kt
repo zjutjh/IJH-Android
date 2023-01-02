@@ -15,9 +15,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.Course
-import com.zjutjh.ijh.mock.CourseRepositoryMock
-import com.zjutjh.ijh.ui.theme.IJHTheme
+import com.zjutjh.ijh.data.model.Course
+import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
+import com.zjutjh.ijh.ui.theme.IJhTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.format.DateTimeFormatter
@@ -25,7 +25,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ScheduleCard(
     courses: ImmutableList<Course>,
-    onClick: () -> Unit,
+    onCalendarClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     OutlinedCard(
@@ -48,7 +48,10 @@ fun ScheduleCard(
                 )
             }
 
-            IconButton(modifier = Modifier.padding(top = 16.dp, end = 10.dp), onClick = onClick) {
+            IconButton(
+                modifier = Modifier.padding(top = 16.dp, end = 10.dp),
+                onClick = onCalendarClick
+            ) {
                 Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null)
             }
         }
@@ -72,7 +75,7 @@ fun CoursesCards(courses: ImmutableList<Course>, modifier: Modifier = Modifier) 
     Column(modifier) {
         courses.forEach {
             Spacer(modifier = Modifier.padding(4.dp))
-            CourseCard(course = it, onClick = {})
+            CourseCard(course = it, onClick = { /* TODO */ })
         }
     }
 }
@@ -140,7 +143,7 @@ fun IconText(
 @Preview
 @Composable
 fun IconTextPreview() {
-    IJHTheme {
+    IJhTheme {
         Surface {
             IconText(
                 icon = Icons.Default.Person,
@@ -154,7 +157,7 @@ fun IconTextPreview() {
 @Preview
 @Composable
 fun CourseCardPreview() {
-    IJHTheme {
+    IJhTheme {
         Surface {
             CourseCard(
                 course = CourseRepositoryMock.getCourse(),
@@ -168,12 +171,12 @@ fun CourseCardPreview() {
 @Preview(name = "Dark", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun ScheduleSurfacePreview() {
-    IJHTheme {
+    IJhTheme {
         Surface {
             ScheduleCard(
                 modifier = Modifier.padding(10.dp),
-                courses = CourseRepositoryMock().getCourses(),
-                onClick = {}
+                courses = CourseRepositoryMock.getCourses(),
+                onCalendarClick = {}
             )
         }
     }
@@ -182,10 +185,12 @@ fun ScheduleSurfacePreview() {
 @Preview
 @Composable
 fun ScheduleSurfaceEmptyPreview() {
-    IJHTheme {
+    IJhTheme {
         Surface {
             ScheduleCard(
-                modifier = Modifier.padding(10.dp), courses = persistentListOf(), onClick = {}
+                modifier = Modifier.padding(10.dp),
+                courses = persistentListOf(),
+                onCalendarClick = {}
             )
         }
     }

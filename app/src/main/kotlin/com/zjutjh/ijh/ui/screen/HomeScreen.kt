@@ -20,9 +20,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.mock.CourseRepositoryMock
+import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.ui.component.ScheduleCard
-import com.zjutjh.ijh.ui.theme.IJHTheme
+import com.zjutjh.ijh.ui.theme.IJhTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,7 +46,7 @@ fun HomeScreen(
                     .padding(16.dp)
                     .fillMaxWidth(),
                 courses = viewModel.uiState.courses,
-                onClick = {},
+                onCalendarClick = { /* TODO */ },
             )
         }
 
@@ -70,7 +70,8 @@ fun HomeScaffold(
                     drawerState.close()
                 }
             })
-        }, drawerState = drawerState
+        },
+        drawerState = drawerState,
     ) {
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -162,7 +163,7 @@ fun HomeTopBar(
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun NavigationDrawerPreview() {
-    IJHTheme {
+    IJhTheme {
         HomeScaffold(drawerState = DrawerState(initialValue = DrawerValue.Open), {}) {}
     }
 }
@@ -171,7 +172,7 @@ fun NavigationDrawerPreview() {
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun HomeScreenPreview() {
-    IJHTheme {
+    IJhTheme {
         val viewModel = HomeViewModel(CourseRepositoryMock())
         HomeScreen(viewModel) {}
     }
@@ -180,7 +181,7 @@ fun HomeScreenPreview() {
 @Preview(heightDp = 400)
 @Composable
 fun ScrollPreview() {
-    IJHTheme {
+    IJhTheme {
         val viewModel = HomeViewModel(CourseRepositoryMock())
         HomeScreen(viewModel) {}
     }

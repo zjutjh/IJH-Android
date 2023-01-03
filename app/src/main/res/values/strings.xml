@@ -9,4 +9,12 @@
     <string name="time">Time</string>
     <string name="place">Place</string>
     <string name="today_class_schedule">Today\'s class schedule</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="input_username">Input username</string>
+    <string name="input_password">Input password</string>
+    <string name="login_forgot">Forgot?</string>
+    <string name="continue_str">Continue</string>
+    <string name="sign_in">Sign in</string>
+    <string name="close">Close</string>
 </resources>

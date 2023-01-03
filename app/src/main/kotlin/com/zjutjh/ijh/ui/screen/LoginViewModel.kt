@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,6 +30,7 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
     }
 
     fun login() {
+        _uiState.loading = true
         viewModelScope.launch {
             val result = userRepository.login(_uiState.username, _uiState.password)
             result.onSuccess {
@@ -37,6 +39,8 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
             result.onFailure {
                 Log.e("Login", it.toString())
             }
+            delay(300)
+            _uiState.loading = false
         }
     }
 
@@ -46,9 +50,11 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
 interface LoginUIState {
     val username: String
     val password: String
+    val loading: Boolean
 }
 
 private class MutableLoginUIState : LoginUIState {
     override var username: String by mutableStateOf(String())
     override var password: String by mutableStateOf(String())
+    override var loading: Boolean by mutableStateOf(false)
 }

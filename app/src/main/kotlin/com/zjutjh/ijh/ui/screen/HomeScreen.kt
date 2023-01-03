@@ -92,7 +92,7 @@ fun HomeScaffold(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
-    ModalDrawerSheet {
+    ModalDrawerSheet(modifier = Modifier.widthIn(max = 300.dp)) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
@@ -162,7 +162,7 @@ fun HomeTopBar(
 @Preview(name = "Light")
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun NavigationDrawerPreview() {
+private fun NavigationDrawerPreview() {
     IJhTheme {
         HomeScaffold(drawerState = DrawerState(initialValue = DrawerValue.Open), {}) {}
     }
@@ -171,7 +171,7 @@ fun NavigationDrawerPreview() {
 @Preview(name = "Light")
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun HomeScreenPreview() {
+private fun HomeScreenPreview() {
     IJhTheme {
         val viewModel = HomeViewModel(CourseRepositoryMock())
         HomeScreen(viewModel) {}
@@ -180,7 +180,7 @@ fun HomeScreenPreview() {
 
 @Preview(heightDp = 400)
 @Composable
-fun ScrollPreview() {
+private fun HomeScrollPreview() {
     IJhTheme {
         val viewModel = HomeViewModel(CourseRepositoryMock())
         HomeScreen(viewModel) {}

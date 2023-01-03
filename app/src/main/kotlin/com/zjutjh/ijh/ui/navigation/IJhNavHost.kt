@@ -1,10 +1,6 @@
 package com.zjutjh.ijh.ui.navigation
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -30,12 +26,6 @@ fun IJhNavHost(
     ) {
         composable(
             Screens.HOME.route,
-            enterTransition = {
-                slideInHorizontally(animationSpec = tween(300))
-            },
-            exitTransition = {
-                slideOutHorizontally(animationSpec = tween(300))
-            }
         ) {
             HomeScreen {
                 navController.navigate(Screens.LOGIN.route) {
@@ -48,14 +38,12 @@ fun IJhNavHost(
             enterTransition = {
                 slideIntoContainer(
                     AnimatedContentScope.SlideDirection.Left,
-                    animationSpec = tween(300)
-                )
+                ) + fadeIn()
             },
             exitTransition = {
                 slideOutOfContainer(
                     AnimatedContentScope.SlideDirection.Right,
-                    animationSpec = tween(300)
-                )
+                ) + fadeOut()
             }
         ) {
             LoginScreen {

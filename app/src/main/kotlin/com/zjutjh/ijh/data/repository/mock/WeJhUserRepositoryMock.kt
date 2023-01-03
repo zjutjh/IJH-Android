@@ -5,8 +5,8 @@ import com.zjutjh.ijh.data.repository.WeJhUserRepository
 
 class WeJhUserRepositoryMock : WeJhUserRepository {
 
-    override suspend fun login(username: String, password: String): Result<WeJhUser> =
-        Result.success(
+    override suspend fun login(username: String, password: String): Result<WeJhUser> {
+        return Result.success(
             WeJhUser(
                 uid = 123,
                 username = "Info",
@@ -21,4 +21,6 @@ class WeJhUserRepositoryMock : WeJhUserRepository {
                 ),
             )
         )
+    }
+
 }

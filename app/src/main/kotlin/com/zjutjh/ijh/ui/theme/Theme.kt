@@ -1,6 +1,7 @@
 package com.zjutjh.ijh.ui.theme
 
 import android.os.Build
+import android.util.Log
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -80,6 +81,7 @@ fun IJhTheme(
     // Dynamic color is available on Android 12+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            Log.i("Theme", "Using Dynamic Color Scheme")
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }

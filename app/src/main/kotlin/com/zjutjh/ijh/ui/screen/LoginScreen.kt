@@ -19,14 +19,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
+import com.zjutjh.ijh.ui.model.CancellableLoadingState
 import com.zjutjh.ijh.ui.theme.IJhTheme
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onCloseClick: () -> Unit) {
     LoginScaffold(
-        continueEnabled = !viewModel.uiState.loading,
+        snackbarHostState = viewModel.uiState.snackbarHostState,
+        loadingState = viewModel.uiState.loading,
         onCloseClick = onCloseClick,
-        onContinueClick = viewModel::login
+        onContinueClick = viewModel::loginOrCancel,
     ) { paddingValues ->
         val scrollState = rememberScrollState()
 
@@ -38,7 +40,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onCloseClick: () ->
             contentAlignment = Alignment.TopCenter
         ) {
             AnimatedVisibility(
-                visible = viewModel.uiState.loading,
+                visible = viewModel.uiState.loading.isLoading(),
                 enter = fadeIn() + expandVertically(),
                 exit = fadeOut() + shrinkVertically(),
             ) {
@@ -48,7 +50,7 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onCloseClick: () ->
             Column(
                 Modifier
                     .widthIn(max = 450.dp)
-                    .padding(top = 18.dp)
+                    .padding(top = 24.dp)
                     .fillMaxWidth(0.9f),
             ) {
                 Icon(
@@ -67,7 +69,8 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onCloseClick: () ->
                     label = stringResource(id = R.string.username),
                     placeholder = stringResource(id = R.string.input_username),
                     value = viewModel.uiState.username,
-                    onValueChange = viewModel::updateUsername
+                    onValueChange = viewModel.uiState::updateUsername,
+                    isError = viewModel.uiState.isUsernameError
                 )
                 LoginFormTextField(
                     modifier = Modifier
@@ -77,7 +80,8 @@ fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onCloseClick: () ->
                     label = stringResource(id = R.string.password),
                     placeholder = stringResource(id = R.string.input_password),
                     value = viewModel.uiState.password,
-                    onValueChange = viewModel::updatePassword
+                    onValueChange = viewModel.uiState::updatePassword,
+                    isError = viewModel.uiState.isPasswordError
                 )
                 Row {
                     TextButton(
@@ -101,6 +105,7 @@ fun LoginFormTextField(
     label: String,
     placeholder: String,
     value: String,
+    isError: Boolean,
     onValueChange: (String) -> Unit,
 ) {
     OutlinedTextField(
@@ -110,6 +115,7 @@ fun LoginFormTextField(
         placeholder = { Text(placeholder) },
         singleLine = true,
         value = value,
+        isError = isError,
         onValueChange = onValueChange,
     )
 }
@@ -118,7 +124,8 @@ fun LoginFormTextField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScaffold(
-    continueEnabled: Boolean,
+    snackbarHostState: SnackbarHostState,
+    loadingState: CancellableLoadingState,
     onCloseClick: () -> Unit,
     onContinueClick: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
@@ -128,7 +135,10 @@ fun LoginScaffold(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LoginTopBar(continueEnabled, scrollBehavior, onCloseClick, onContinueClick)
+            LoginTopBar(loadingState, scrollBehavior, onCloseClick, onContinueClick)
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
         },
         content = content,
     )
@@ -137,28 +147,41 @@ fun LoginScaffold(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginTopBar(
-    continueEnabled: Boolean,
+    loadingState: CancellableLoadingState,
     scrollBehavior: TopAppBarScrollBehavior?,
     onCloseClick: () -> Unit,
-    onContinueClick: () -> Unit
+    onContinueClick: () -> Unit,
 ) {
-    TopAppBar(title = {
-        Text(stringResource(id = R.string.sign_in))
-    }, navigationIcon = {
-        IconButton(onClick = onCloseClick) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(id = R.string.close),
-            )
-        }
-    }, colors = TopAppBarDefaults.smallTopAppBarColors(), actions = {
-        TextButton(
-            onClick = onContinueClick,
-            enabled = continueEnabled,
-        ) {
-            Text(stringResource(R.string.continue_str))
-        }
-    }, scrollBehavior = scrollBehavior
+    TopAppBar(
+        title = {
+            Text(stringResource(id = R.string.sign_in))
+        },
+        navigationIcon = {
+            IconButton(onClick = onCloseClick) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(id = R.string.close),
+                )
+            }
+        },
+        colors = TopAppBarDefaults.smallTopAppBarColors(),
+        actions = {
+            val enabled =
+                loadingState == CancellableLoadingState.READY || loadingState == CancellableLoadingState.CANCELLABLE
+            TextButton(
+                modifier = Modifier.animateContentSize(),
+                onClick = onContinueClick,
+                enabled = enabled,
+            ) {
+                val text = when (loadingState) {
+                    CancellableLoadingState.CANCELLABLE -> stringResource(id = R.string.cancel)
+                    else -> stringResource(R.string.continue_str)
+                }
+                Text(text)
+            }
+            Spacer(Modifier.width(16.dp))
+        },
+        scrollBehavior = scrollBehavior,
     )
 }
 

@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
-    id "com.google.protobuf"
+    id 'com.google.protobuf'
     id 'com.google.dagger.hilt.android'
     id 'io.objectbox'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
@@ -31,6 +31,7 @@ android {
 
     buildTypes {
         release {
+            signingConfig signingConfigs.debug
             manifestPlaceholders usesCleartextTraffic: false
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

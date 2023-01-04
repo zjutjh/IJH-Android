@@ -1,8 +1,10 @@
 package com.zjutjh.ijh.ui.navigation
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -11,6 +13,7 @@ import com.zjutjh.ijh.ui.screen.HomeScreen
 import com.zjutjh.ijh.ui.screen.LoginScreen
 import com.zjutjh.ijh.ui.screen.Screens
 
+private const val ANIM_DURATION: Int = 200
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -22,10 +25,29 @@ fun IJhNavHost(
     AnimatedNavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
+        enterTransition = {
+            slideIn(tween(ANIM_DURATION)) {
+                IntOffset(x = it.width / 4, y = 0)
+            } + fadeIn(tween(ANIM_DURATION))
+        },
+        exitTransition = {
+            slideOut(tween(ANIM_DURATION)) {
+                IntOffset(x = it.width / 4, y = 0)
+            } + fadeOut(tween(ANIM_DURATION))
+        },
+        popEnterTransition = {
+            EnterTransition.None
+        },
     ) {
         composable(
             Screens.HOME.route,
+            enterTransition = {
+                EnterTransition.None
+            },
+            exitTransition = {
+                ExitTransition.None
+            }
         ) {
             HomeScreen {
                 navController.navigate(Screens.LOGIN.route) {
@@ -35,16 +57,6 @@ fun IJhNavHost(
         }
         composable(
             Screens.LOGIN.route,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentScope.SlideDirection.Left,
-                ) + fadeIn()
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentScope.SlideDirection.Right,
-                ) + fadeOut()
-            }
         ) {
             LoginScreen {
                 navController.popBackStack()

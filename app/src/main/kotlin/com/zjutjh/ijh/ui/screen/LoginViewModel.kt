@@ -63,7 +63,7 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
                     _uiState.loading = CancellableLoadingState.READY
                 }
             }
-            else -> {}
+            else -> Unit
         }
     }
 

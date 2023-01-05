@@ -33,7 +33,7 @@ class ApiProcessInterceptor @Inject constructor() : Interceptor {
 
         val code = jsonObject.getInt("code")
         // Success
-        if (code == 0) {
+        if (code == 1 || code == 0) {
             // If data field exist, extract it
             return if (jsonObject.has("data")) {
                 val dataString = jsonObject.getString("data")

@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MenuOpen
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
+import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import kotlinx.coroutines.launch
@@ -83,6 +81,10 @@ fun HomeScaffold(
                     onAccountButtonClick,
                     scrollBehavior,
                 )
+            },
+            contentWindowInsets = WindowInsets.safeDrawing,
+            bottomBar = {
+                DividerBottomBar()
             },
             content = content,
         )
@@ -149,7 +151,7 @@ fun HomeTopBar(
         actions = {
             IconButton(onClick = onAccountButtonClick) {
                 Icon(
-                    imageVector = Icons.Default.AccountCircle,
+                    imageVector = Icons.Default.Login,
                     contentDescription = stringResource(id = R.string.account)
                 )
             }

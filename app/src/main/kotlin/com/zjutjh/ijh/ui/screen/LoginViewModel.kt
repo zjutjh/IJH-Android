@@ -1,18 +1,20 @@
 package com.zjutjh.ijh.ui.screen
 
+import android.content.Context
 import android.util.Log
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zjutjh.ijh.R
+import com.zjutjh.ijh.data.model.WeJhUser
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.network.exception.ApiResponseException
+import com.zjutjh.ijh.network.exception.HttpStatusException
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 
 private const val CANCELLABLE_INTERVAL = 1000L
@@ -26,11 +28,12 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
 
     private var currentJob: Job? = null
 
-    fun loginOrCancel() {
+    fun loginOrCancel(context: Context, onSuccess: (WeJhUser) -> Unit) {
         when (_uiState.loading) {
             CancellableLoadingState.READY -> {
                 currentJob = viewModelScope.launch {
                     _uiState.loading = CancellableLoadingState.LOADING
+
                     val task = async {
                         userRepository.login(_uiState.username, _uiState.password)
                     }
@@ -46,35 +49,11 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
 
                     result.onSuccess {
                         Log.i("Login", it.toString())
-                        return@launch
+                        onSuccess(it)
+                    }.onFailure {
+                        loginErrorHandle(it, context)
                     }
-                    result.onFailure {
-                        when (it) {
-                            is ApiResponseException -> {
-                                Log.e("Login", "code: ${it.code}, msg: ${it.message}")
-                                /* TODO: locale */
-                                when (it.code) {
-                                    200501 -> {
-                                        _uiState.isUsernameError = true
-                                        _uiState.isPasswordError = true
-                                        _uiState.snackbarHostState.showDismissibleSnackBar("Bad inputs.")
-                                    }
-                                    200503 -> {
-                                        _uiState.isUsernameError = true
-                                        _uiState.snackbarHostState.showDismissibleSnackBar("Unknown username.")
-                                    }
-                                    else -> {
-                                        _uiState.snackbarHostState.showDismissibleSnackBar("Unknown error.")
-                                    }
-                                }
-                            }
-                            else -> {
-                                Log.e("Login", it.toString())
-                                _uiState.isUsernameError = true
-                                _uiState.isPasswordError = true
-                            }
-                        }
-                    }
+
                     _uiState.loading = CancellableLoadingState.READY
                 }
             }
@@ -88,14 +67,40 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
         }
     }
 
-    private suspend fun SnackbarHostState.showDismissibleSnackBar(message: String) {
-
-        showSnackbar(
-            message,
-            null,
-            true
-        )
-
+    private suspend fun loginErrorHandle(it: Throwable, context: Context) {
+        when (it) {
+            is ApiResponseException -> {
+                when (it.code) {
+                    200501 -> {
+                        _uiState.isUsernameError = true
+                        _uiState.isPasswordError = true
+                        _uiState.showDismissibleSnackbar(context.getString(R.string.invalid_inputs))
+                    }
+                    200503 -> {
+                        _uiState.isUsernameError = true
+                        _uiState.showDismissibleSnackbar(context.getString(R.string.unknown_user))
+                    }
+                    200504 -> {
+                        _uiState.isPasswordError = true
+                        _uiState.showDismissibleSnackbar(context.getString(R.string.wrong_password))
+                    }
+                    else -> {
+                        Log.w("Login", "code: ${it.code}, msg: ${it.message}")
+                        _uiState.showDismissibleSnackbar("${it.message} (${it.code})")
+                    }
+                }
+            }
+            is HttpStatusException -> {
+                _uiState.showDismissibleSnackbar(context.getString(R.string.network_error))
+            }
+            is SocketTimeoutException -> {
+                _uiState.showDismissibleSnackbar(context.getString(R.string.request_timeout))
+            }
+            else -> {
+                Log.e("Login", it.toString())
+                _uiState.showDismissibleSnackbar(context.getString(R.string.unknown_error))
+            }
+        }
     }
 
     private class MutableLoginUIState : LoginUIState {
@@ -115,6 +120,12 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
             password = value
             isPasswordError = false
         }
+
+        @OptIn(ExperimentalMaterial3Api::class)
+        override suspend fun showDismissibleSnackbar(message: String): SnackbarResult =
+            snackbarHostState.showSnackbar(
+                DismissibleSnackbarVisuals(message),
+            )
     }
 }
 
@@ -129,4 +140,14 @@ interface LoginUIState {
 
     fun updateUsername(value: String)
     fun updatePassword(value: String)
+
+    suspend fun showDismissibleSnackbar(message: String): SnackbarResult
+}
+
+class DismissibleSnackbarVisuals(
+    override val message: String,
+    override val actionLabel: String? = null,
+    override val duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite
+) : SnackbarVisuals {
+    override val withDismissAction: Boolean = true
 }

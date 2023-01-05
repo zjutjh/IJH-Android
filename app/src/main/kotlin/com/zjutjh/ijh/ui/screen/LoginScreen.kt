@@ -13,22 +13,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
+import com.zjutjh.ijh.data.model.WeJhUser
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
+import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
 import com.zjutjh.ijh.ui.theme.IJhTheme
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel = hiltViewModel(), onCloseClick: () -> Unit) {
+fun LoginScreen(
+    viewModel: LoginViewModel = hiltViewModel(),
+    onCloseClick: () -> Unit,
+    onContinue: (WeJhUser) -> Unit,
+) {
+    val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+
     LoginScaffold(
         snackbarHostState = viewModel.uiState.snackbarHostState,
         loadingState = viewModel.uiState.loading,
         onCloseClick = onCloseClick,
-        onContinueClick = viewModel::loginOrCancel,
+        onActionClick = {
+            focusManager.clearFocus()
+            viewModel.loginOrCancel(context, onContinue)
+        },
     ) { paddingValues ->
         val scrollState = rememberScrollState()
 
@@ -127,7 +141,7 @@ fun LoginScaffold(
     snackbarHostState: SnackbarHostState,
     loadingState: CancellableLoadingState,
     onCloseClick: () -> Unit,
-    onContinueClick: () -> Unit,
+    onActionClick: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -135,10 +149,14 @@ fun LoginScaffold(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LoginTopBar(loadingState, scrollBehavior, onCloseClick, onContinueClick)
+            LoginTopBar(loadingState, scrollBehavior, onCloseClick, onActionClick)
         },
         snackbarHost = {
             SnackbarHost(snackbarHostState)
+        },
+        contentWindowInsets = WindowInsets.safeDrawing,
+        bottomBar = {
+            DividerBottomBar()
         },
         content = content,
     )
@@ -150,7 +168,7 @@ fun LoginTopBar(
     loadingState: CancellableLoadingState,
     scrollBehavior: TopAppBarScrollBehavior?,
     onCloseClick: () -> Unit,
-    onContinueClick: () -> Unit,
+    onActionClick: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -170,7 +188,7 @@ fun LoginTopBar(
                 loadingState == CancellableLoadingState.READY || loadingState == CancellableLoadingState.CANCELLABLE
             TextButton(
                 modifier = Modifier.animateContentSize(),
-                onClick = onContinueClick,
+                onClick = onActionClick,
                 enabled = enabled,
             ) {
                 val text = when (loadingState) {
@@ -179,7 +197,6 @@ fun LoginTopBar(
                 }
                 Text(text)
             }
-            Spacer(Modifier.width(16.dp))
         },
         scrollBehavior = scrollBehavior,
     )
@@ -191,7 +208,7 @@ fun LoginTopBar(
 private fun LoginScreenPreview() {
     IJhTheme {
         val viewModel = LoginViewModel(WeJhUserRepositoryMock())
-        LoginScreen(viewModel) {}
+        LoginScreen(viewModel, {}) {}
     }
 }
 
@@ -200,6 +217,6 @@ private fun LoginScreenPreview() {
 private fun LoginScrollPreview() {
     IJhTheme {
         val viewModel = LoginViewModel(WeJhUserRepositoryMock())
-        LoginScreen(viewModel) {}
+        LoginScreen(viewModel, {}) {}
     }
 }

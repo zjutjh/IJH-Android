@@ -1,12 +1,10 @@
 package com.zjutjh.ijh
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.animation.Animator
-import androidx.core.animation.AnticipateInterpolator
 import androidx.core.animation.ObjectAnimator
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -35,23 +33,21 @@ class MainActivity : ComponentActivity() {
         // the app content.
         splashScreen.setOnExitAnimationListener { splashScreenView ->
 
-            val slideDown = ObjectAnimator.ofFloat(
+            val animator = ObjectAnimator.ofFloat(
                 splashScreenView.view,
                 View.TRANSLATION_Y,
                 0f,
-                splashScreenView.view.height.toFloat()
+                splashScreenView.view.height.toFloat(),
             )
 
-            slideDown.interpolator = AnticipateInterpolator()
-            slideDown.duration = 300L
+            animator.duration = 200L
 
-            slideDown.doOnEnd {
-                Log.d("SplashScreen", "Removed.")
+            animator.doOnEnd {
                 splashScreenView.remove()
             }
 
             // Run animation.
-            slideDown.start()
+            animator.start()
         }
     }
 

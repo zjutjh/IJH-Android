@@ -18,4 +18,10 @@
     <string name="sign_in">Sign in</string>
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
+    <string name="unknown_user">Unknown username</string>
+    <string name="wrong_password">Wrong password</string>
+    <string name="invalid_inputs">Invalid inputs</string>
+    <string name="network_error">Network error</string>
+    <string name="request_timeout">Request timed out</string>
+    <string name="unknown_error">Unknown error</string>
 </resources>

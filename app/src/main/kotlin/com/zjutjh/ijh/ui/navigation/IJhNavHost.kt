@@ -33,33 +33,34 @@ fun IJhNavHost(
         },
         exitTransition = {
             slideOut(tween(ANIM_DURATION)) {
-                IntOffset(x = it.width / 4, y = 0)
+                IntOffset(x = -it.width / 4, y = 0)
             } + fadeOut(tween(ANIM_DURATION))
         },
         popEnterTransition = {
-            EnterTransition.None
+            slideIn(tween(ANIM_DURATION)) {
+                IntOffset(x = -it.width / 4, y = 0)
+            } + fadeIn()
         },
+        popExitTransition = {
+            slideOut(tween(ANIM_DURATION)) {
+                IntOffset(x = it.width / 4, y = 0)
+            } + fadeOut(tween(ANIM_DURATION))
+        }
     ) {
-        composable(
-            Screens.HOME.route,
-            enterTransition = {
-                EnterTransition.None
-            },
-            exitTransition = {
-                ExitTransition.None
-            }
-        ) {
+        composable(Screens.HOME.route) {
             HomeScreen {
                 navController.navigate(Screens.LOGIN.route) {
                     launchSingleTop = true
                 }
             }
+
         }
         composable(
             Screens.LOGIN.route,
         ) {
-            LoginScreen {
-                navController.popBackStack()
+            LoginScreen(onCloseClick = navController::popBackStack) {
+                // TODO
+                navController.popBackStack(Screens.HOME.route, false)
             }
         }
     }

@@ -11,12 +11,12 @@ import com.zjutjh.ijh.data.repository.CourseRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(courseRepository: CourseRepository) :
-    ViewModel() {
+class HomeViewModel @Inject constructor(courseRepository: CourseRepository) : ViewModel() {
 
     private val _uiState = MutableHomeUIState()
     val uiState: HomeUIState = _uiState
@@ -26,13 +26,23 @@ class HomeViewModel @Inject constructor(courseRepository: CourseRepository) :
             _uiState.courses = courseRepository.getCourses()
         }
     }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _uiState.isRefreshing = true
+            delay(500)
+            _uiState.isRefreshing = false
+        }
+    }
+
+    private class MutableHomeUIState : HomeUIState {
+        override var courses: ImmutableList<Course> by mutableStateOf(persistentListOf())
+        override var isRefreshing: Boolean by mutableStateOf(false)
+    }
 }
 
 @Stable
 interface HomeUIState {
     val courses: ImmutableList<Course>
-}
-
-private class MutableHomeUIState : HomeUIState {
-    override var courses: ImmutableList<Course> by mutableStateOf(persistentListOf())
+    val isRefreshing: Boolean
 }

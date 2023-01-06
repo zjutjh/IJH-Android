@@ -2,7 +2,7 @@ package com.zjutjh.ijh.ui.screen
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -29,10 +30,8 @@ import com.zjutjh.ijh.data.model.WeJhUser
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
 import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
-import com.zjutjh.ijh.ui.model.EmptyInteractionSource
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun LoginScreen(
@@ -189,15 +188,10 @@ fun LoginScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val interactionSource = remember { EmptyInteractionSource() }
 
     Scaffold(
         modifier = Modifier
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick,
-            )
+            .pointerInput(onClick) { detectTapGestures { onClick() } }
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LoginTopBar(loadingState, scrollBehavior, onCloseClick, onActionClick)
@@ -233,7 +227,6 @@ fun LoginTopBar(
                 )
             }
         },
-        colors = TopAppBarDefaults.smallTopAppBarColors(),
         actions = {
             val enabled =
                 loadingState == CancellableLoadingState.READY || loadingState == CancellableLoadingState.CANCELLABLE

@@ -11,7 +11,9 @@ import com.zjutjh.ijh.data.model.WeJhUser
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.network.exception.ApiResponseException
 import com.zjutjh.ijh.network.exception.HttpStatusException
+import com.zjutjh.ijh.network.exception.WeJhApiExceptions
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
+import com.zjutjh.ijh.ui.model.DismissibleSnackbarVisuals
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.net.SocketTimeoutException
@@ -71,17 +73,17 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
         when (it) {
             is ApiResponseException -> {
                 when (it.code) {
-                    200501 -> {
-                        _uiState.isUsernameError = true
-                        _uiState.isPasswordError = true
+                    WeJhApiExceptions.PARAM_ERROR -> {
+                        _uiState.usernameFieldState = UsernameFieldState.INVALID
+                        _uiState.passwordFieldState = PasswordFieldState.INVALID
                         _uiState.showDismissibleSnackbar(context.getString(R.string.invalid_inputs))
                     }
-                    200503 -> {
-                        _uiState.isUsernameError = true
+                    WeJhApiExceptions.USER_NOT_FOUND -> {
+                        _uiState.usernameFieldState = UsernameFieldState.UNKNOWN
                         _uiState.showDismissibleSnackbar(context.getString(R.string.unknown_user))
                     }
-                    200504 -> {
-                        _uiState.isPasswordError = true
+                    WeJhApiExceptions.WRONG_PASSWORD -> {
+                        _uiState.passwordFieldState = PasswordFieldState.WRONG
                         _uiState.showDismissibleSnackbar(context.getString(R.string.wrong_password))
                     }
                     else -> {
@@ -106,19 +108,28 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
     private class MutableLoginUIState : LoginUIState {
         override var username: String by mutableStateOf(String())
         override var password: String by mutableStateOf(String())
+        override var usernameFieldState: UsernameFieldState by mutableStateOf(UsernameFieldState.OK)
+        override var passwordFieldState: PasswordFieldState by mutableStateOf(PasswordFieldState.OK)
+
         override var loading: CancellableLoadingState by mutableStateOf(CancellableLoadingState.READY)
-        override var isUsernameError: Boolean by mutableStateOf(false)
-        override var isPasswordError: Boolean by mutableStateOf(false)
         override val snackbarHostState: SnackbarHostState = SnackbarHostState()
 
         override fun updateUsername(value: String) {
             username = value
-            isUsernameError = false
+            usernameFieldState = if (value.isBlank()) {
+                UsernameFieldState.INVALID
+            } else {
+                UsernameFieldState.OK
+            }
         }
 
         override fun updatePassword(value: String) {
             password = value
-            isPasswordError = false
+            passwordFieldState = if (value.isBlank()) {
+                PasswordFieldState.INVALID
+            } else {
+                PasswordFieldState.OK
+            }
         }
 
         @OptIn(ExperimentalMaterial3Api::class)
@@ -134,8 +145,8 @@ interface LoginUIState {
     val username: String
     val password: String
     val loading: CancellableLoadingState
-    val isUsernameError: Boolean
-    val isPasswordError: Boolean
+    val usernameFieldState: UsernameFieldState
+    val passwordFieldState: PasswordFieldState
     val snackbarHostState: SnackbarHostState
 
     fun updateUsername(value: String)
@@ -144,10 +155,11 @@ interface LoginUIState {
     suspend fun showDismissibleSnackbar(message: String): SnackbarResult
 }
 
-class DismissibleSnackbarVisuals(
-    override val message: String,
-    override val actionLabel: String? = null,
-    override val duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite
-) : SnackbarVisuals {
-    override val withDismissAction: Boolean = true
+enum class UsernameFieldState {
+    OK, INVALID, UNKNOWN,
 }
+
+enum class PasswordFieldState {
+    OK, INVALID, WRONG,
+}
+

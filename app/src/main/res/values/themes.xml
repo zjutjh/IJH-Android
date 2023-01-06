@@ -40,7 +40,7 @@
         <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
              animated drawable. One of these is required. -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_animated</item>
-        <item name="windowSplashScreenIconBackgroundColor">@color/md_theme_light_primary</item>
+        <item name="windowSplashScreenIconBackgroundColor">@color/md_theme_light_primaryContainer</item>
 
         <!-- Required for animated icons -->
         <item name="windowSplashScreenAnimationDuration">300</item>

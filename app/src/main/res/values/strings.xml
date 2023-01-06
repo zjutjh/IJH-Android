@@ -8,7 +8,7 @@
     <string name="course">Course</string>
     <string name="time">Time</string>
     <string name="place">Place</string>
-    <string name="today_class_schedule">Today\'s class schedule</string>
+    <string name="today_class_schedule">Today\'s class schedule.</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="input_username">Input username</string>
@@ -18,10 +18,13 @@
     <string name="sign_in">Sign in</string>
     <string name="close">Close</string>
     <string name="cancel">Cancel</string>
-    <string name="unknown_user">Unknown username</string>
-    <string name="wrong_password">Wrong password</string>
-    <string name="invalid_inputs">Invalid inputs</string>
-    <string name="network_error">Network error</string>
-    <string name="request_timeout">Request timed out</string>
-    <string name="unknown_error">Unknown error</string>
+    <string name="unknown_user">Unknown username.</string>
+    <string name="wrong_password">Wrong password.</string>
+    <string name="invalid_inputs">Invalid inputs.</string>
+    <string name="network_error">Network error.</string>
+    <string name="request_timeout">Request timed out.</string>
+    <string name="unknown_error">Unknown error.</string>
+    <string name="invalid_username">Invalid username.</string>
+    <string name="invalid_password">Invalid password.</string>
+    <string name="not_supported">Not supported yet.</string>
 </resources>

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -25,6 +26,7 @@ import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
 import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
 import com.zjutjh.ijh.ui.theme.IJhTheme
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(
@@ -34,6 +36,7 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val scope = rememberCoroutineScope()
 
     LoginScaffold(
         snackbarHostState = viewModel.uiState.snackbarHostState,
@@ -69,38 +72,60 @@ fun LoginScreen(
             ) {
                 Icon(
                     modifier = Modifier
-                        .height(70.dp)
+                        .height(100.dp)
                         .fillMaxWidth(),
                     imageVector = Icons.Default.AccountCircle,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.secondary
                 )
+                Spacer(modifier = Modifier.height(12.dp))
                 LoginFormTextField(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .fillMaxWidth(),
                     icon = Icons.Default.Person,
                     label = stringResource(id = R.string.username),
                     placeholder = stringResource(id = R.string.input_username),
                     value = viewModel.uiState.username,
                     onValueChange = viewModel.uiState::updateUsername,
-                    isError = viewModel.uiState.isUsernameError
+                    isError = viewModel.uiState.usernameFieldState != UsernameFieldState.OK,
+                    supportingText = {
+                        val text: String = when (viewModel.uiState.usernameFieldState) {
+                            UsernameFieldState.OK -> String()
+                            UsernameFieldState.UNKNOWN -> stringResource(id = R.string.unknown_user)
+                            UsernameFieldState.INVALID -> stringResource(id = R.string.invalid_username)
+                        }
+                        Text(text)
+                    }
                 )
                 LoginFormTextField(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .fillMaxWidth(),
                     icon = Icons.Default.Password,
                     label = stringResource(id = R.string.password),
                     placeholder = stringResource(id = R.string.input_password),
                     value = viewModel.uiState.password,
                     onValueChange = viewModel.uiState::updatePassword,
-                    isError = viewModel.uiState.isPasswordError
+                    isError = viewModel.uiState.passwordFieldState != PasswordFieldState.OK,
+                    supportingText = {
+                        val text: String = when (viewModel.uiState.passwordFieldState) {
+                            PasswordFieldState.OK -> String()
+                            PasswordFieldState.WRONG -> stringResource(id = R.string.wrong_password)
+                            PasswordFieldState.INVALID -> stringResource(id = R.string.invalid_password)
+                        }
+                        Text(text)
+                    }
                 )
                 Row {
                     TextButton(
                         modifier = Modifier.offset(x = (-8).dp),
-                        onClick = { /* TODO */ },
+                        onClick = {
+                            // TODO
+                            scope.launch {
+                                viewModel.uiState.showDismissibleSnackbar(
+                                    context.getString(R.string.not_supported)
+                                )
+                            }
+                        },
                     ) {
                         Text(stringResource(id = R.string.login_forgot))
                     }
@@ -120,6 +145,7 @@ fun LoginFormTextField(
     placeholder: String,
     value: String,
     isError: Boolean,
+    supportingText: @Composable () -> Unit,
     onValueChange: (String) -> Unit,
 ) {
     OutlinedTextField(
@@ -130,6 +156,7 @@ fun LoginFormTextField(
         singleLine = true,
         value = value,
         isError = isError,
+        supportingText = supportingText,
         onValueChange = onValueChange,
     )
 }

@@ -13,7 +13,7 @@ import com.zjutjh.ijh.ui.screen.HomeScreen
 import com.zjutjh.ijh.ui.screen.LoginScreen
 import com.zjutjh.ijh.ui.screen.Screens
 
-private const val ANIM_DURATION: Int = 200
+private const val ANIM_DURATION: Int = 300
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

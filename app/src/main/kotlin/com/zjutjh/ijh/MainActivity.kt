@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                 splashScreenView.view.height.toFloat(),
             )
 
-            animator.duration = 200L
+            animator.duration = 300L
 
             animator.doOnEnd {
                 splashScreenView.remove()

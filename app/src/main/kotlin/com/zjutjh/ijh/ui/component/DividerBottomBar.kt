@@ -7,13 +7,14 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun DividerBottomBar() {
-    Divider(
-        modifier = Modifier
-            .padding(
-                bottom = WindowInsets.safeDrawing
-                    .asPaddingValues()
-                    .calculateBottomPadding()
-            )
-            .fillMaxWidth()
-    )
+    val bottomInsets = WindowInsets.safeDrawing
+        .asPaddingValues()
+        .calculateBottomPadding()
+    if (bottomInsets.value > 0f) {
+        Divider(
+            modifier = Modifier
+                .padding(bottom = bottomInsets)
+                .fillMaxWidth()
+        )
+    }
 }

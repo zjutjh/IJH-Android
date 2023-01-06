@@ -2,14 +2,15 @@ package com.zjutjh.ijh.ui.screen
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -17,6 +18,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -25,8 +29,10 @@ import com.zjutjh.ijh.data.model.WeJhUser
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
 import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
+import com.zjutjh.ijh.ui.model.EmptyInteractionSource
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun LoginScreen(
@@ -42,9 +48,12 @@ fun LoginScreen(
         snackbarHostState = viewModel.uiState.snackbarHostState,
         loadingState = viewModel.uiState.loading,
         onCloseClick = onCloseClick,
+        onClick = focusManager::clearFocus,
         onActionClick = {
             focusManager.clearFocus()
-            viewModel.loginOrCancel(context, onContinue)
+            if (viewModel.checkUsername() && viewModel.checkPassword()) {
+                viewModel.loginOrCancel(context, onContinue)
+            }
         },
     ) { paddingValues ->
         val scrollState = rememberScrollState()
@@ -79,14 +88,12 @@ fun LoginScreen(
                     tint = MaterialTheme.colorScheme.secondary
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                LoginFormTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                LoginFormTextField(modifier = Modifier.fillMaxWidth(),
                     icon = Icons.Default.Person,
                     label = stringResource(id = R.string.username),
                     placeholder = stringResource(id = R.string.input_username),
                     value = viewModel.uiState.username,
-                    onValueChange = viewModel.uiState::updateUsername,
+                    onValueChange = viewModel::updateUsername,
                     isError = viewModel.uiState.usernameFieldState != UsernameFieldState.OK,
                     supportingText = {
                         val text: String = when (viewModel.uiState.usernameFieldState) {
@@ -95,16 +102,14 @@ fun LoginScreen(
                             UsernameFieldState.INVALID -> stringResource(id = R.string.invalid_username)
                         }
                         Text(text)
-                    }
-                )
+                    })
                 LoginFormTextField(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     icon = Icons.Default.Password,
                     label = stringResource(id = R.string.password),
                     placeholder = stringResource(id = R.string.input_password),
                     value = viewModel.uiState.password,
-                    onValueChange = viewModel.uiState::updatePassword,
+                    onValueChange = viewModel::updatePassword,
                     isError = viewModel.uiState.passwordFieldState != PasswordFieldState.OK,
                     supportingText = {
                         val text: String = when (viewModel.uiState.passwordFieldState) {
@@ -113,17 +118,24 @@ fun LoginScreen(
                             PasswordFieldState.INVALID -> stringResource(id = R.string.invalid_password)
                         }
                         Text(text)
-                    }
+                    },
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                 )
                 Row {
+                    var enabled by remember { mutableStateOf(true) }
+
                     TextButton(
                         modifier = Modifier.offset(x = (-8).dp),
+                        enabled = enabled,
                         onClick = {
                             // TODO
                             scope.launch {
-                                viewModel.uiState.showDismissibleSnackbar(
+                                enabled = false
+                                viewModel.showDismissibleSnackbar(
                                     context.getString(R.string.not_supported)
                                 )
+                                enabled = true
                             }
                         },
                     ) {
@@ -147,6 +159,8 @@ fun LoginFormTextField(
     isError: Boolean,
     supportingText: @Composable () -> Unit,
     onValueChange: (String) -> Unit,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     OutlinedTextField(
         modifier = modifier,
@@ -158,6 +172,8 @@ fun LoginFormTextField(
         isError = isError,
         supportingText = supportingText,
         onValueChange = onValueChange,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions
     )
 }
 
@@ -167,14 +183,22 @@ fun LoginFormTextField(
 fun LoginScaffold(
     snackbarHostState: SnackbarHostState,
     loadingState: CancellableLoadingState,
+    onClick: () -> Unit,
     onCloseClick: () -> Unit,
     onActionClick: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val interactionSource = remember { EmptyInteractionSource() }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = onClick,
+            )
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LoginTopBar(loadingState, scrollBehavior, onCloseClick, onActionClick)
         },
@@ -213,6 +237,7 @@ fun LoginTopBar(
         actions = {
             val enabled =
                 loadingState == CancellableLoadingState.READY || loadingState == CancellableLoadingState.CANCELLABLE
+
             TextButton(
                 modifier = Modifier.animateContentSize(),
                 onClick = onActionClick,

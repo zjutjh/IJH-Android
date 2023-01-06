@@ -76,67 +76,78 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
                     WeJhApiExceptions.PARAM_ERROR -> {
                         _uiState.usernameFieldState = UsernameFieldState.INVALID
                         _uiState.passwordFieldState = PasswordFieldState.INVALID
-                        _uiState.showDismissibleSnackbar(context.getString(R.string.invalid_inputs))
+                        showDismissibleSnackbar(context.getString(R.string.invalid_inputs))
                     }
                     WeJhApiExceptions.USER_NOT_FOUND -> {
                         _uiState.usernameFieldState = UsernameFieldState.UNKNOWN
-                        _uiState.showDismissibleSnackbar(context.getString(R.string.unknown_user))
+                        showDismissibleSnackbar(context.getString(R.string.unknown_user))
                     }
                     WeJhApiExceptions.WRONG_PASSWORD -> {
                         _uiState.passwordFieldState = PasswordFieldState.WRONG
-                        _uiState.showDismissibleSnackbar(context.getString(R.string.wrong_password))
+                        showDismissibleSnackbar(context.getString(R.string.wrong_password))
                     }
                     else -> {
                         Log.w("Login", "code: ${it.code}, msg: ${it.message}")
-                        _uiState.showDismissibleSnackbar("${it.message} (${it.code})")
+                        showDismissibleSnackbar("${it.message} (${it.code})")
                     }
                 }
             }
             is HttpStatusException -> {
-                _uiState.showDismissibleSnackbar(context.getString(R.string.network_error))
+                showDismissibleSnackbar(context.getString(R.string.network_error))
             }
             is SocketTimeoutException -> {
-                _uiState.showDismissibleSnackbar(context.getString(R.string.request_timeout))
+                showDismissibleSnackbar(context.getString(R.string.request_timeout))
             }
             else -> {
                 Log.e("Login", it.toString())
-                _uiState.showDismissibleSnackbar(context.getString(R.string.unknown_error))
+                showDismissibleSnackbar(context.getString(R.string.unknown_error))
             }
         }
     }
+
+    fun updateUsername(value: String) {
+        _uiState.username = value
+        checkUsername()
+    }
+
+    fun updatePassword(value: String) {
+        _uiState.password = value
+        checkPassword()
+    }
+
+    fun checkUsername(): Boolean {
+        return if (_uiState.username.isBlank()) {
+            _uiState.usernameFieldState = UsernameFieldState.INVALID
+            false
+        } else {
+            _uiState.usernameFieldState = UsernameFieldState.OK
+            true
+        }
+    }
+
+    fun checkPassword(): Boolean {
+        return if (_uiState.password.isBlank()) {
+            _uiState.passwordFieldState = PasswordFieldState.INVALID
+            false
+        } else {
+            _uiState.passwordFieldState = PasswordFieldState.OK
+            true
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    suspend fun showDismissibleSnackbar(message: String): SnackbarResult =
+        _uiState.snackbarHostState.showSnackbar(
+            DismissibleSnackbarVisuals(message),
+        )
 
     private class MutableLoginUIState : LoginUIState {
         override var username: String by mutableStateOf(String())
         override var password: String by mutableStateOf(String())
         override var usernameFieldState: UsernameFieldState by mutableStateOf(UsernameFieldState.OK)
         override var passwordFieldState: PasswordFieldState by mutableStateOf(PasswordFieldState.OK)
-
         override var loading: CancellableLoadingState by mutableStateOf(CancellableLoadingState.READY)
         override val snackbarHostState: SnackbarHostState = SnackbarHostState()
-
-        override fun updateUsername(value: String) {
-            username = value
-            usernameFieldState = if (value.isBlank()) {
-                UsernameFieldState.INVALID
-            } else {
-                UsernameFieldState.OK
-            }
-        }
-
-        override fun updatePassword(value: String) {
-            password = value
-            passwordFieldState = if (value.isBlank()) {
-                PasswordFieldState.INVALID
-            } else {
-                PasswordFieldState.OK
-            }
-        }
-
-        @OptIn(ExperimentalMaterial3Api::class)
-        override suspend fun showDismissibleSnackbar(message: String): SnackbarResult =
-            snackbarHostState.showSnackbar(
-                DismissibleSnackbarVisuals(message),
-            )
     }
 }
 
@@ -148,11 +159,6 @@ interface LoginUIState {
     val usernameFieldState: UsernameFieldState
     val passwordFieldState: PasswordFieldState
     val snackbarHostState: SnackbarHostState
-
-    fun updateUsername(value: String)
-    fun updatePassword(value: String)
-
-    suspend fun showDismissibleSnackbar(message: String): SnackbarResult
 }
 
 enum class UsernameFieldState {

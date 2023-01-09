@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">IJH</string>
     <string name="schedule">Schedule</string>
-    <string name="nothing_to_do">Nothing to do.</string>
+    <string name="nothing_to_do">Nothing to do. 😆</string>
     <string name="navigation">Navigation</string>
     <string name="account">Account</string>
     <string name="teacher">Teacher</string>
@@ -27,4 +27,5 @@
     <string name="invalid_username">Invalid username.</string>
     <string name="invalid_password">Invalid password.</string>
     <string name="not_supported">Not supported yet.</string>
+    <string name="error_response">Error response.</string>
 </resources>

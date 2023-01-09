@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+option java_package = "com.zjutjh.ijh.datastore.model";
+option java_multiple_files = true;
+
+message LocalWeJhUser {
+  string username = 1;
+  string session_token = 2;
+  uint64 session_expires_at = 3;
+  int64 uid = 4;
+  string student_id = 5;
+  int64 create_time = 6;
+  string phone_number = 7;
+  uint32 user_type = 8;
+  Bind bind = 9;
+
+  message Bind {
+    bool zf = 1;
+    bool lib = 2;
+    bool yxy = 3;
+  }
+}

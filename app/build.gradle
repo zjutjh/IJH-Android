@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
     id 'com.google.protobuf'
     id 'com.google.dagger.hilt.android'
     id 'io.objectbox'
@@ -85,11 +86,13 @@ dependencies {
     implementation "androidx.datastore:datastore:1.0.0"
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
 
-    // Retrofit
+    // Network
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+    implementation "com.squareup.moshi:moshi:1.14.0"
+    ksp "com.squareup.moshi:moshi-kotlin-codegen:1.14.0"
 
-    // Hilt
+    // Dependency injection (Hilt)
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"

@@ -6,8 +6,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.squareup.moshi.JsonDataException
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.model.WeJhUser
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.network.exception.ApiResponseException
 import com.zjutjh.ijh.network.exception.HttpStatusException
@@ -22,22 +22,22 @@ import javax.inject.Inject
 private const val CANCELLABLE_INTERVAL = 1000L
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRepository) :
+class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUserRepository) :
     ViewModel() {
 
-    private val _uiState = MutableLoginUIState()
-    val uiState: LoginUIState = _uiState
+    private val _uiState = MutableLoginUiState()
+    val uiState: LoginUiState = _uiState
 
     private var currentJob: Job? = null
 
-    fun loginOrCancel(context: Context, onSuccess: (WeJhUser) -> Unit) {
+    fun loginOrCancel(context: Context, onSuccess: () -> Unit) {
         when (_uiState.loading) {
             CancellableLoadingState.READY -> {
                 currentJob = viewModelScope.launch {
                     _uiState.loading = CancellableLoadingState.LOADING
 
                     val task = async {
-                        userRepository.login(_uiState.username, _uiState.password)
+                        weJhUserRepository.weJhLogin(_uiState.username, _uiState.password)
                     }
 
                     val timeoutCancel = launch {
@@ -50,8 +50,8 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
                     _uiState.loading = CancellableLoadingState.PENDING
 
                     result.onSuccess {
-                        Log.i("Login", it.toString())
-                        onSuccess(it)
+                        Log.i("Login", "Success: $it")
+                        onSuccess()
                     }.onFailure {
                         loginErrorHandle(it, context)
                     }
@@ -92,6 +92,9 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
                     }
                 }
             }
+            is JsonDataException -> {
+                showDismissibleSnackbar(context.getString(R.string.error_response))
+            }
             is HttpStatusException -> {
                 showDismissibleSnackbar(context.getString(R.string.network_error))
             }
@@ -99,7 +102,7 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
                 showDismissibleSnackbar(context.getString(R.string.request_timeout))
             }
             else -> {
-                Log.e("Login", it.toString())
+                Log.e("Login", "Error: $it")
                 showDismissibleSnackbar(context.getString(R.string.unknown_error))
             }
         }
@@ -141,7 +144,7 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
             DismissibleSnackbarVisuals(message),
         )
 
-    private class MutableLoginUIState : LoginUIState {
+    private class MutableLoginUiState : LoginUiState {
         override var username: String by mutableStateOf(String())
         override var password: String by mutableStateOf(String())
         override var usernameFieldState: UsernameFieldState by mutableStateOf(UsernameFieldState.OK)
@@ -152,7 +155,7 @@ class LoginViewModel @Inject constructor(private val userRepository: WeJhUserRep
 }
 
 @Stable
-interface LoginUIState {
+interface LoginUiState {
     val username: String
     val password: String
     val loading: CancellableLoadingState

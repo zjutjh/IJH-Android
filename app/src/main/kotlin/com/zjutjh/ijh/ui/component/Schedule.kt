@@ -1,6 +1,8 @@
 package com.zjutjh.ijh.ui.component
 
 import android.content.res.Configuration.*
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -22,6 +24,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ScheduleCard(
     courses: ImmutableList<Course>,
@@ -56,16 +59,21 @@ fun ScheduleCard(
             }
         }
 
-
-        if (courses.isEmpty()) {
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
-                text = stringResource(id = R.string.nothing_to_do)
-            )
-        } else {
-            CoursesCards(
-                courses = courses, modifier = Modifier.padding(10.dp, 0.dp, 10.dp, 10.dp)
-            )
+        AnimatedContent(
+            modifier = Modifier.fillMaxWidth(),
+            targetState = courses,
+            contentAlignment = Alignment.Center
+        ) {
+            if (it.isEmpty()) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+                    text = stringResource(id = R.string.nothing_to_do)
+                )
+            } else {
+                CoursesCards(
+                    courses = it, modifier = Modifier.padding(10.dp, 0.dp, 10.dp, 10.dp)
+                )
+            }
         }
     }
 }

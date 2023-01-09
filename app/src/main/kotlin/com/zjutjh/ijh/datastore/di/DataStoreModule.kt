@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import com.zjutjh.ijh.datastore.UserPreference
-import com.zjutjh.ijh.datastore.UserPreferenceSerializer
+import com.zjutjh.ijh.datastore.LocalWeJhUserSerializer
+import com.zjutjh.ijh.datastore.model.LocalWeJhUser
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,13 +19,13 @@ object DataStoreModule {
 
     @Provides
     @Singleton
-    fun provideWeJhUserPreferenceDataStore(
+    fun provideWeJhUserDataStore(
         @ApplicationContext context: Context,
-        serializer: UserPreferenceSerializer
-    ): DataStore<UserPreference> =
+        serializer: LocalWeJhUserSerializer
+    ): DataStore<LocalWeJhUser> =
         DataStoreFactory.create(
             serializer,
         ) {
-            context.dataStoreFile("user_preference.pb")
+            context.dataStoreFile("we_jh_user.pb")
         }
 }

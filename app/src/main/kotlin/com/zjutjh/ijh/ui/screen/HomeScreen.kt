@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +21,6 @@ import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.material.pullrefresh.PullRefreshIndicator
-import com.zjutjh.ijh.ui.material.pullrefresh.PullRefreshState
 import com.zjutjh.ijh.ui.material.pullrefresh.pullRefresh
 import com.zjutjh.ijh.ui.material.pullrefresh.rememberPullRefreshState
 import com.zjutjh.ijh.ui.theme.IJhTheme
@@ -32,7 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
-    onAccountButtonClick: () -> Unit,
+    onNavigateToLogin: () -> Unit,
 ) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val pullRefreshState = rememberPullRefreshState(
@@ -40,14 +38,9 @@ fun HomeScreen(
         onRefresh = viewModel::refresh
     )
 
-    LaunchedEffect(Unit) {
-        viewModel.refresh()
-    }
-
     HomeScaffold(
         drawerState,
-        pullRefreshState,
-        onAccountButtonClick
+        onNavigateToLogin
     ) { paddingValues ->
         val scrollState = rememberScrollState()
 
@@ -55,6 +48,7 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .pullRefresh(pullRefreshState)
                 .verticalScroll(scrollState),
             contentAlignment = Alignment.TopCenter
         ) {
@@ -80,7 +74,6 @@ fun HomeScreen(
 @Composable
 fun HomeScaffold(
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
-    pullRefreshState: PullRefreshState,
     onAccountButtonClick: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -100,8 +93,7 @@ fun HomeScaffold(
     ) {
         Scaffold(
             modifier = Modifier
-                .nestedScroll(scrollBehavior.nestedScrollConnection)
-                .pullRefresh(pullRefreshState),
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 HomeTopBar(
                     {
@@ -195,10 +187,8 @@ fun HomeTopBar(
 @Composable
 private fun NavigationDrawerPreview() {
     IJhTheme {
-        val pullRefreshState = rememberPullRefreshState(refreshing = false, onRefresh = { })
         HomeScaffold(
             drawerState = DrawerState(initialValue = DrawerValue.Open),
-            pullRefreshState,
             {}) {}
     }
 }

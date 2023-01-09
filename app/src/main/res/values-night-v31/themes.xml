@@ -1,19 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="Theme.IJh" parent="Theme.Material3.DynamicColors.Dark">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
 
     <style name="Theme.IJh.Starting" parent="Theme.SplashScreen.IconBackground">
         <!-- Set the splash screen background, animated icon, and animation duration. -->
-        <item name="windowSplashScreenBackground">@color/md_theme_dark_background</item>
+        <item name="windowSplashScreenBackground">@android:color/system_neutral1_900</item>
 
         <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
              animated drawable. One of these is required. -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
-        <item name="windowSplashScreenIconBackgroundColor">@color/md_theme_dark_primaryContainer
+        <item name="windowSplashScreenIconBackgroundColor">@android:color/system_accent1_700
         </item>
 
         <!-- Required for animated icons -->

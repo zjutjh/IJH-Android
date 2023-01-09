@@ -1,5 +1,6 @@
 package com.zjutjh.ijh.ui.screen
 
+import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,33 +17,34 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(courseRepository: CourseRepository) : ViewModel() {
+class HomeViewModel @Inject constructor(private val courseRepository: CourseRepository) :
+    ViewModel() {
 
-    private val _uiState = MutableHomeUIState()
-    val uiState: HomeUIState = _uiState
+    private val _uiState = MutableHomeUiState()
+    val uiState: HomeUiState = _uiState
 
     init {
-        viewModelScope.launch {
-            _uiState.courses = courseRepository.getCourses()
-        }
+        Log.i("ViewModel", "HomeViewModel: $this")
+        refresh()
     }
 
     fun refresh() {
         viewModelScope.launch {
             _uiState.isRefreshing = true
             delay(500)
+            _uiState.courses = courseRepository.getCourses()
             _uiState.isRefreshing = false
         }
     }
 
-    private class MutableHomeUIState : HomeUIState {
+    private class MutableHomeUiState : HomeUiState {
         override var courses: ImmutableList<Course> by mutableStateOf(persistentListOf())
         override var isRefreshing: Boolean by mutableStateOf(false)
     }
 }
 
 @Stable
-interface HomeUIState {
+interface HomeUiState {
     val courses: ImmutableList<Course>
     val isRefreshing: Boolean
 }

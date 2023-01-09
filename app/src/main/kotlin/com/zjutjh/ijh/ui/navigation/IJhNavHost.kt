@@ -6,12 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
+import androidx.navigation.navOptions
 import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.zjutjh.ijh.ui.screen.HomeScreen
-import com.zjutjh.ijh.ui.screen.LoginScreen
-import com.zjutjh.ijh.ui.screen.Screens
 
 private const val ANIM_DURATION: Int = 300
 
@@ -20,7 +17,7 @@ private const val ANIM_DURATION: Int = 300
 fun IJhNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
-    startDestination: String = Screens.HOME.route
+    startDestination: String = HomeRoute
 ) {
     AnimatedNavHost(
         modifier = modifier,
@@ -47,21 +44,15 @@ fun IJhNavHost(
             } + fadeOut(tween(ANIM_DURATION))
         }
     ) {
-        composable(Screens.HOME.route) {
-            HomeScreen {
-                navController.navigate(Screens.LOGIN.route) {
-                    launchSingleTop = true
-                }
-            }
+        homeScreen {
+            navController.navigateToLoginScreen(navOptions {
+                launchSingleTop = true
+            })
+        }
 
-        }
-        composable(
-            Screens.LOGIN.route,
-        ) {
-            LoginScreen(onCloseClick = navController::popBackStack) {
-                // TODO
-                navController.popBackStack(Screens.HOME.route, false)
-            }
-        }
+        loginScreen(
+            navController::popBackStack,
+            navController::popUpAndNavigateToHomeScreen,
+        )
     }
 }

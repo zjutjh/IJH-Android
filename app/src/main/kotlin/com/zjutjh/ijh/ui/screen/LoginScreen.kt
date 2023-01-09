@@ -26,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.model.WeJhUser
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
 import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
@@ -36,8 +35,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    onCloseClick: () -> Unit,
-    onContinue: (WeJhUser) -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateContinue: () -> Unit,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -46,12 +45,12 @@ fun LoginScreen(
     LoginScaffold(
         snackbarHostState = viewModel.uiState.snackbarHostState,
         loadingState = viewModel.uiState.loading,
-        onCloseClick = onCloseClick,
+        onCloseClick = onNavigateBack,
         onClick = focusManager::clearFocus,
         onActionClick = {
             focusManager.clearFocus()
             if (viewModel.checkUsername() && viewModel.checkPassword()) {
-                viewModel.loginOrCancel(context, onContinue)
+                viewModel.loginOrCancel(context, onNavigateContinue)
             }
         },
     ) { paddingValues ->

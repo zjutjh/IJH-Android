@@ -51,9 +51,8 @@ class ResultCall<T>(private val delegate: Call<T>, private val nullable: T? = nu
             override fun onResponse(call: Call<T>, response: Response<T>) =
                 callback.onResponse(
                     this@ResultCall,
-                    Response.success(responseHandler(response))
+                    Response.success(responseHandler(response), response.raw())
                 )
-
 
             override fun onFailure(call: Call<T>, t: Throwable) =
                 callback.onResponse(this@ResultCall, Response.success(Result.failure(t)))
@@ -65,15 +64,12 @@ class ResultCall<T>(private val delegate: Call<T>, private val nullable: T? = nu
         "Synchronous execution is not recommend.", replaceWith = ReplaceWith("enqueue()")
     )
     override fun execute(): Response<Result<T>> {
-        return Response.success(
-            try {
-                val response = delegate.execute()
-
-                responseHandler(response)
-            } catch (t: Throwable) {
-                Result.failure(t)
-            }
-        )
+        return try {
+            val response = delegate.execute()
+            Response.success(responseHandler(response), response.raw())
+        } catch (t: Throwable) {
+            Response.success(Result.failure(t))
+        }
     }
 
     private fun responseHandler(response: Response<T>): Result<T> =

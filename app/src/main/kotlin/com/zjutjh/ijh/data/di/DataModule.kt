@@ -17,5 +17,5 @@ interface DataModule {
     fun bindCourseRepository(impl: CourseRepositoryImpl): CourseRepository
 
     @Binds
-    fun bindUserRepository(impl: WeJhUserRepositoryImpl): WeJhUserRepository
+    fun bindWeJhUserRepository(impl: WeJhUserRepositoryImpl): WeJhUserRepository
 }

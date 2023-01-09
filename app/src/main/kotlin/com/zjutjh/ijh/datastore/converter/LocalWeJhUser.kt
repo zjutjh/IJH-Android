@@ -1,5 +1,6 @@
-package com.zjutjh.ijh.datastore.model
+package com.zjutjh.ijh.datastore.converter
 
+import com.zjutjh.ijh.datastore.model.LocalWeJhUser
 import com.zjutjh.ijh.model.WeJhUser
 import java.time.Instant
 import java.time.ZoneOffset

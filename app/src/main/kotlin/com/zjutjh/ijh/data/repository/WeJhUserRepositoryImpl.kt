@@ -13,8 +13,9 @@ class WeJhUserRepositoryImpl @Inject constructor(
 
     override suspend fun weJhLogin(username: String, password: String): Result<WeJhUser> {
         return network.login(username, password).map {
-
             it.asExternalModel()
+        }.onSuccess {
+            local.set(it)
         }
     }
 

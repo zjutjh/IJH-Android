@@ -11,7 +11,7 @@ data class WeJhUser(
     val sessionExpiresAt: ZonedDateTime,
     val studentId: String,
     val createTime: ZonedDateTime,
-    val phoneNumber: String?,
+    val phoneNumber: String,
     val userType: Int,
     val bind: Bind,
 ) {

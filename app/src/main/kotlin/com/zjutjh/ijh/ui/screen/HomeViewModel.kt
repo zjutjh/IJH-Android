@@ -1,6 +1,5 @@
 package com.zjutjh.ijh.ui.screen
 
-import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,7 +23,6 @@ class HomeViewModel @Inject constructor(private val courseRepository: CourseRepo
     val uiState: HomeUiState = _uiState
 
     init {
-        Log.i("ViewModel", "HomeViewModel: $this")
         refresh()
     }
 

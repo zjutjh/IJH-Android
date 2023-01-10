@@ -64,6 +64,7 @@ fun HomeScreen(
             PullRefreshIndicator(
                 refreshing = viewModel.uiState.isRefreshing,
                 state = pullRefreshState,
+                scale = true
             )
         }
 

@@ -4,9 +4,11 @@ import com.zjutjh.ijh.datastore.model.LocalWeJhUser
 import com.zjutjh.ijh.datastore.model.LocalWeJhUserKt
 import com.zjutjh.ijh.datastore.model.localWeJhUser
 import com.zjutjh.ijh.model.WeJhUser
+import com.zjutjh.ijh.network.model.NetworkWeJhUser
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 fun LocalWeJhUser.asExternalModel() = WeJhUser(
     uid = uid,
@@ -30,22 +32,48 @@ fun LocalWeJhUser.Bind.asExternalModel() = WeJhUser.Bind(
     zf = zf,
 )
 
-fun WeJhUser.asInternalModel(): LocalWeJhUser =
+fun WeJhUser.asLocalModel(): LocalWeJhUser =
     localWeJhUser {
-        uid = this@asInternalModel.uid
-        username = this@asInternalModel.username
-        sessionToken = this@asInternalModel.sessionToken
-        sessionExpiresAt = this@asInternalModel.sessionExpiresAt.toEpochSecond()
-        studentId = this@asInternalModel.studentId
-        createTime = this@asInternalModel.createTime.toEpochSecond()
-        phoneNumber = this@asInternalModel.phoneNumber
-        userType = this@asInternalModel.userType
-        bind = this@asInternalModel.bind.asInternalModel()
+        uid = this@asLocalModel.uid
+        username = this@asLocalModel.username
+        sessionToken = this@asLocalModel.sessionToken
+        sessionExpiresAt = this@asLocalModel.sessionExpiresAt.toEpochSecond()
+        studentId = this@asLocalModel.studentId
+        createTime = this@asLocalModel.createTime.toEpochSecond()
+        phoneNumber = this@asLocalModel.phoneNumber
+        userType = this@asLocalModel.userType
+        bind = this@asLocalModel.bind.asLocalModel()
     }
 
-fun WeJhUser.Bind.asInternalModel(): LocalWeJhUser.Bind =
+fun WeJhUser.Bind.asLocalModel(): LocalWeJhUser.Bind =
     LocalWeJhUserKt.bind {
-        lib = this@asInternalModel.lib
-        yxy = this@asInternalModel.yxy
-        zf = this@asInternalModel.zf
+        lib = this@asLocalModel.lib
+        yxy = this@asLocalModel.yxy
+        zf = this@asLocalModel.zf
+    }
+
+fun NetworkWeJhUser.asLocalModel(
+    sessionToken: String,
+    sessionExpiresAt: Long
+): LocalWeJhUser =
+    localWeJhUser {
+        uid = this@asLocalModel.id
+        username = this@asLocalModel.username
+        this.sessionToken = sessionToken
+        this.sessionExpiresAt = sessionExpiresAt
+        studentId = this@asLocalModel.studentId
+        createTime = ZonedDateTime.parse(
+            this@asLocalModel.createTime,
+            DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        ).toEpochSecond()
+        phoneNumber = this@asLocalModel.phoneNumber
+        userType = this@asLocalModel.userType
+        bind = this@asLocalModel.bind.asLocalModel()
+    }
+
+fun NetworkWeJhUser.Bind.asLocalModel(): LocalWeJhUser.Bind =
+    LocalWeJhUserKt.bind {
+        lib = this@asLocalModel.lib
+        yxy = this@asLocalModel.yxy
+        zf = this@asLocalModel.zf
     }

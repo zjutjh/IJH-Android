@@ -52,7 +52,7 @@ fun IJhNavHost(
 
         loginScreen(
             navController::popBackStack,
-            navController::popUpAndNavigateToHomeScreen,
+            navController::popUpToHomeScreen,
         )
     }
 }

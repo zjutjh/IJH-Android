@@ -92,12 +92,12 @@ fun LoginScreen(
                     placeholder = stringResource(id = R.string.input_username),
                     value = viewModel.uiState.username,
                     onValueChange = viewModel::updateUsername,
-                    isError = viewModel.uiState.usernameFieldState != UsernameFieldState.OK,
+                    isError = viewModel.uiState.usernameUiState != UsernameUiState.OK,
                     supportingText = {
-                        val text: String = when (viewModel.uiState.usernameFieldState) {
-                            UsernameFieldState.OK -> String()
-                            UsernameFieldState.UNKNOWN -> stringResource(id = R.string.unknown_user)
-                            UsernameFieldState.INVALID -> stringResource(id = R.string.invalid_username)
+                        val text: String = when (viewModel.uiState.usernameUiState) {
+                            UsernameUiState.OK -> String()
+                            UsernameUiState.UNKNOWN -> stringResource(id = R.string.unknown_user)
+                            UsernameUiState.INVALID -> stringResource(id = R.string.invalid_username)
                         }
                         Text(text)
                     })
@@ -108,12 +108,12 @@ fun LoginScreen(
                     placeholder = stringResource(id = R.string.input_password),
                     value = viewModel.uiState.password,
                     onValueChange = viewModel::updatePassword,
-                    isError = viewModel.uiState.passwordFieldState != PasswordFieldState.OK,
+                    isError = viewModel.uiState.passwordUiState != PasswordUiState.OK,
                     supportingText = {
-                        val text: String = when (viewModel.uiState.passwordFieldState) {
-                            PasswordFieldState.OK -> String()
-                            PasswordFieldState.WRONG -> stringResource(id = R.string.wrong_password)
-                            PasswordFieldState.INVALID -> stringResource(id = R.string.invalid_password)
+                        val text: String = when (viewModel.uiState.passwordUiState) {
+                            PasswordUiState.OK -> String()
+                            PasswordUiState.WRONG -> stringResource(id = R.string.wrong_password)
+                            PasswordUiState.INVALID -> stringResource(id = R.string.invalid_password)
                         }
                         Text(text)
                     },

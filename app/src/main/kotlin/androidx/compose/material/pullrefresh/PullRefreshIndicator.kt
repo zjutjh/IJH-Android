@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.zjutjh.ijh.ui.material.pullrefresh
+package androidx.compose.material.pullrefresh
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween

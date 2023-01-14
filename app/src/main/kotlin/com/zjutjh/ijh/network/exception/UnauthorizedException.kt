@@ -1,3 +1,5 @@
 package com.zjutjh.ijh.network.exception
 
-class UnauthorizedException(override val message: String?) : Exception()
+import java.io.IOException
+
+class UnauthorizedException(override val message: String?) : IOException()

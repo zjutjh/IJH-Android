@@ -1,6 +1,6 @@
 package com.zjutjh.ijh.ui.screen
 
-import androidx.compose.runtime.Stable
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,41 +8,66 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.model.Course
 import com.zjutjh.ijh.data.repository.CourseRepository
+import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val courseRepository: CourseRepository) :
-    ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val weJhUserRepository: WeJhUserRepository,
+    private val courseRepository: CourseRepository
+) : ViewModel() {
 
-    private val _uiState = MutableHomeUiState()
-    val uiState: HomeUiState = _uiState
+    val loginState: StateFlow<Boolean> = weJhUserRepository.userStream
+        .map { it.uid != 0L }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = false
+        )
+
+    var coursesState: ImmutableList<Course> by mutableStateOf(persistentListOf())
+
+    var refreshState by mutableStateOf(false)
+        private set
 
     init {
-        refresh()
-    }
-
-    fun refresh() {
         viewModelScope.launch {
-            _uiState.isRefreshing = true
-            delay(500)
-            _uiState.courses = courseRepository.getCourses()
-            _uiState.isRefreshing = false
+            coursesState = courseRepository.getCourses()
         }
     }
 
-    private class MutableHomeUiState : HomeUiState {
-        override var courses: ImmutableList<Course> by mutableStateOf(persistentListOf())
-        override var isRefreshing: Boolean by mutableStateOf(false)
+    /**
+     * Sync with upstream
+     */
+    fun refresh() {
+        if (refreshState || !loginState.value) {
+            return
+        }
+        viewModelScope.launch {
+            refreshState = true
+            try {
+                weJhUserRepository.sync()
+                Log.i("HomeSync", "Synchronization succeeded.")
+            } catch (e: Throwable) {
+                Log.w("HomeSync", "Error: $e.")
+            }
+            delay(100)
+            refreshState = false
+        }
     }
-}
 
-@Stable
-interface HomeUiState {
-    val courses: ImmutableList<Course>
-    val isRefreshing: Boolean
+    fun logout() {
+        viewModelScope.launch {
+            weJhUserRepository.logout()
+        }
+    }
 }

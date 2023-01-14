@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.zjutjh.ijh.ui.material.pullrefresh
+package androidx.compose.material.pullrefresh
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset

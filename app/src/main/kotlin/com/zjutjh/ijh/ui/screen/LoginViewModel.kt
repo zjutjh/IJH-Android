@@ -11,6 +11,7 @@ import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.network.exception.ApiResponseException
 import com.zjutjh.ijh.network.exception.HttpStatusException
+import com.zjutjh.ijh.network.exception.UnauthorizedException
 import com.zjutjh.ijh.network.exception.WeJhApiExceptions
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
 import com.zjutjh.ijh.ui.model.DismissibleSnackbarVisuals
@@ -36,8 +37,8 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
                 currentJob = viewModelScope.launch {
                     _uiState.loading = CancellableLoadingState.LOADING
 
-                    val task = async {
-                        weJhUserRepository.weJhLogin(_uiState.username, _uiState.password)
+                    val task = async(SupervisorJob(coroutineContext.job)) {
+                        weJhUserRepository.login(_uiState.username, _uiState.password)
                     }
 
                     val timeoutCancel = launch {
@@ -45,16 +46,24 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
                         _uiState.loading = CancellableLoadingState.CANCELLABLE
                     }
 
-                    val result = task.await()
+                    val result = try {
+                        Result.success(task.await())
+                    } catch (t: Throwable) {
+                        Result.failure(t)
+                    }
+
                     timeoutCancel.cancelAndJoin()
                     _uiState.loading = CancellableLoadingState.PENDING
 
-                    result.onSuccess {
-                        Log.i("Login", "Success: $it")
-                        onSuccess()
-                    }.onFailure {
-                        loginErrorHandle(it, context)
-                    }
+                    result.fold(
+                        onSuccess = {
+                            Log.i("Login", "Success: $it")
+                            onSuccess()
+                        },
+                        onFailure = {
+                            loginErrorHandle(it, context)
+                        },
+                    )
 
                     _uiState.loading = CancellableLoadingState.READY
                 }
@@ -69,41 +78,46 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
         }
     }
 
-    private suspend fun loginErrorHandle(it: Throwable, context: Context) {
-        when (it) {
+    private suspend fun loginErrorHandle(t: Throwable, context: Context) {
+        when (t) {
             is ApiResponseException -> {
-                when (it.code) {
+                when (t.code) {
                     WeJhApiExceptions.PARAM_ERROR -> {
-                        _uiState.usernameFieldState = UsernameFieldState.INVALID
-                        _uiState.passwordFieldState = PasswordFieldState.INVALID
+                        _uiState.usernameUiState = UsernameUiState.INVALID
+                        _uiState.passwordUiState = PasswordUiState.INVALID
                         showDismissibleSnackbar(context.getString(R.string.invalid_inputs))
                     }
                     WeJhApiExceptions.USER_NOT_FOUND -> {
-                        _uiState.usernameFieldState = UsernameFieldState.UNKNOWN
+                        _uiState.usernameUiState = UsernameUiState.UNKNOWN
                         showDismissibleSnackbar(context.getString(R.string.unknown_user))
                     }
                     WeJhApiExceptions.WRONG_PASSWORD -> {
-                        _uiState.passwordFieldState = PasswordFieldState.WRONG
+                        _uiState.passwordUiState = PasswordUiState.WRONG
                         showDismissibleSnackbar(context.getString(R.string.wrong_password))
                     }
                     else -> {
-                        Log.w("Login", "code: ${it.code}, msg: ${it.message}")
-                        showDismissibleSnackbar("${it.message} (${it.code})")
+                        Log.w("Login", "code: ${t.code}, msg: ${t.message}")
+                        showDismissibleSnackbar("${t.message} (${t.code})")
                     }
                 }
             }
             is JsonDataException -> {
+                Log.e("JsonParsing", t.localizedMessage ?: t.toString())
                 showDismissibleSnackbar(context.getString(R.string.error_response))
             }
             is HttpStatusException -> {
-                showDismissibleSnackbar(context.getString(R.string.network_error))
+                showDismissibleSnackbar(context.getString(R.string.unexpected_http_status, t.code))
+            }
+            is UnauthorizedException -> {
+                showDismissibleSnackbar(context.getString(R.string.authentication_exception))
             }
             is SocketTimeoutException -> {
                 showDismissibleSnackbar(context.getString(R.string.request_timeout))
             }
             else -> {
-                Log.e("Login", "Error: $it")
+                Log.e("Login", "Error: $t")
                 showDismissibleSnackbar(context.getString(R.string.unknown_error))
+                throw t
             }
         }
     }
@@ -120,20 +134,20 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
 
     fun checkUsername(): Boolean {
         return if (_uiState.username.isBlank()) {
-            _uiState.usernameFieldState = UsernameFieldState.INVALID
+            _uiState.usernameUiState = UsernameUiState.INVALID
             false
         } else {
-            _uiState.usernameFieldState = UsernameFieldState.OK
+            _uiState.usernameUiState = UsernameUiState.OK
             true
         }
     }
 
     fun checkPassword(): Boolean {
         return if (_uiState.password.isBlank()) {
-            _uiState.passwordFieldState = PasswordFieldState.INVALID
+            _uiState.passwordUiState = PasswordUiState.INVALID
             false
         } else {
-            _uiState.passwordFieldState = PasswordFieldState.OK
+            _uiState.passwordUiState = PasswordUiState.OK
             true
         }
     }
@@ -147,8 +161,8 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
     private class MutableLoginUiState : LoginUiState {
         override var username: String by mutableStateOf(String())
         override var password: String by mutableStateOf(String())
-        override var usernameFieldState: UsernameFieldState by mutableStateOf(UsernameFieldState.OK)
-        override var passwordFieldState: PasswordFieldState by mutableStateOf(PasswordFieldState.OK)
+        override var usernameUiState: UsernameUiState by mutableStateOf(UsernameUiState.OK)
+        override var passwordUiState: PasswordUiState by mutableStateOf(PasswordUiState.OK)
         override var loading: CancellableLoadingState by mutableStateOf(CancellableLoadingState.READY)
         override val snackbarHostState: SnackbarHostState = SnackbarHostState()
     }
@@ -159,16 +173,16 @@ interface LoginUiState {
     val username: String
     val password: String
     val loading: CancellableLoadingState
-    val usernameFieldState: UsernameFieldState
-    val passwordFieldState: PasswordFieldState
+    val usernameUiState: UsernameUiState
+    val passwordUiState: PasswordUiState
     val snackbarHostState: SnackbarHostState
 }
 
-enum class UsernameFieldState {
+enum class UsernameUiState {
     OK, INVALID, UNKNOWN,
 }
 
-enum class PasswordFieldState {
+enum class PasswordUiState {
     OK, INVALID, WRONG,
 }
 

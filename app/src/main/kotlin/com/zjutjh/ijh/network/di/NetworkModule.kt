@@ -1,12 +1,13 @@
 package com.zjutjh.ijh.network.di
 
 import android.util.Log
+import com.zjutjh.ijh.network.cookie.WeJhAuthorizationCookieJar
 import com.zjutjh.ijh.network.interceptor.ApiProcessInterceptor
-import com.zjutjh.ijh.network.interceptor.WeJhAuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.*
 import okhttp3.OkHttpClient
 import java.time.Duration
 
@@ -30,11 +31,11 @@ object NetworkModule {
 
     @Provides
     @WeJhAuthOkHttpClient
-    fun provideWeJHAuthInterceptorOkHttpClient(interceptor: WeJhAuthInterceptor): OkHttpClient {
+    fun provideWeJHAuthorizedOkHttpClient(cookieJar: WeJhAuthorizationCookieJar): OkHttpClient {
         Log.i("NetworkModule", "provided WeJHAuthOKHttpClient")
 
         return okHttpClientCommonBuilder()
-            .addInterceptor(interceptor)
+            .cookieJar(cookieJar)
             .build()
     }
 }

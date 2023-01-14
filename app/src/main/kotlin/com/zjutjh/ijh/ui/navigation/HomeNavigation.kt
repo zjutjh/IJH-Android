@@ -27,11 +27,6 @@ fun NavController.popUpAndNavigateToHomeScreen() =
         popUpTo(HomeRoute) { inclusive = true }
     }
 
-
-fun NavController.getHomeBackStackEntry(): NavBackStackEntry =
-    this.getBackStackEntry(HomeRoute)
-
-
 fun NavController.popUpToHomeScreen(): Boolean =
     this.popBackStack(HomeRoute, inclusive = false)
 

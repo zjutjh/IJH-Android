@@ -9,6 +9,5 @@ import retrofit2.http.POST
 interface WeJhService {
 
     @POST("user/login")
-    suspend fun login(@Body body: LoginBody): Response<Result<WeJhUserResult>>
-
+    suspend fun login(@Body body: LoginBody): Response<WeJhUserResult>
 }

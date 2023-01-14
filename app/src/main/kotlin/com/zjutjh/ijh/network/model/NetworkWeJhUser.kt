@@ -14,7 +14,8 @@ data class NetworkWeJhUser(
     var sessionToken: String? = null,
     @Transient
     var sessionExpiresAt: ZonedDateTime? = null,
-    val studentID: String,
+    @Json(name = "studentID")
+    val studentId: String,
     val createTime: String,
     @Json(name = "phoneNum")
     val phoneNumber: String,
@@ -34,7 +35,7 @@ fun NetworkWeJhUser.asExternalModel() = WeJhUser(
     username = username,
     sessionToken = sessionToken!!,
     sessionExpiresAt = sessionExpiresAt!!,
-    studentId = studentID,
+    studentId = studentId,
     phoneNumber = phoneNumber,
     createTime = ZonedDateTime.parse(createTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME),
     userType = userType,

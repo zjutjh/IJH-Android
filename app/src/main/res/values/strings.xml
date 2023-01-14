@@ -28,4 +28,7 @@
     <string name="invalid_password">Invalid password.</string>
     <string name="not_supported">Not supported yet.</string>
     <string name="error_response">Error response.</string>
+    <string name="login">Login</string>
+    <string name="unexpected_http_status">Unexpected HTTP status. (%1$d)</string>
+    <string name="authentication_exception">Authentication exception.</string>
 </resources>

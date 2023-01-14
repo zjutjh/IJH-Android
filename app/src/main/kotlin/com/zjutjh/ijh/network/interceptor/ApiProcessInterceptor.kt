@@ -1,6 +1,7 @@
 package com.zjutjh.ijh.network.interceptor
 
 import com.zjutjh.ijh.network.exception.ApiResponseException
+import com.zjutjh.ijh.network.exception.HttpStatusException
 import okhttp3.Interceptor
 import okhttp3.Response
 import okhttp3.ResponseBody
@@ -15,7 +16,7 @@ class ApiProcessInterceptor @Inject constructor() : Interceptor {
         val response = chain.proceed(chain.request())
 
         if (!response.isSuccessful) {
-            return response
+            throw HttpStatusException(response.code())
         }
 
         val responseBody = response.body()!!

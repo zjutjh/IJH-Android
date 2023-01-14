@@ -2,7 +2,6 @@ package com.zjutjh.ijh.network.service.di
 
 import android.util.Log
 import com.zjutjh.ijh.BuildConfig
-import com.zjutjh.ijh.network.adapter.ResultCallAdapterFactory
 import com.zjutjh.ijh.network.di.DefaultOkHttpClient
 import com.zjutjh.ijh.network.di.WeJhAuthOkHttpClient
 import com.zjutjh.ijh.network.service.WeJhAuthorizedService
@@ -23,7 +22,6 @@ object ServiceModule {
     private fun retrofitCommonBuilder(): Retrofit.Builder =
         Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create())
-            .addCallAdapterFactory(ResultCallAdapterFactory())
 
     @Provides
     @Singleton

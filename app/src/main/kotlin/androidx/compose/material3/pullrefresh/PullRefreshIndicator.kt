@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.pullrefresh
+package androidx.compose.material3.pullrefresh
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
@@ -50,8 +50,6 @@ import kotlin.math.pow
 
 /**
  * The default indicator for Compose pull-to-refresh, based on Android's SwipeRefreshLayout.
- *
- * @sample androidx.compose.material.samples.PullRefreshSample
  *
  * @param refreshing A boolean representing whether a refresh is occurring.
  * @param state The [PullRefreshState] which controls where and how the indicator will be drawn.

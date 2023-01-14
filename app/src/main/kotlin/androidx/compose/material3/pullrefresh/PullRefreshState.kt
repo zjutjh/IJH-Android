@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.pullrefresh
+package androidx.compose.material3.pullrefresh
 
 import androidx.compose.animation.core.animate
 import androidx.compose.foundation.MutatorMutex
@@ -31,8 +31,6 @@ import kotlin.math.pow
  * Creates a [PullRefreshState] that is remembered across compositions.
  *
  * Changes to [refreshing] will result in [PullRefreshState] being updated.
- *
- * @sample androidx.compose.material.samples.PullRefreshSample
  *
  * @param refreshing A boolean representing whether a refresh is currently occurring.
  * @param onRefresh The function to be called to trigger a refresh.

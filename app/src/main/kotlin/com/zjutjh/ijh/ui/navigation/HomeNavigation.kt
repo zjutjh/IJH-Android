@@ -9,24 +9,28 @@ const val HomeRoute = "home"
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.homeScreen(
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    onNavigateToProfile: () -> Unit,
 ) {
     composable(HomeRoute) {
-        HomeScreen(onNavigateToLogin = onNavigateToLogin)
+        HomeScreen(
+            onNavigateToLogin = onNavigateToLogin,
+            onNavigateToProfile = onNavigateToProfile
+        )
     }
 }
 
-fun NavController.navigateToHomeScreen(navOptions: NavOptions? = null) =
+fun NavController.navigateToHome(navOptions: NavOptions? = null) =
     this.navigate(HomeRoute, navOptions)
 
 /**
  * Pop up previous existed screens and navigate to [HomeScreen] with new ViewModel
  */
-fun NavController.popUpAndNavigateToHomeScreen() =
+fun NavController.popUpAndNavigateToHome() =
     this.navigate(HomeRoute) {
         popUpTo(HomeRoute) { inclusive = true }
     }
 
-fun NavController.popUpToHomeScreen(): Boolean =
+fun NavController.popUpToHome(): Boolean =
     this.popBackStack(HomeRoute, inclusive = false)
 

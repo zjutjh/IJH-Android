@@ -116,7 +116,7 @@ fun CourseCard(course: Course, onClick: () -> Unit, modifier: Modifier = Modifie
             IconText(
                 icon = Icons.Default.Person,
                 contentDescription = stringResource(id = R.string.teacher),
-                text = course.teacher
+                text = course.teacherName
             )
         }
     }

@@ -3,7 +3,7 @@ package com.zjutjh.ijh.network.service.di
 import android.util.Log
 import com.zjutjh.ijh.BuildConfig
 import com.zjutjh.ijh.network.di.DefaultOkHttpClient
-import com.zjutjh.ijh.network.di.WeJhAuthOkHttpClient
+import com.zjutjh.ijh.network.di.WeJhAuthorizedOkHttpClient
 import com.zjutjh.ijh.network.service.WeJhAuthorizedService
 import com.zjutjh.ijh.network.service.WeJhService
 import dagger.Module
@@ -38,7 +38,7 @@ object ServiceModule {
     @Provides
     @Singleton
     fun provideWeJHAuthorizedService(
-        @WeJhAuthOkHttpClient client: OkHttpClient
+        @WeJhAuthorizedOkHttpClient client: OkHttpClient
     ): WeJhAuthorizedService {
         Log.i("ServiceModule", "provided WeJHAuthorizedService")
 

@@ -1,25 +1,22 @@
 package com.zjutjh.ijh.ui.screen
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.material3.pullrefresh.PullRefreshIndicator
 import androidx.compose.material3.pullrefresh.PullRefreshState
 import androidx.compose.material3.pullrefresh.pullRefresh
 import androidx.compose.material3.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,12 +28,15 @@ import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
 import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.ui.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToClassSchedule: () -> Unit = {/* TODO */ },
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
 
@@ -46,22 +46,11 @@ fun HomeScreen(
         onRefresh = viewModel::refresh
     )
 
-    LaunchedEffect(loginState) {
-        viewModel.refresh()
-    }
-
-    val context = LocalContext.current
-
     HomeScaffold(
         loginState,
         drawerState,
         pullRefreshState,
-        {
-            /* TODO: profile page */
-            Toast.makeText(context, context.getString(R.string.not_supported), Toast.LENGTH_SHORT)
-                .show()
-            viewModel.logout()
-        },
+        onNavigateToProfile,
         onNavigateToLogin,
     ) { paddingValues ->
         val scrollState = rememberScrollState()
@@ -79,7 +68,7 @@ fun HomeScreen(
                     .padding(16.dp)
                     .fillMaxWidth(),
                 courses = viewModel.coursesState,
-                onCalendarClick = { /* TODO */ },
+                onCalendarClick = onNavigateToClassSchedule,
             )
 
             PullRefreshIndicator(
@@ -238,7 +227,7 @@ private fun NavigationDrawerPreview() {
 private fun HomeScreenPreview() {
     IJhTheme {
         val viewModel = HomeViewModel(WeJhUserRepositoryMock(), CourseRepositoryMock())
-        HomeScreen(viewModel) {}
+        HomeScreen(viewModel, {}, {}) {}
     }
 }
 
@@ -247,6 +236,6 @@ private fun HomeScreenPreview() {
 private fun HomeScrollPreview() {
     IJhTheme {
         val viewModel = HomeViewModel(WeJhUserRepositoryMock(), CourseRepositoryMock())
-        HomeScreen(viewModel) {}
+        HomeScreen(viewModel, {}, {}) {}
     }
 }

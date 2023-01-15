@@ -20,4 +20,6 @@ data class WeJhUser(
         val yxy: Boolean,
         val zf: Boolean,
     )
+
+    fun isEmpty(): Boolean = uid == 0L
 }

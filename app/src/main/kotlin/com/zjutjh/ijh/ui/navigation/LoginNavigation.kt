@@ -22,5 +22,5 @@ fun NavGraphBuilder.loginScreen(
     }
 }
 
-fun NavController.navigateToLoginScreen(navOptions: NavOptions?) =
+fun NavController.navigateToLogin(navOptions: NavOptions?) =
     this.navigate(LoginRoute, navOptions)

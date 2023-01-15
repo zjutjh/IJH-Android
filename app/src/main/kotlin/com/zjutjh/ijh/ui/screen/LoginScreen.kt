@@ -27,9 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
+import com.zjutjh.ijh.ui.component.BackIconButton
 import com.zjutjh.ijh.ui.component.DividerBottomBar
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
 import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.ui.viewmodel.LoginViewModel
+import com.zjutjh.ijh.ui.viewmodel.PasswordUiState
+import com.zjutjh.ijh.ui.viewmodel.UsernameUiState
 import kotlinx.coroutines.launch
 
 @Composable
@@ -45,7 +49,7 @@ fun LoginScreen(
     LoginScaffold(
         snackbarHostState = viewModel.uiState.snackbarHostState,
         loadingState = viewModel.uiState.loading,
-        onCloseClick = onNavigateBack,
+        onBackClick = onNavigateBack,
         onClick = focusManager::clearFocus,
         onActionClick = {
             focusManager.clearFocus()
@@ -147,7 +151,7 @@ fun LoginScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginFormTextField(
+private fun LoginFormTextField(
     modifier: Modifier = Modifier,
     icon: ImageVector,
     iconContentDescriptor: String? = null,
@@ -178,11 +182,11 @@ fun LoginFormTextField(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScaffold(
+private fun LoginScaffold(
     snackbarHostState: SnackbarHostState,
     loadingState: CancellableLoadingState,
     onClick: () -> Unit,
-    onCloseClick: () -> Unit,
+    onBackClick: () -> Unit,
     onActionClick: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -193,7 +197,7 @@ fun LoginScaffold(
             .pointerInput(onClick) { detectTapGestures { onClick() } }
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LoginTopBar(loadingState, scrollBehavior, onCloseClick, onActionClick)
+            LoginTopBar(loadingState, scrollBehavior, onBackClick, onActionClick)
         },
         snackbarHost = {
             SnackbarHost(snackbarHostState)
@@ -208,10 +212,10 @@ fun LoginScaffold(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginTopBar(
+private fun LoginTopBar(
     loadingState: CancellableLoadingState,
     scrollBehavior: TopAppBarScrollBehavior?,
-    onCloseClick: () -> Unit,
+    onBackClick: () -> Unit,
     onActionClick: () -> Unit,
 ) {
     TopAppBar(
@@ -219,12 +223,7 @@ fun LoginTopBar(
             Text(stringResource(id = R.string.sign_in))
         },
         navigationIcon = {
-            IconButton(onClick = onCloseClick) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(id = R.string.close),
-                )
-            }
+            BackIconButton(onBackClick)
         },
         actions = {
             val enabled =

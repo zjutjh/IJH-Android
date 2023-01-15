@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.ui.screen
+package com.zjutjh.ijh.ui.viewmodel
 
 import android.content.Context
 import android.util.Log

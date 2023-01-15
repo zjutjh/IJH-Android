@@ -31,4 +31,8 @@
     <string name="login">Login</string>
     <string name="unexpected_http_status">Unexpected HTTP status. (%1$d)</string>
     <string name="authentication_exception">Authentication exception.</string>
+    <string name="profile">Profile</string>
+    <string name="back">Back</string>
+    <string name="logout">Logout</string>
+    <string name="sign_out">Sign out</string>
 </resources>

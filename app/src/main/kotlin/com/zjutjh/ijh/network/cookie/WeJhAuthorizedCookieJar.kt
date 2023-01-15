@@ -1,51 +1,36 @@
 package com.zjutjh.ijh.network.cookie
 
-import android.util.Log
 import com.zjutjh.ijh.datastore.WeJhUserLocalDataSource
 import com.zjutjh.ijh.network.exception.UnauthorizedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class WeJhAuthorizationCookieJar @Inject constructor(private val local: WeJhUserLocalDataSource) :
-    CookieJar {
+@Singleton
+class WeJhAuthorizedCookieJar @Inject constructor(local: WeJhUserLocalDataSource) : CookieJar {
+
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    private val tokenFlow: Flow<String> = local.user.map { it.sessionToken }
 
     init {
         scope.launch {
-            subscribe()
+            tokenFlow.collect {
+                currentToken = it
+            }
         }
     }
 
-    private suspend fun subscribe() =
-        local.user
-            .map {
-                Cookie.Builder()
-                    .name(COOKIE_NAME)
-                    .value(it.sessionToken)
-                    .domain(COOKIE_DOMAIN)
-                    .build()
-            }
-            .collectLatest {
-                Log.d("WeJhAuthCookieJar", "Current token: $it")
-                cookie = it
-            }
-
-    /**
-     * Null stand for Loading
-     */
-    private var cookie: Cookie = Cookie.Builder()
-        .name(COOKIE_NAME)
-        .value(String())
-        .domain(COOKIE_DOMAIN)
-        .build()
+    @Volatile
+    private var currentToken: String? = null
 
     /**
      * For requests only
@@ -53,11 +38,18 @@ class WeJhAuthorizationCookieJar @Inject constructor(private val local: WeJhUser
     override fun saveFromResponse(url: HttpUrl, cookies: MutableList<Cookie>) = Unit
 
     override fun loadForRequest(url: HttpUrl): MutableList<Cookie> {
-        if (cookie.value().isEmpty()) {
+        val token =
+            currentToken
+                ?: throw UnauthorizedException("Uninitialized token, maybe still in loading.")
+        if (token.isEmpty()) {
             throw UnauthorizedException("Empty session token")
         }
         return mutableListOf(
-            cookie
+            Cookie.Builder()
+                .domain(COOKIE_DOMAIN)
+                .name(COOKIE_NAME)
+                .value(token)
+                .build()
         )
     }
 

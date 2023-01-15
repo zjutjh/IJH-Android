@@ -1,0 +1,126 @@
+package com.zjutjh.ijh.ui.screen
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.zjutjh.ijh.R
+import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
+import com.zjutjh.ijh.model.WeJhUser
+import com.zjutjh.ijh.ui.component.BackIconButton
+import com.zjutjh.ijh.ui.component.DividerBottomBar
+import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.ui.viewmodel.ProfileViewModel
+
+@Composable
+fun ProfileRoute(
+    viewModel: ProfileViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
+) {
+    val userState by viewModel.userState.collectAsStateWithLifecycle()
+
+    ProfileScreen(
+        userState = userState,
+        onNavigateBack = onNavigateBack,
+        onLogout = {
+            viewModel.logout(onNavigateBack)
+        }
+    )
+}
+
+@Composable
+fun ProfileScreen(
+    userState: WeJhUser?,
+    onNavigateBack: () -> Unit = {},
+    onLogout: () -> Unit = {},
+) {
+    ProfileScaffold(onBackClick = onNavigateBack) { paddingValues ->
+        val scrollState = rememberScrollState()
+        AnimatedVisibility(visible = userState != null, enter = expandVertically()) {
+            Column(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                ElevatedCard(
+                    modifier = Modifier
+                        .widthIn(max = 450.dp)
+                        .padding(top = 16.dp)
+                        .fillMaxWidth(0.9f),
+                ) {
+                    Text(
+                        modifier = Modifier.padding(12.dp),
+                        text = userState!!.username,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
+                TextButton(onClick = onLogout) {
+                    Text(stringResource(id = R.string.sign_out))
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ProfileScaffold(
+    onBackClick: () -> Unit,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    Scaffold(
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            ProfileTopBar(scrollBehavior, onBackClick)
+        },
+        contentWindowInsets = WindowInsets.safeDrawing,
+        bottomBar = {
+            DividerBottomBar()
+        },
+        content = content,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ProfileTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    onBackClick: () -> Unit,
+) {
+    TopAppBar(
+        title = {
+            Text(stringResource(id = R.string.profile))
+        },
+        navigationIcon = {
+            BackIconButton(onBackClick)
+        },
+        scrollBehavior = scrollBehavior,
+    )
+}
+
+@Preview
+@Composable
+private fun ProfileScreenPreview() {
+    IJhTheme {
+        val repo = WeJhUserRepositoryMock()
+        ProfileScreen(repo.mockWeJhUser())
+    }
+}

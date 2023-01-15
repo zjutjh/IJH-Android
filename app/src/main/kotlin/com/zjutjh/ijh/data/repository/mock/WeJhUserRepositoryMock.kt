@@ -15,7 +15,7 @@ class WeJhUserRepositoryMock : WeJhUserRepository {
 
     override suspend fun sync() = Unit
 
-    private fun mockWeJhUser(): WeJhUser =
+    fun mockWeJhUser(): WeJhUser =
         WeJhUser(
             uid = 123,
             username = "Info",

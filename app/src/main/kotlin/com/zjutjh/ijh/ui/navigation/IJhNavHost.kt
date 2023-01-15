@@ -44,15 +44,26 @@ fun IJhNavHost(
             } + fadeOut(tween(ANIM_DURATION))
         }
     ) {
-        homeScreen {
-            navController.navigateToLoginScreen(navOptions {
-                launchSingleTop = true
-            })
-        }
+        homeScreen(
+            onNavigateToLogin = {
+                navController.navigateToLogin(
+                    navOptions { launchSingleTop = true }
+                )
+            },
+            onNavigateToProfile = {
+                navController.navigateToProfile(
+                    navOptions { launchSingleTop = true }
+                )
+            }
+        )
 
         loginScreen(
             navController::popBackStack,
-            navController::popUpToHomeScreen,
+            navController::popUpToHome,
+        )
+
+        profileScreen(
+            navController::popBackStack
         )
     }
 }

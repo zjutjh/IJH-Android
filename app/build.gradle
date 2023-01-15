@@ -86,6 +86,10 @@ dependencies {
     implementation "androidx.datastore:datastore:1.0.0"
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
 
+    // Room
+    implementation "androidx.room:room-runtime:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+
     // Network
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"

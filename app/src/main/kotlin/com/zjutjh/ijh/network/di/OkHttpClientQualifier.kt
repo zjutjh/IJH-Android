@@ -8,4 +8,4 @@ annotation class DefaultOkHttpClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class WeJhAuthOkHttpClient
+annotation class WeJhAuthorizedOkHttpClient

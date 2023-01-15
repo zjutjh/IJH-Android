@@ -4,6 +4,7 @@ import com.zjutjh.ijh.data.model.Course
 import com.zjutjh.ijh.data.repository.CourseRepository
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import java.time.DayOfWeek
 
 /**
  * A mock of [CourseRepository] for preview and tests
@@ -14,42 +15,51 @@ class CourseRepositoryMock : CourseRepository {
 
     companion object {
         fun getCourse(): Course = Course(
+            id = 1,
             name = "Design pattern in practice",
-            teacher = "Mr. Info",
+            teacherName = "Mr. Info",
             place = "Software.A.302",
             campus = "PF",
-            credit = "4.0",
+            type = "A",
+            credit = 4.0f,
+            hours = 64,
             className = "001",
             sectionStart = 3,
             sectionEnd = 4,
-            dayOfWeek = 0,
+            dayOfWeek = DayOfWeek.MONDAY,
             weekStart = 1,
             weekEnd = 16,
         )
 
         fun getCourses(): ImmutableList<Course> = persistentListOf(
             Course(
+                id = 1,
                 name = "Design pattern in practice",
-                teacher = "Mr. Info",
+                teacherName = "Mr. Info",
                 place = "Software.A.302",
                 campus = "PF",
-                credit = "4.0",
+                type = "A",
+                credit = 4.0f,
+                hours = 64,
                 className = "001",
                 sectionStart = 1,
                 sectionEnd = 2,
-                dayOfWeek = 0,
+                dayOfWeek = DayOfWeek.MONDAY,
                 weekStart = 1,
                 weekEnd = 16,
             ), Course(
+                id = 2,
                 name = "Software Engineering and Information Technology",
-                teacher = "Mr. Hex",
+                teacherName = "Mr. Hex",
                 place = "Information.B.101",
                 campus = "PF",
-                credit = "4.0",
+                type = "B",
+                credit = 4.0f,
+                hours = 64,
                 className = "002",
                 sectionStart = 3,
                 sectionEnd = 4,
-                dayOfWeek = 0,
+                dayOfWeek = DayOfWeek.MONDAY,
                 weekStart = 1,
                 weekEnd = 8,
             )

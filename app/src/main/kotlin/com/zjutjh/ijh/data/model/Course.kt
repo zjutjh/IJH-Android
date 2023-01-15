@@ -1,21 +1,25 @@
 package com.zjutjh.ijh.data.model
 
 import androidx.compose.runtime.Stable
+import java.time.DayOfWeek
 import java.time.LocalTime
 
 @Stable
 data class Course(
-    var name: String,
-    var teacher: String,
-    var campus: String,
-    var place: String,
-    var className: String,
-    var credit: String,
-    var sectionStart: Int,
-    var sectionEnd: Int,
-    var dayOfWeek: Int,
-    var weekStart: Int,
-    var weekEnd: Int,
+    val id: Long,
+    val name: String,
+    val teacherName: String,
+    val campus: String,
+    val place: String,
+    val className: String,
+    val type: String,
+    val credit: Float,
+    val hours: Int,
+    val sectionStart: Int,
+    val sectionEnd: Int,
+    val dayOfWeek: DayOfWeek,
+    val weekStart: Int,
+    val weekEnd: Int,
 ) {
     companion object {
         val SECTIONS = arrayOf(

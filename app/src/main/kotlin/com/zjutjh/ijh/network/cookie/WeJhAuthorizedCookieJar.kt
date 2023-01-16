@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class WeJhAuthorizedCookieJar @Inject constructor(local: WeJhUserLocalDataSource) : CookieJar {
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     private val tokenFlow: Flow<String> = local.user.map { it.sessionToken }
 

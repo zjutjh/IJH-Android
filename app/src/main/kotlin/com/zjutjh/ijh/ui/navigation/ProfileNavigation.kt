@@ -7,17 +7,17 @@ import androidx.navigation.NavOptions
 import com.google.accompanist.navigation.animation.composable
 import com.zjutjh.ijh.ui.screen.ProfileRoute
 
-private const val ProfileRoute = "profile"
+private const val profileRoute = "profile"
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.profileScreen(
     onPopBackStack: () -> Unit,
 ) {
-    composable(ProfileRoute) {
+    composable(profileRoute) {
         ProfileRoute(onNavigateBack = onPopBackStack)
     }
 }
 
 fun NavController.navigateToProfile(navOptions: NavOptions?) {
-    this.navigate(ProfileRoute, navOptions)
+    this.navigate(profileRoute, navOptions)
 }

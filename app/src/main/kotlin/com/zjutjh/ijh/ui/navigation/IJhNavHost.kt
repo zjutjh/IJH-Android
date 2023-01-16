@@ -17,7 +17,7 @@ private const val ANIM_DURATION: Int = 300
 fun IJhNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
-    startDestination: String = HomeRoute
+    startDestination: String = homeRoute
 ) {
     AnimatedNavHost(
         modifier = modifier,

@@ -3,14 +3,10 @@ package com.zjutjh.ijh.ui.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -20,7 +16,7 @@ import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
 import com.zjutjh.ijh.model.WeJhUser
 import com.zjutjh.ijh.ui.component.BackIconButton
-import com.zjutjh.ijh.ui.component.DividerBottomBar
+import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.ProfileViewModel
 
@@ -41,25 +37,20 @@ fun ProfileRoute(
 }
 
 @Composable
-fun ProfileScreen(
+private fun ProfileScreen(
     userState: WeJhUser?,
     onNavigateBack: () -> Unit = {},
     onLogout: () -> Unit = {},
 ) {
     ProfileScaffold(onBackClick = onNavigateBack) { paddingValues ->
-        val scrollState = rememberScrollState()
-        AnimatedVisibility(visible = userState != null, enter = expandVertically()) {
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .verticalScroll(scrollState),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+        Column(
+            modifier = Modifier.padding(paddingValues)
+        ) {
+            AnimatedVisibility(visible = userState != null, enter = expandVertically()) {
                 ElevatedCard(
                     modifier = Modifier
                         .widthIn(max = 450.dp)
-                        .padding(top = 16.dp)
+                        .padding(16.dp)
                         .fillMaxWidth(0.9f),
                 ) {
                     Text(
@@ -68,9 +59,9 @@ fun ProfileScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
-                TextButton(onClick = onLogout) {
-                    Text(stringResource(id = R.string.sign_out))
-                }
+            }
+            TextButton(onClick = onLogout) {
+                Text(stringResource(id = R.string.sign_out))
             }
         }
     }
@@ -81,19 +72,11 @@ fun ProfileScreen(
 @Composable
 private fun ProfileScaffold(
     onBackClick: () -> Unit,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable BoxScope.(PaddingValues) -> Unit
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    Scaffold(
-        modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+    IJhScaffold(
         topBar = {
-            ProfileTopBar(scrollBehavior, onBackClick)
-        },
-        contentWindowInsets = WindowInsets.safeDrawing,
-        bottomBar = {
-            DividerBottomBar()
+            ProfileTopBar(it, onBackClick)
         },
         content = content,
     )

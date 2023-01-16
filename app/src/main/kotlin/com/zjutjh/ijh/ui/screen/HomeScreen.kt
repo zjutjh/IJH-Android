@@ -2,8 +2,6 @@ package com.zjutjh.ijh.ui.screen
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -11,73 +9,86 @@ import androidx.compose.material3.pullrefresh.PullRefreshIndicator
 import androidx.compose.material3.pullrefresh.PullRefreshState
 import androidx.compose.material3.pullrefresh.pullRefresh
 import androidx.compose.material3.pullrefresh.rememberPullRefreshState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zjutjh.ijh.R
+import com.zjutjh.ijh.data.model.Course
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
-import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
-import com.zjutjh.ijh.ui.component.DividerBottomBar
+import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.HomeViewModel
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(
+fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToClassSchedule: () -> Unit = {/* TODO */ },
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
+    val refreshState by viewModel.refreshState.collectAsState()
+    val courseState by viewModel.coursesState.collectAsStateWithLifecycle()
 
+    HomeScreen(
+        refreshing = refreshState,
+        isLoggedIn = loginState,
+        courses = courseState,
+        onRefresh = viewModel::refresh,
+        onNavigateToLogin = onNavigateToLogin,
+        onNavigateToProfile = onNavigateToProfile,
+        onNavigateToClassSchedule = onNavigateToClassSchedule,
+    )
+}
+
+@Composable
+private fun HomeScreen(
+    refreshing: Boolean,
+    isLoggedIn: Boolean,
+    courses: ImmutableList<Course>,
+    onRefresh: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToClassSchedule: () -> Unit,
+) {
     val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val pullRefreshState = rememberPullRefreshState(
-        refreshing = viewModel.refreshState,
-        onRefresh = viewModel::refresh
+        refreshing = refreshing,
+        onRefresh = onRefresh,
     )
 
     HomeScaffold(
-        loginState,
+        isLoggedIn,
         drawerState,
         pullRefreshState,
         onNavigateToProfile,
         onNavigateToLogin,
     ) { paddingValues ->
-        val scrollState = rememberScrollState()
-
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .verticalScroll(scrollState),
-            contentAlignment = Alignment.TopCenter
+        Column(
+            modifier = Modifier.padding(paddingValues)
         ) {
-
             ScheduleCard(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
-                courses = viewModel.coursesState,
+                courses = courses,
                 onCalendarClick = onNavigateToClassSchedule,
-            )
-
-            PullRefreshIndicator(
-                refreshing = viewModel.refreshState,
-                state = pullRefreshState,
-                scale = true
             )
         }
 
+        PullRefreshIndicator(
+            refreshing = refreshing,
+            state = pullRefreshState,
+            scale = true
+        )
     }
 }
 
@@ -89,10 +100,9 @@ fun HomeScaffold(
     pullRefreshState: PullRefreshState,
     onAccountButtonClick: () -> Unit,
     onLoginButtonClick: () -> Unit,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable BoxScope.(PaddingValues) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     ModalNavigationDrawer(
         drawerContent = {
@@ -104,10 +114,9 @@ fun HomeScaffold(
         },
         drawerState = drawerState,
     ) {
-        Scaffold(
+        IJhScaffold(
             modifier = Modifier
-                .pullRefresh(pullRefreshState)
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
+                .pullRefresh(pullRefreshState),
             topBar = {
                 HomeTopBar(
                     isLoggedIn,
@@ -116,14 +125,10 @@ fun HomeScaffold(
                     },
                     onAccountButtonClick,
                     onLoginButtonClick,
-                    scrollBehavior,
+                    it,
                 )
             },
-            contentWindowInsets = WindowInsets.safeDrawing,
-            bottomBar = {
-                DividerBottomBar()
-            },
-            content = content,
+            content = content
         )
     }
 }
@@ -225,17 +230,17 @@ private fun NavigationDrawerPreview() {
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun HomeScreenPreview() {
+    val courses = CourseRepositoryMock.getCourses()
     IJhTheme {
-        val viewModel = HomeViewModel(WeJhUserRepositoryMock(), CourseRepositoryMock())
-        HomeScreen(viewModel, {}, {}) {}
+        HomeScreen(refreshing = false, isLoggedIn = true, courses, {}, {}, {}) {}
     }
 }
 
 @Preview(heightDp = 400)
 @Composable
 private fun HomeScrollPreview() {
+    val courses = CourseRepositoryMock.getCourses()
     IJhTheme {
-        val viewModel = HomeViewModel(WeJhUserRepositoryMock(), CourseRepositoryMock())
-        HomeScreen(viewModel, {}, {}) {}
+        HomeScreen(refreshing = false, isLoggedIn = true, courses, {}, {}, {}) {}
     }
 }

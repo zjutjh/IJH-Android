@@ -18,6 +18,7 @@ import com.zjutjh.ijh.ui.model.DismissibleSnackbarVisuals
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 private const val CANCELLABLE_INTERVAL = 1000L
@@ -114,10 +115,12 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
             is SocketTimeoutException -> {
                 showDismissibleSnackbar(context.getString(R.string.request_timeout))
             }
+            is UnknownHostException -> {
+                showDismissibleSnackbar(context.getString(R.string.network_error))
+            }
             else -> {
                 Log.e("Login", "Error: $t")
                 showDismissibleSnackbar(context.getString(R.string.unknown_error))
-                throw t
             }
         }
     }

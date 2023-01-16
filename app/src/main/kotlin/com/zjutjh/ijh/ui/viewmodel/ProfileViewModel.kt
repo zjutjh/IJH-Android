@@ -21,7 +21,7 @@ class ProfileViewModel @Inject constructor(
      */
     val userState: StateFlow<WeJhUser?> = weJhUserRepository.userStream
         .stateIn(
-            viewModelScope,
+            scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = null
         )

@@ -1,9 +1,6 @@
 package com.zjutjh.ijh.ui.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.model.Course
@@ -12,11 +9,8 @@ import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,16 +27,18 @@ class HomeViewModel @Inject constructor(
             initialValue = false
         )
 
-    var coursesState: ImmutableList<Course> by mutableStateOf(persistentListOf())
+    private val _coursesState: MutableStateFlow<ImmutableList<Course>> =
+        MutableStateFlow(persistentListOf())
+    var coursesState: StateFlow<ImmutableList<Course>> = _coursesState.asStateFlow()
 
-    var refreshState by mutableStateOf(false)
-        private set
+    private val _refreshState = MutableStateFlow(false)
+    val refreshState: StateFlow<Boolean> = _refreshState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            coursesState = courseRepository.getCourses()
+        viewModelScope.launch(Dispatchers.Default) {
+            _coursesState.update { courseRepository.getCourses() }
             loginState.collectLatest {
-                if (it) suspendRefresh(this)
+                if (it) refresh(this)
             }
         }
     }
@@ -51,7 +47,7 @@ class HomeViewModel @Inject constructor(
      * Sync with upstream
      */
     fun refresh() {
-        if (refreshState) {
+        if (_refreshState.value) {
             // Already in refreshing, abort.
             return
         }
@@ -59,19 +55,19 @@ class HomeViewModel @Inject constructor(
             // Not logged in, no refresh required.
             viewModelScope.launch {
                 // Add animation duration to make the animation smoother
-                refreshState = true
+                _refreshState.update { true }
                 delay(animationDuration)
-                refreshState = false
+                _refreshState.update { false }
             }
         } else {
             viewModelScope.launch {
-                suspendRefresh(this)
+                refresh(this)
             }
         }
     }
 
-    private suspend fun suspendRefresh(scope: CoroutineScope) {
-        refreshState = true
+    private suspend fun refresh(scope: CoroutineScope) {
+        _refreshState.update { true }
         val timer = scope.async { delay(animationDuration) }
         try {
             weJhUserRepository.sync()
@@ -80,7 +76,7 @@ class HomeViewModel @Inject constructor(
             Log.w("HomeSync", "Error: $e.")
         }
         timer.await()
-        refreshState = false
+        _refreshState.update { false }
     }
 
     companion object {

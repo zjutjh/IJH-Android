@@ -185,7 +185,7 @@ private fun LoginScaffold(
             LoginTopBar(loadingState, it, onBackClick, onActionClick)
         },
         snackbarHost = {
-            SnackbarHost(snackbarHostState)
+            SnackbarHost(snackbarHostState, Modifier.padding(it))
         },
         content = content,
     )

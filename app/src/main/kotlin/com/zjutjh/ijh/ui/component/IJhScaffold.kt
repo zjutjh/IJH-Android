@@ -15,21 +15,22 @@ fun IJhScaffold(
     modifier: Modifier = Modifier,
     topBar: @Composable (TopAppBarScrollBehavior) -> Unit,
     scrollBehavior: TopAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
-    snackbarHost: @Composable () -> Unit = {},
+    snackbarHost: @Composable (PaddingValues) -> Unit = {},
     content: @Composable BoxScope.(PaddingValues) -> Unit,
 ) {
     val navigationBarsInsets = WindowInsets.navigationBars
+    val navigationBarsPadding = navigationBarsInsets.asPaddingValues()
     val windowInset = WindowInsets.safeDrawing.exclude(navigationBarsInsets)
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = { topBar(scrollBehavior) },
-        snackbarHost = snackbarHost,
+        snackbarHost = { snackbarHost(navigationBarsPadding) },
         contentWindowInsets = windowInset,
         content = {
             VerticalContentBox(
                 paddingValues = it,
-                content = { content(navigationBarsInsets.asPaddingValues()) },
+                content = { content(navigationBarsPadding) },
             )
         },
     )

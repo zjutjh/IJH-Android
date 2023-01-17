@@ -154,7 +154,7 @@ fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
                 IconButton(onClick = onCloseButtonClick) {
                     Icon(
                         imageVector = Icons.Default.MenuOpen,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = R.string.collapse),
                     )
                 }
             }

@@ -1,18 +1,18 @@
 package com.zjutjh.ijh.network.service.response
 
 
-data class ClassTableResult (
+data class ClassTableResult(
     val info: ClassTableInfo,
     val lessonsTable: List<LessonsTable>,
     val practiceLessons: List<PracticeLesson>?,
 )
 
-data class ClassTableInfo (
+data class ClassTableInfo(
     val className: String,
     val name: String
 )
 
-data class LessonsTable (
+data class LessonsTable(
     val campus: String,
     val className: String,
     val credits: String,
@@ -28,7 +28,7 @@ data class LessonsTable (
     val weekday: String
 )
 
-data class PracticeLesson (
+data class PracticeLesson(
     val className: String,
     val credits: String,
     val lessonName: String,

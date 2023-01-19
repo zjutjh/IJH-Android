@@ -1,0 +1,38 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.dagger.hilt.android'
+    id 'kotlin-kapt'
+}
+
+android {
+    namespace 'com.zjutjh.ijh.data'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 29
+        targetSdk 33
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation project(":core:model")
+    implementation project(":core:network")
+    implementation project(":core:datastore")
+    implementation project(":core:database")
+
+    implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
+
+    // Dependency injection (Hilt)
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+}

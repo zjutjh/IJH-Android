@@ -15,3 +15,8 @@ dependencyResolutionManagement {
 rootProject.name = "IJH"
 include ':app'
 include ':benchmarks'
+include ':core:network'
+include ':core:datastore'
+include ':core:model'
+include ':core:data'
+include ':core:database'

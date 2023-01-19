@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.model.Course
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
+import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.theme.IJhTheme

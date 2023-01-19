@@ -2,9 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- permissions for INTERNET -->
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application
         android:name=".IJhApplication"
         android:allowBackup="true"
@@ -17,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.IJh.Starting"
-        android:usesCleartextTraffic="${usesCleartextTraffic}"
         tools:targetApi="tiramisu">
         <profileable android:shell="true" />
 

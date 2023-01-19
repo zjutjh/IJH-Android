@@ -14,7 +14,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
-import com.zjutjh.ijh.model.WeJhUser
 import com.zjutjh.ijh.ui.component.BackIconButton
 import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.theme.IJhTheme
@@ -38,7 +37,7 @@ fun ProfileRoute(
 
 @Composable
 private fun ProfileScreen(
-    userState: WeJhUser?,
+    userState: com.zjutjh.ijh.model.WeJhUser?,
     onNavigateBack: () -> Unit = {},
     onLogout: () -> Unit = {},
 ) {

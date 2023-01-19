@@ -1,0 +1,60 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp'
+    id 'com.google.dagger.hilt.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id 'kotlin-kapt'
+}
+
+android {
+    namespace 'com.zjutjh.ijh.network'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 29
+        targetSdk 33
+    }
+
+    buildTypes {
+        debug {
+            manifestPlaceholders usesCleartextTraffic: true
+        }
+        release {
+            manifestPlaceholders usesCleartextTraffic: false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+secrets {
+    // Change the properties file from the default "local.properties" in your root project
+    // to another properties file in your root project.
+    propertiesFileName 'secrets.properties'
+
+    // A properties file containing default secret values.
+    // This file can be checked in version control.
+    defaultPropertiesFileName = 'secrets.defaults.properties'
+}
+
+dependencies {
+    implementation project(":core:model")
+    implementation project(":core:datastore")
+
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+    implementation "com.squareup.moshi:moshi:1.14.0"
+    ksp "com.squareup.moshi:moshi-kotlin-codegen:1.14.0"
+
+    implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
+
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+}

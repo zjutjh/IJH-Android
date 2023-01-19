@@ -4,7 +4,6 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'com.google.protobuf'
     id 'com.google.dagger.hilt.android'
-    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'kotlin-kapt'
 }
 
@@ -30,12 +29,8 @@ android {
     }
 
     buildTypes {
-        debug {
-            manifestPlaceholders usesCleartextTraffic: true
-        }
         release {
             signingConfig signingConfigs.debug
-            manifestPlaceholders usesCleartextTraffic: false
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -70,7 +65,7 @@ android {
 }
 
 dependencies {
-    // Core & UI
+    // Androidx Core & UI
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation "androidx.core:core-animation:1.0.0-beta01"
     implementation 'androidx.activity:activity-compose:1.6.1'
@@ -87,21 +82,13 @@ dependencies {
     implementation 'androidx.profileinstaller:profileinstaller:1.2.2'
     implementation 'com.google.android.material:material:1.7.0'
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
 
-    // Datastore
-    implementation "androidx.datastore:datastore:1.0.0"
-    implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
+    implementation project(":core:data")
+    implementation project(":core:model")
+    implementation project(":core:network")
 
-    // Room
-    implementation "androidx.room:room-runtime:$room_version"
-    ksp "androidx.room:room-compiler:$room_version"
-
-    // Network
-    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
     implementation "com.squareup.moshi:moshi:1.14.0"
-    ksp "com.squareup.moshi:moshi-kotlin-codegen:1.14.0"
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
 
     // Dependency injection (Hilt)
     implementation "com.google.dagger:hilt-android:$hilt_version"
@@ -123,33 +110,3 @@ kapt {
     correctErrorTypes true
 }
 
-secrets {
-    // Change the properties file from the default "local.properties" in your root project
-    // to another properties file in your root project.
-    propertiesFileName 'secrets.properties'
-
-    // A properties file containing default secret values.
-    // This file can be checked in version control.
-    defaultPropertiesFileName = 'secrets.defaults.properties'
-}
-
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:$protobuf_version"
-    }
-    // Generates the java Protobuf-lite code for the Protobuf in this project. See
-    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
-    // for more information.
-    generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                java {
-                    option 'lite'
-                }
-                kotlin {
-                    option 'lite'
-                }
-            }
-        }
-    }
-}

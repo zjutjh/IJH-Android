@@ -17,8 +17,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.model.Course
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
+import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

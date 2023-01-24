@@ -1,30 +1,17 @@
 <resources>
 
-    <style name="Theme.IJh" parent="Theme.Material3.DynamicColors.Dark">
+    <style name="Base.Theme.IJh" parent="Theme.Material3.DynamicColors.Dark">
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/dark_background_transparent</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
-        <item name="android:enforceNavigationBarContrast">true</item>
     </style>
 
-    <style name="Theme.IJh.Starting" parent="Theme.SplashScreen.IconBackground">
+    <style name="Theme.IJh.Starting" parent="Base.Theme.IJh.Starting">
         <!-- Set the splash screen background, animated icon, and animation duration. -->
         <item name="windowSplashScreenBackground">@color/md_theme_dark_background</item>
-
-        <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
-             animated drawable. One of these is required. -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="windowSplashScreenIconBackgroundColor">@color/md_theme_dark_primaryContainer
         </item>
-
-        <!-- Required for animated icons -->
-        <item name="windowSplashScreenAnimationDuration">300</item>
-
-        <!-- Set the theme of the Activity that directly follows your splash screen. -->
-        <!-- Required -->
-        <item name="postSplashScreenTheme">@style/Theme.IJh</item>
-
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
     </style>

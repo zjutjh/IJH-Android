@@ -1,14 +1,15 @@
 <resources>
 
-    <style name="Theme.IJh" parent="Theme.Material3.DynamicColors.Light">
+    <style name="Base.Theme.IJh" parent="Theme.Material3.DynamicColors.Light">
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/light_background_transparent</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:enforceNavigationBarContrast">true</item>
     </style>
 
-    <style name="Theme.IJh.Starting" parent="Theme.SplashScreen.IconBackground">
+    <style name="Theme.IJh" parent="Base.Theme.IJh" />
+
+    <style name="Base.Theme.IJh.Starting" parent="Theme.SplashScreen.IconBackground">
         <!-- Set the splash screen background, animated icon, and animation duration. -->
         <item name="windowSplashScreenBackground">@color/md_theme_light_background</item>
 
@@ -28,4 +29,6 @@
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
+
+    <style name="Theme.IJh.Starting" parent="Base.Theme.IJh.Starting" />
 </resources>

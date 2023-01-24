@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.model
+package com.zjutjh.ijh.util
 
 /**
  * Kotlin-std Result may have some unexpected issues while using coroutine

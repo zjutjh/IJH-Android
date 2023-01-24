@@ -18,17 +18,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen: SplashScreen = installSplashScreen()
-        super.onCreate(savedInstanceState)
-
-        // Make system bars inside the application's layout scope
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        setContent {
-            IJhTheme {
-                IJhApp()
-            }
-        }
-
         // Add a callback that's called when the splash screen is animating to
         // the app content.
         splashScreen.setOnExitAnimationListener { splashScreenView ->
@@ -48,6 +37,17 @@ class MainActivity : ComponentActivity() {
 
             // Run animation.
             animator.start()
+        }
+
+        super.onCreate(savedInstanceState)
+
+        // Make system bars inside the application's layout scope
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        setContent {
+            IJhTheme {
+                IJhApp()
+            }
         }
     }
 

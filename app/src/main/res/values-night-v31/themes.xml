@@ -1,24 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.IJh.Starting" parent="Theme.SplashScreen.IconBackground">
+    <style name="Theme.IJh.Starting" parent="Base.Theme.IJh.Starting">
         <!-- Set the splash screen background, animated icon, and animation duration. -->
         <item name="windowSplashScreenBackground">@android:color/system_neutral1_900</item>
 
-        <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
-             animated drawable. One of these is required. -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="windowSplashScreenIconBackgroundColor">@android:color/system_accent1_700
         </item>
-
-        <!-- Required for animated icons -->
-        <item name="windowSplashScreenAnimationDuration">300</item>
-
-        <!-- Set the theme of the Activity that directly follows your splash screen. -->
-        <!-- Required -->
-        <item name="postSplashScreenTheme">@style/Theme.IJh</item>
-
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar">false</item>
     </style>
+
 </resources>

@@ -9,12 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.squareup.moshi.JsonDataException
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
-import com.zjutjh.ijh.network.exception.ApiResponseException
-import com.zjutjh.ijh.network.exception.HttpStatusException
-import com.zjutjh.ijh.network.exception.UnauthorizedException
-import com.zjutjh.ijh.network.exception.WeJhApiExceptions
+import com.zjutjh.ijh.exception.ApiResponseException
+import com.zjutjh.ijh.exception.HttpStatusException
+import com.zjutjh.ijh.exception.UnauthorizedException
+import com.zjutjh.ijh.exception.WeJhApiExceptions
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
-import com.zjutjh.ijh.ui.model.DismissibleSnackbarVisuals
+import com.zjutjh.ijh.ui.util.DismissibleSnackbarVisuals
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.net.SocketTimeoutException

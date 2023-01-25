@@ -84,8 +84,7 @@ dependencies {
     implementation "com.google.accompanist:accompanist-navigation-animation:$accompanist_version"
 
     implementation project(":core:data")
-    implementation project(":core:model")
-    implementation project(":core:network")
+    implementation project(':core:common')
 
     implementation "com.squareup.moshi:moshi:1.14.0"
     implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'

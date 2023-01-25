@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.ui.model
+package com.zjutjh.ijh.ui.util
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarVisuals

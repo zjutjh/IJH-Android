@@ -1,7 +1,7 @@
 package com.zjutjh.ijh.network.cookie
 
 import com.zjutjh.ijh.datastore.WeJhUserLocalDataSource
-import com.zjutjh.ijh.network.exception.UnauthorizedException
+import com.zjutjh.ijh.exception.UnauthorizedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

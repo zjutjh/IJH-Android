@@ -2,6 +2,7 @@ package com.zjutjh.ijh.data.repository.mock
 
 import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.CourseWeek
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.time.DayOfWeek
@@ -12,6 +13,7 @@ import java.time.DayOfWeek
 class CourseRepositoryMock : CourseRepository {
 
     override suspend fun getCourses(): ImmutableList<Course> = Companion.getCourses()
+    override suspend fun sync() = Unit
 
     companion object {
         fun getCourse(): Course = Course(
@@ -21,14 +23,17 @@ class CourseRepositoryMock : CourseRepository {
             place = "Software.A.302",
             campus = "PF",
             type = "A",
-            credit = 4.0f,
+            credits = 4.0f,
             hours = 64,
             className = "001",
             sectionStart = 3,
             sectionEnd = 4,
             dayOfWeek = DayOfWeek.MONDAY,
-            weekStart = 1,
-            weekEnd = 16,
+            weeks = CourseWeek(
+                listOf(
+                    CourseWeek.WeekSection(1, 16, null)
+                ), listOf()
+            )
         )
 
         fun getCourses(): ImmutableList<Course> = persistentListOf(
@@ -39,14 +44,17 @@ class CourseRepositoryMock : CourseRepository {
                 place = "Software.A.302",
                 campus = "PF",
                 type = "A",
-                credit = 4.0f,
+                credits = 4.0f,
                 hours = 64,
                 className = "001",
                 sectionStart = 1,
                 sectionEnd = 2,
                 dayOfWeek = DayOfWeek.MONDAY,
-                weekStart = 1,
-                weekEnd = 16,
+                weeks = CourseWeek(
+                    listOf(
+                        CourseWeek.WeekSection(1, 16, null)
+                    ), listOf()
+                )
             ),
             Course(
                 id = 2,
@@ -55,14 +63,17 @@ class CourseRepositoryMock : CourseRepository {
                 place = "Information.B.101",
                 campus = "PF",
                 type = "B",
-                credit = 4.0f,
+                credits = 4.0f,
                 hours = 64,
                 className = "002",
                 sectionStart = 3,
                 sectionEnd = 4,
                 dayOfWeek = DayOfWeek.MONDAY,
-                weekStart = 1,
-                weekEnd = 8,
+                weeks = CourseWeek(
+                    listOf(
+                        CourseWeek.WeekSection(1, 16, null)
+                    ), listOf()
+                )
             ),
             Course(
                 id = 1,
@@ -71,14 +82,17 @@ class CourseRepositoryMock : CourseRepository {
                 place = "Software.A.302",
                 campus = "PF",
                 type = "A",
-                credit = 4.0f,
+                credits = 4.0f,
                 hours = 64,
                 className = "001",
                 sectionStart = 1,
                 sectionEnd = 2,
                 dayOfWeek = DayOfWeek.MONDAY,
-                weekStart = 1,
-                weekEnd = 16,
+                weeks = CourseWeek(
+                    listOf(
+                        CourseWeek.WeekSection(1, 16, null)
+                    ), listOf()
+                )
             ),
             Course(
                 id = 2,
@@ -87,14 +101,17 @@ class CourseRepositoryMock : CourseRepository {
                 place = "Information.B.101",
                 campus = "PF",
                 type = "B",
-                credit = 4.0f,
+                credits = 4.0f,
                 hours = 64,
                 className = "002",
                 sectionStart = 3,
                 sectionEnd = 4,
                 dayOfWeek = DayOfWeek.MONDAY,
-                weekStart = 1,
-                weekEnd = 8,
+                weeks = CourseWeek(
+                    listOf(
+                        CourseWeek.WeekSection(1, 16, null)
+                    ), listOf()
+                )
             ),
             Course(
                 id = 1,
@@ -103,14 +120,17 @@ class CourseRepositoryMock : CourseRepository {
                 place = "Software.A.302",
                 campus = "PF",
                 type = "A",
-                credit = 4.0f,
+                credits = 4.0f,
                 hours = 64,
                 className = "001",
                 sectionStart = 1,
                 sectionEnd = 2,
                 dayOfWeek = DayOfWeek.MONDAY,
-                weekStart = 1,
-                weekEnd = 16,
+                weeks = CourseWeek(
+                    listOf(
+                        CourseWeek.WeekSection(1, 16, null)
+                    ), listOf()
+                )
             ),
             Course(
                 id = 2,
@@ -119,14 +139,17 @@ class CourseRepositoryMock : CourseRepository {
                 place = "Information.B.101",
                 campus = "PF",
                 type = "B",
-                credit = 4.0f,
+                credits = 4.0f,
                 hours = 64,
                 className = "002",
                 sectionStart = 3,
                 sectionEnd = 4,
                 dayOfWeek = DayOfWeek.MONDAY,
-                weekStart = 1,
-                weekEnd = 8,
+                weeks = CourseWeek(
+                    listOf(
+                        CourseWeek.WeekSection(1, 16, null)
+                    ), listOf()
+                )
             )
         )
     }

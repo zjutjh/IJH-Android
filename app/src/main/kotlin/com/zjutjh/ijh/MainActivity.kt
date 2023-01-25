@@ -66,6 +66,4 @@ class MainActivity : ComponentActivity() {
 
         override fun onAnimationRepeat(animation: Animator) = Unit
     }
-
-
 }

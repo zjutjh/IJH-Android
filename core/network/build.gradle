@@ -44,7 +44,7 @@ secrets {
 }
 
 dependencies {
-    implementation project(":core:model")
+    implementation project(':core:common')
     implementation project(":core:datastore")
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"

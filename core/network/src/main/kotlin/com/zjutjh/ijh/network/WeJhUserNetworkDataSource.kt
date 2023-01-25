@@ -1,6 +1,6 @@
 package com.zjutjh.ijh.network
 
-import com.zjutjh.ijh.network.exception.UnauthorizedException
+import com.zjutjh.ijh.exception.UnauthorizedException
 import com.zjutjh.ijh.network.model.NetworkWeJhUser
 import com.zjutjh.ijh.network.service.WeJhService
 import com.zjutjh.ijh.network.service.WeJhUserService

@@ -36,7 +36,6 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            _coursesState.update { courseRepository.getCourses() }
             loginState.collectLatest {
                 if (it) refresh(this)
             }
@@ -71,6 +70,7 @@ class HomeViewModel @Inject constructor(
         val timer = scope.async { delay(animationDuration) }
         try {
             weJhUserRepository.sync()
+            courseRepository.sync()
             Log.i("HomeSync", "Synchronization succeeded.")
         } catch (e: Throwable) {
             Log.w("HomeSync", "Error: $e.")

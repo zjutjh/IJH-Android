@@ -8,6 +8,8 @@ import kotlinx.collections.immutable.ImmutableList
  */
 interface CourseRepository {
     suspend fun getCourses(): ImmutableList<Course>
+
+    suspend fun sync()
 }
 
 

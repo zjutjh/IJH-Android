@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.network.exception
+package com.zjutjh.ijh.exception
 
 object WeJhApiExceptions {
     const val PARAM_ERROR = 200501

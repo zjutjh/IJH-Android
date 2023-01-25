@@ -1,7 +1,7 @@
 package com.zjutjh.ijh.network.adapter
 
-import com.zjutjh.ijh.network.exception.EmptyResponseException
-import com.zjutjh.ijh.network.exception.HttpStatusException
+import com.zjutjh.ijh.exception.EmptyResponseException
+import com.zjutjh.ijh.exception.HttpStatusException
 import okhttp3.Request
 import okio.Timeout
 import retrofit2.*

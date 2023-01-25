@@ -20,7 +20,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     val loginState: StateFlow<Boolean> = weJhUserRepository.userStream
-        .map { !it.isEmpty() }
+        .map { it != null }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -59,7 +59,7 @@ class HomeViewModel @Inject constructor(
                 _refreshState.update { false }
             }
         } else {
-            viewModelScope.launch {
+            viewModelScope.launch(Dispatchers.Default) {
                 refresh(this)
             }
         }
@@ -69,8 +69,16 @@ class HomeViewModel @Inject constructor(
         _refreshState.update { true }
         val timer = scope.async { delay(animationDuration) }
         try {
-            weJhUserRepository.sync()
-            courseRepository.sync()
+            // Parallel jobs
+            joinAll(
+                scope.launch {
+                    weJhUserRepository.sync()
+                },
+                scope.launch {
+                    courseRepository.sync()
+                },
+            )
+
             Log.i("HomeSync", "Synchronization succeeded.")
         } catch (e: Throwable) {
             Log.w("HomeSync", "Error: $e.")

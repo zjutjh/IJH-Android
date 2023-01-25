@@ -4,7 +4,7 @@ import com.zjutjh.ijh.model.WeJhUser
 import kotlinx.coroutines.flow.Flow
 
 interface WeJhUserRepository {
-    val userStream: Flow<WeJhUser>
+    val userStream: Flow<WeJhUser?>
 
     suspend fun login(username: String, password: String): WeJhUser
 

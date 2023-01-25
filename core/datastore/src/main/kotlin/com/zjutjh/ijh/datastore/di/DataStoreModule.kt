@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.dataStoreFile
-import com.zjutjh.ijh.datastore.LocalWeJhUserSerializer
-import com.zjutjh.ijh.datastore.model.LocalWeJhUser
+import com.zjutjh.ijh.datastore.WeJhPreferenceSerializer
+import com.zjutjh.ijh.datastore.model.WeJhPreference
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,16 +16,17 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataStoreModule {
+    private const val WE_JH_FILENAME = "we_jh.pb"
 
     @Provides
     @Singleton
-    fun provideWeJhUserDataStore(
+    fun provideWeJhDataStore(
         @ApplicationContext context: Context,
-        serializer: LocalWeJhUserSerializer
-    ): DataStore<LocalWeJhUser> =
+        serializer: WeJhPreferenceSerializer
+    ): DataStore<WeJhPreference> =
         DataStoreFactory.create(
             serializer,
         ) {
-            context.dataStoreFile("we_jh_user.pb")
+            context.dataStoreFile(WE_JH_FILENAME)
         }
 }

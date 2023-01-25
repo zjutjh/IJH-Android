@@ -1,6 +1,7 @@
 package com.zjutjh.ijh.network.cookie
 
-import com.zjutjh.ijh.datastore.WeJhUserLocalDataSource
+import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
+import com.zjutjh.ijh.datastore.model.userOrNull
 import com.zjutjh.ijh.exception.UnauthorizedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +16,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class WeJhAuthorizedCookieJar @Inject constructor(local: WeJhUserLocalDataSource) : CookieJar {
+class WeJhAuthorizedCookieJar @Inject constructor(local: WeJhPreferenceDataSource) : CookieJar {
 
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    private val tokenFlow: Flow<String> = local.user.map { it.sessionToken }
+    private val tokenFlow: Flow<String?> = local.data.map { it.userOrNull?.sessionToken }
 
     init {
         scope.launch {
@@ -41,9 +42,9 @@ class WeJhAuthorizedCookieJar @Inject constructor(local: WeJhUserLocalDataSource
         val token =
             currentToken
                 ?: throw UnauthorizedException("Uninitialized token, maybe still in loading.")
-        if (token.isEmpty()) {
-            throw UnauthorizedException("Empty session token")
-        }
+//        if (token.isEmpty()) {
+//            throw UnauthorizedException("Empty session token")
+//        }
         return mutableListOf(
             Cookie.Builder()
                 .domain(COOKIE_DOMAIN)

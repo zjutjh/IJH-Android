@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option java_package = "com.zjutjh.ijh.datastore.model";
+option java_multiple_files = true;
+
+message WeJhPreference {
+  optional Info info = 1;
+  optional User user = 2;
+
+  optional uint64 courses_last_sync_time = 3;
+
+  message Info {
+    bool isBegin = 1;
+    string year = 2;
+    string term = 3;
+    uint64 term_start_date = 4;
+    uint32 week = 5;
+    uint64 last_sync_time = 6;
+    string school_bus_url = 7;
+  }
+
+  message User {
+    string username = 1;
+    string session_token = 2;
+    uint64 session_expiration_time = 3;
+    int64 uid = 4;
+    string student_id = 5;
+    uint64 create_time = 6;
+    string phone_number = 7;
+    uint32 user_type = 8;
+    Bind bind = 9;
+
+    message Bind {
+      bool zf = 1;
+      bool lib = 2;
+      bool yxy = 3;
+    }
+  }
+}

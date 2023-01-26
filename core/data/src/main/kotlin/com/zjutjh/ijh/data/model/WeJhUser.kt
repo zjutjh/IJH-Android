@@ -6,7 +6,6 @@ import com.zjutjh.ijh.network.model.NetworkWeJhUser
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-
 fun NetworkWeJhUser.asLocalModel(): WeJhPreference.User =
     WeJhPreferenceKt.user {
         uid = this@asLocalModel.id

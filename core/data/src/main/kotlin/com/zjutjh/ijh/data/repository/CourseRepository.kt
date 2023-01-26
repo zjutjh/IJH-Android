@@ -1,15 +1,14 @@
 package com.zjutjh.ijh.data.repository
 
 import com.zjutjh.ijh.model.Course
-import kotlinx.collections.immutable.ImmutableList
+import com.zjutjh.ijh.model.Term
+import kotlinx.coroutines.flow.Flow
+import java.time.ZonedDateTime
 
 /**
  * Data layer Interface of [Course] repository
  */
 interface CourseRepository {
-    suspend fun getCourses(): ImmutableList<Course>
-
-    suspend fun sync()
+    val lastSyncTimeStream: Flow<ZonedDateTime?>
+    suspend fun sync(year: Int, term: Term)
 }
-
-

@@ -4,27 +4,59 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.repository.CourseRepository
+import com.zjutjh.ijh.data.repository.WeJhInfoRepository
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.ui.model.TermDayState
+import com.zjutjh.ijh.ui.model.toTermDayState
+import com.zjutjh.ijh.util.LoadResult
+import com.zjutjh.ijh.util.asLoadResultStateFlow
+import com.zjutjh.ijh.util.isReady
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import java.time.Duration
+import java.time.ZonedDateTime
 import javax.inject.Inject
+import kotlin.time.toKotlinDuration
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val weJhUserRepository: WeJhUserRepository,
-    private val courseRepository: CourseRepository
+    weJhUserRepository: WeJhUserRepository,
+    private val courseRepository: CourseRepository,
+    private val weJhInfoRepository: WeJhInfoRepository,
 ) : ViewModel() {
 
-    val loginState: StateFlow<Boolean> = weJhUserRepository.userStream
+    val loginState: StateFlow<LoadResult<Boolean>> = weJhUserRepository.userStream
         .map { it != null }
+        .distinctUntilChanged()
+        .asLoadResultStateFlow(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+        )
+
+    private val timerFlow: Flow<Unit> = flow {
+        val duration = Duration.ofSeconds(20).toKotlinDuration()
+        while (true) {
+            emit(Unit)
+            delay(duration)
+        }
+    }
+    val courseLastSyncState: StateFlow<Duration?> = courseRepository.lastSyncTimeStream
+        .distinctUntilChanged()
+        .combine(timerFlow) { t1, _ -> t1 }
+        .map {
+            if (it == null) null else {
+                Duration.between(it, ZonedDateTime.now())
+            }
+        }
+        .flowOn(Dispatchers.Default)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = false
+            initialValue = null
         )
 
     private val _coursesState: MutableStateFlow<ImmutableList<Course>> =
@@ -34,57 +66,79 @@ class HomeViewModel @Inject constructor(
     private val _refreshState = MutableStateFlow(false)
     val refreshState: StateFlow<Boolean> = _refreshState.asStateFlow()
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val termState: StateFlow<LoadResult<TermDayState?>> = weJhInfoRepository.infoStream
+        .mapLatest {
+            it?.toTermDayState()
+        }
+        .distinctUntilChanged()
+        .asLoadResultStateFlow(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+        )
+
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            loginState.collectLatest {
-                if (it) refresh(this)
+            this.launch {
+                // Subscribe state.
+                termState.collect()
             }
+            loginState
+                .filter { it.isReady() }
+                .collectLatest {
+                    refreshAll(this)
+                }
         }
     }
 
     /**
      * Sync with upstream
      */
-    fun refresh() {
+    fun refreshAll() {
         if (_refreshState.value) {
             // Already in refreshing, abort.
             return
         }
-        if (!loginState.value) {
-            // Not logged in, no refresh required.
-            viewModelScope.launch {
-                // Add animation duration to make the animation smoother
-                _refreshState.update { true }
-                delay(animationDuration)
-                _refreshState.update { false }
-            }
-        } else {
-            viewModelScope.launch(Dispatchers.Default) {
-                refresh(this)
-            }
+        viewModelScope.launch(Dispatchers.Default) {
+            refreshAll(this)
         }
     }
 
-    private suspend fun refresh(scope: CoroutineScope) {
+    private suspend fun refreshAll(scope: CoroutineScope) {
         _refreshState.update { true }
         val timer = scope.async { delay(animationDuration) }
-        try {
-            // Parallel jobs
-            joinAll(
-                scope.launch {
-                    weJhUserRepository.sync()
-                },
-                scope.launch {
-                    courseRepository.sync()
-                },
-            )
 
-            Log.i("HomeSync", "Synchronization succeeded.")
-        } catch (e: Throwable) {
-            Log.w("HomeSync", "Error: $e.")
-        }
+        // Parallel jobs
+        refreshTerm()
+
+        val isLoggedIn = loginState.value
+        if (isLoggedIn is LoadResult.Ready && isLoggedIn.data)
+            refreshCourse()
+
+        Log.i("HomeSync", "Synchronization complete.")
+
         timer.await()
         _refreshState.update { false }
+    }
+
+    /**
+     * Refresh on startup only or manually
+     */
+    private suspend fun refreshTerm() {
+        runCatching { weJhInfoRepository.sync() }.onFailure {
+            Log.e("HomeSync", "Sync WeJhInfo failed: $it")
+        }
+    }
+
+    private suspend fun refreshCourse() {
+        val termInfo = termState.value
+        if (termInfo is LoadResult.Ready && termInfo.data != null) {
+            runCatching {
+                courseRepository.sync(termInfo.data.year, termInfo.data.term)
+            }.onFailure {
+                Log.e("HomeSync", "Sync Courses failed: $it")
+            }
+        }
     }
 
     companion object {

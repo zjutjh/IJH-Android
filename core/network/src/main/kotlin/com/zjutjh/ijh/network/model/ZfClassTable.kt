@@ -8,7 +8,7 @@ import com.zjutjh.ijh.model.CourseWeek
 import java.time.DayOfWeek
 
 @JsonClass(generateAdapter = true)
-data class ClassTable(
+data class ZfClassTable(
     val info: Info,
     val lessonsTable: List<LessonsTable>?,
     val practiceLessons: List<PracticeLesson>?,
@@ -50,7 +50,7 @@ data class ClassTable(
 /**
  * @throws CourseParseException
  */
-fun ClassTable.LessonsTable.asExternalModel(): Course {
+fun ZfClassTable.LessonsTable.asExternalModel(): Course {
     val section = sections.split('-')
     if (section.size != 2) {
         throw CourseParseException("Invalid class section format.")

@@ -24,25 +24,33 @@ import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.HomeViewModel
-import kotlinx.collections.immutable.ImmutableList
+import com.zjutjh.ijh.util.LoadResult
 import kotlinx.coroutines.launch
+import java.time.Duration
 
 @Composable
 fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToClassSchedule: () -> Unit = {/* TODO */ },
+    onNavigateToClassSchedule: () -> Unit = { /* TODO */ },
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
     val refreshState by viewModel.refreshState.collectAsState()
     val courseState by viewModel.coursesState.collectAsStateWithLifecycle()
+    val coursesLastSyncState by viewModel.courseLastSyncState.collectAsStateWithLifecycle()
+
+    val isLoggedIn = when (val state = loginState) {
+        is LoadResult.Loading -> null
+        is LoadResult.Ready -> state.data
+    }
 
     HomeScreen(
         refreshing = refreshState,
-        isLoggedIn = loginState,
+        isLoggedIn = isLoggedIn,
         courses = courseState,
-        onRefresh = viewModel::refresh,
+        coursesLastSyncDuration = coursesLastSyncState,
+        onRefresh = viewModel::refreshAll,
         onNavigateToLogin = onNavigateToLogin,
         onNavigateToProfile = onNavigateToProfile,
         onNavigateToClassSchedule = onNavigateToClassSchedule,
@@ -52,8 +60,9 @@ fun HomeRoute(
 @Composable
 private fun HomeScreen(
     refreshing: Boolean,
-    isLoggedIn: Boolean,
-    courses: ImmutableList<Course>,
+    isLoggedIn: Boolean?,
+    courses: List<Course>,
+    coursesLastSyncDuration: Duration?,
     onRefresh: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -81,6 +90,7 @@ private fun HomeScreen(
                     .fillMaxWidth(),
                 courses = courses,
                 onCalendarClick = onNavigateToClassSchedule,
+                lastSyncDuration = coursesLastSyncDuration,
             )
         }
 
@@ -95,7 +105,7 @@ private fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScaffold(
-    isLoggedIn: Boolean,
+    isLoggedIn: Boolean?,
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     pullRefreshState: PullRefreshState,
     onAccountButtonClick: () -> Unit,
@@ -173,7 +183,7 @@ fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
-    isLoggedIn: Boolean,
+    isLoggedIn: Boolean?,
     onMenuButtonClick: () -> Unit,
     onAccountButtonClick: () -> Unit,
     onLoginButtonClick: () -> Unit,
@@ -192,19 +202,21 @@ fun HomeTopBar(
             }
         },
         actions = {
-            if (isLoggedIn) {
-                IconButton(onClick = onAccountButtonClick) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = stringResource(id = R.string.account),
-                    )
-                }
-            } else {
-                IconButton(onClick = onLoginButtonClick) {
-                    Icon(
-                        imageVector = Icons.Default.Login,
-                        contentDescription = stringResource(id = R.string.login),
-                    )
+            if (isLoggedIn != null) {
+                if (isLoggedIn) {
+                    IconButton(onClick = onAccountButtonClick) {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = stringResource(id = R.string.account),
+                        )
+                    }
+                } else {
+                    IconButton(onClick = onLoginButtonClick) {
+                        Icon(
+                            imageVector = Icons.Default.Login,
+                            contentDescription = stringResource(id = R.string.login),
+                        )
+                    }
                 }
             }
         },
@@ -232,7 +244,14 @@ private fun NavigationDrawerPreview() {
 private fun HomeScreenPreview() {
     val courses = CourseRepositoryMock.getCourses()
     IJhTheme {
-        HomeScreen(refreshing = false, isLoggedIn = true, courses, {}, {}, {}) {}
+        HomeScreen(
+            refreshing = false,
+            isLoggedIn = true,
+            courses,
+            Duration.ofDays(1),
+            {},
+            {},
+            {}) {}
     }
 }
 
@@ -241,6 +260,13 @@ private fun HomeScreenPreview() {
 private fun HomeScrollPreview() {
     val courses = CourseRepositoryMock.getCourses()
     IJhTheme {
-        HomeScreen(refreshing = false, isLoggedIn = true, courses, {}, {}, {}) {}
+        HomeScreen(
+            refreshing = false,
+            isLoggedIn = true,
+            courses,
+            Duration.ofDays(1),
+            {},
+            {},
+            {}) {}
     }
 }

@@ -55,4 +55,18 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
                 clearCoursesLastSyncTime()
             }
         }
+
+    suspend fun setInfo(info: WeJhPreference.Info) =
+        dataStore.updateData {
+            it.copy {
+                this.info = info
+            }
+        }
+
+    suspend fun deleteInfo() =
+        dataStore.updateData {
+            it.copy {
+                clearInfo()
+            }
+        }
 }

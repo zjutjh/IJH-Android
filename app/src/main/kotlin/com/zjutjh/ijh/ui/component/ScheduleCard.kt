@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,14 +21,16 @@ import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.theme.IJhTheme
-import kotlinx.collections.immutable.ImmutableList
+import com.zjutjh.ijh.util.toSimplifiedString
 import kotlinx.collections.immutable.persistentListOf
+import java.time.Duration
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ScheduleCard(
-    courses: ImmutableList<Course>,
+    courses: List<Course>,
+    lastSyncDuration: Duration?,
     onCalendarClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -44,11 +47,25 @@ fun ScheduleCard(
                     modifier = Modifier.padding(start = 24.dp, top = 16.dp),
                     style = MaterialTheme.typography.headlineMedium,
                 )
-                Text(
-                    text = stringResource(id = R.string.today_class_schedule),
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
+                if (lastSyncDuration == null) {
+                    Text(
+                        text = stringResource(
+                            id = R.string.today_class_schedule,
+                            stringResource(id = R.string.never)
+                        ),
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                } else {
+                    Text(
+                        text = stringResource(
+                            id = R.string.today_class_schedule,
+                            lastSyncDuration.toSimplifiedString(LocalContext.current)
+                        ),
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
 
             IconButton(
@@ -79,7 +96,7 @@ fun ScheduleCard(
 }
 
 @Composable
-fun CoursesCards(courses: ImmutableList<Course>, modifier: Modifier = Modifier) {
+fun CoursesCards(courses: List<Course>, modifier: Modifier = Modifier) {
     Column(modifier) {
         courses.forEach {
             Spacer(modifier = Modifier.padding(4.dp))
@@ -184,7 +201,8 @@ fun ScheduleSurfacePreview() {
             ScheduleCard(
                 modifier = Modifier.padding(10.dp),
                 courses = CourseRepositoryMock.getCourses(),
-                onCalendarClick = {}
+                onCalendarClick = {},
+                lastSyncDuration = Duration.ofDays(2),
             )
         }
     }
@@ -198,7 +216,8 @@ fun ScheduleSurfaceEmptyPreview() {
             ScheduleCard(
                 modifier = Modifier.padding(10.dp),
                 courses = persistentListOf(),
-                onCalendarClick = {}
+                onCalendarClick = {},
+                lastSyncDuration = Duration.ofDays(1),
             )
         }
     }

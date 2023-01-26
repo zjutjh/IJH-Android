@@ -3,17 +3,24 @@ package com.zjutjh.ijh.data.repository.mock
 import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.CourseWeek
+import com.zjutjh.ijh.model.Term
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import java.time.DayOfWeek
+import java.time.ZonedDateTime
 
 /**
  * A mock of [CourseRepository] for preview and tests
  */
 class CourseRepositoryMock : CourseRepository {
 
-    override suspend fun getCourses(): ImmutableList<Course> = Companion.getCourses()
-    override suspend fun sync() = Unit
+    override val lastSyncTimeStream: Flow<ZonedDateTime?> = flowOf(
+        ZonedDateTime.now()
+    )
+
+    override suspend fun sync(year: Int, term: Term) = Unit
 
     companion object {
         fun getCourse(): Course = Course(

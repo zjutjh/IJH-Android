@@ -1,35 +1,38 @@
 package com.zjutjh.ijh.data.repository
 
 import android.util.Log
-import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
-import com.zjutjh.ijh.model.Course
-import com.zjutjh.ijh.network.WeJhZfDataSource
+import com.zjutjh.ijh.datastore.converter.toZonedDateTime
+import com.zjutjh.ijh.model.Term
+import com.zjutjh.ijh.network.ZfDataSource
 import com.zjutjh.ijh.network.model.asExternalModel
-import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.collections.immutable.ImmutableList
+import dagger.hilt.android.scopes.ActivityRetainedScoped
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
 /**
  * Default impl of [CourseRepository]
  */
-@ViewModelScoped
+@ActivityRetainedScoped
 class CourseRepositoryImpl @Inject constructor(
-    private val zfDataSource: WeJhZfDataSource,
+    private val zfDataSource: ZfDataSource,
     private val localPreference: WeJhPreferenceDataSource,
 ) : CourseRepository {
 
-    override suspend fun getCourses(): ImmutableList<Course> {
-        // TODO: unimplemented, just placeholder
-        return CourseRepositoryMock().getCourses()
-    }
+    override val lastSyncTimeStream: Flow<ZonedDateTime?> =
+        localPreference.data.map {
+            if (it.hasCoursesLastSyncTime())
+                it.coursesLastSyncTime.toZonedDateTime()
+            else null
+        }
 
-    override suspend fun sync() {
-        val classTable = zfDataSource.getClassTable("2022", "上")
-        if (classTable.lessonsTable != null) {
+    override suspend fun sync(year: Int, term: Term) {
+        val classTable = zfDataSource.getClassTable(year.toString(), term.value).lessonsTable
+        if (classTable != null) {
             // TODO: store into Database.
-            Log.i("CourseSync", classTable.lessonsTable!!.map { it.asExternalModel() }.toString())
+            Log.i("CourseSync", classTable.map { it.asExternalModel() }.toString())
             localPreference.setCoursesLastSyncTime(ZonedDateTime.now())
         }
     }

@@ -11,8 +11,8 @@ message WeJhPreference {
 
   message Info {
     bool isBegin = 1;
-    string year = 2;
-    string term = 3;
+    uint32 year = 2;
+    uint32 term = 3;
     uint64 term_start_date = 4;
     uint32 week = 5;
     uint64 last_sync_time = 6;

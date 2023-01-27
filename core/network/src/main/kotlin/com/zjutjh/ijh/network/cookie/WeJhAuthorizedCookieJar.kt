@@ -6,9 +6,10 @@ import com.zjutjh.ijh.exception.UnauthorizedException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.stateIn
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
@@ -20,18 +21,13 @@ class WeJhAuthorizedCookieJar @Inject constructor(local: WeJhPreferenceDataSourc
 
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-    private val tokenFlow: Flow<String?> = local.data.map { it.userOrNull?.sessionToken }
-
-    init {
-        scope.launch {
-            tokenFlow.collect {
-                currentToken = it
-            }
-        }
-    }
-
-    @Volatile
-    private var currentToken: String? = null
+    private val tokenFlow: StateFlow<String?> = local.data
+        .map { it.userOrNull?.sessionToken ?: String() }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Eagerly,
+            initialValue = null
+        )
 
     /**
      * For requests only
@@ -40,11 +36,11 @@ class WeJhAuthorizedCookieJar @Inject constructor(local: WeJhPreferenceDataSourc
 
     override fun loadForRequest(url: HttpUrl): MutableList<Cookie> {
         val token =
-            currentToken
+            tokenFlow.value
                 ?: throw UnauthorizedException("Uninitialized token, maybe still in loading.")
-//        if (token.isEmpty()) {
-//            throw UnauthorizedException("Empty session token")
-//        }
+        if (token.isEmpty()) {
+            throw UnauthorizedException("Empty session token.")
+        }
         return mutableListOf(
             Cookie.Builder()
                 .domain(COOKIE_DOMAIN)

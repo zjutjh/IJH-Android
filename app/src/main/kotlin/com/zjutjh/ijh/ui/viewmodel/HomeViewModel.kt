@@ -54,7 +54,7 @@ class HomeViewModel @Inject constructor(
         MutableStateFlow(persistentListOf())
     var coursesState: StateFlow<ImmutableList<Course>> = _coursesState.asStateFlow()
 
-    private val _refreshState = MutableStateFlow(false)
+    private val _refreshState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val refreshState: StateFlow<Boolean> = _refreshState.asStateFlow()
 
     val loginState: StateFlow<LoadResult<Boolean>> = weJhUserRepository.userStream
@@ -107,7 +107,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun refreshAll(scope: CoroutineScope) {
         _refreshState.update { true }
-        val timer = scope.async { delay(animationDuration) }
+        val timer = scope.async { delay(300L) }
 
         // Parallel jobs
         refreshTerm()
@@ -139,9 +139,5 @@ class HomeViewModel @Inject constructor(
                 Log.e("HomeSync", "Sync Courses failed: $it")
             }
         }
-    }
-
-    companion object {
-        private const val animationDuration: Long = 300
     }
 }

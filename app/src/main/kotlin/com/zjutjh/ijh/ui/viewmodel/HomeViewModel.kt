@@ -11,7 +11,6 @@ import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.toTermDayState
 import com.zjutjh.ijh.util.LoadResult
 import com.zjutjh.ijh.util.asLoadResultStateFlow
-import com.zjutjh.ijh.util.isReady
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -28,14 +27,6 @@ class HomeViewModel @Inject constructor(
     private val courseRepository: CourseRepository,
     private val weJhInfoRepository: WeJhInfoRepository,
 ) : ViewModel() {
-
-    val loginState: StateFlow<LoadResult<Boolean>> = weJhUserRepository.userStream
-        .map { it != null }
-        .distinctUntilChanged()
-        .asLoadResultStateFlow(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-        )
 
     private val timerFlow: Flow<Unit> = flow {
         val duration = Duration.ofSeconds(20).toKotlinDuration()
@@ -66,25 +57,35 @@ class HomeViewModel @Inject constructor(
     private val _refreshState = MutableStateFlow(false)
     val refreshState: StateFlow<Boolean> = _refreshState.asStateFlow()
 
+    val loginState: StateFlow<LoadResult<Boolean>> = weJhUserRepository.userStream
+        .map { it != null }
+        .distinctUntilChanged()
+        .flowOn(Dispatchers.Default)
+        .asLoadResultStateFlow(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+        )
+
+    private val termLocalRefreshChannel: MutableStateFlow<Unit> = MutableStateFlow(Unit)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val termState: StateFlow<LoadResult<TermDayState?>> = weJhInfoRepository.infoStream
+        .distinctUntilChanged()
+        .combine(termLocalRefreshChannel) { t1, _ -> t1 }
         .mapLatest {
             it?.toTermDayState()
         }
-        .distinctUntilChanged()
+        .flowOn(Dispatchers.Default)
         .asLoadResultStateFlow(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
         )
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            this.launch {
-                // Subscribe state.
-                termState.collect()
-            }
+            // Subscribe latest login state, and trigger refresh.
             loginState
-                .filter { it.isReady() }
+                .drop(1) // Wait until available
                 .collectLatest {
                     refreshAll(this)
                 }
@@ -121,12 +122,11 @@ class HomeViewModel @Inject constructor(
         _refreshState.update { false }
     }
 
-    /**
-     * Refresh on startup only or manually
-     */
     private suspend fun refreshTerm() {
         runCatching { weJhInfoRepository.sync() }.onFailure {
             Log.e("HomeSync", "Sync WeJhInfo failed: $it")
+            // Run local refresh when failed
+            termLocalRefreshChannel.emit(Unit)
         }
     }
 

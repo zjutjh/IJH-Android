@@ -25,6 +25,7 @@ data class ZfClassTable(
     data class LessonsTable(
         val campus: String,
         val className: String,
+        val classID: String,
         val credits: String,
         val id: String,
         val lessonHours: String,
@@ -69,6 +70,6 @@ fun ZfClassTable.LessonsTable.asExternalModel(): Course {
         dayOfWeek = DayOfWeek.of(weekday.toInt()),
         sectionStart = section[0].toInt(),
         sectionEnd = section[1].toInt(),
-        weeks = CourseWeek.parseFromWeekString(week)
+        weeks = CourseWeek.parseFromZfWeekString(week)
     )
 }

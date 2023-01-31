@@ -20,6 +20,8 @@ class CourseRepositoryMock : CourseRepository {
         ZonedDateTime.now()
     )
 
+    override fun getCourses(year: Int, term: Term): Flow<List<Course>> = flowOf(getCourses())
+
     override suspend fun sync(year: Int, term: Term) = Unit
 
     companion object {
@@ -37,9 +39,10 @@ class CourseRepositoryMock : CourseRepository {
             sectionEnd = 4,
             dayOfWeek = DayOfWeek.MONDAY,
             weeks = CourseWeek(
+                listOf(),
                 listOf(
-                    CourseWeek.WeekSection(1, 16, null)
-                ), listOf()
+                    CourseWeek.WeekRange(1, 16, null)
+                )
             )
         )
 
@@ -58,9 +61,10 @@ class CourseRepositoryMock : CourseRepository {
                 sectionEnd = 2,
                 dayOfWeek = DayOfWeek.MONDAY,
                 weeks = CourseWeek(
+                    listOf(),
                     listOf(
-                        CourseWeek.WeekSection(1, 16, null)
-                    ), listOf()
+                        CourseWeek.WeekRange(1, 16, null)
+                    )
                 )
             ),
             Course(
@@ -77,13 +81,14 @@ class CourseRepositoryMock : CourseRepository {
                 sectionEnd = 4,
                 dayOfWeek = DayOfWeek.MONDAY,
                 weeks = CourseWeek(
+                    listOf(),
                     listOf(
-                        CourseWeek.WeekSection(1, 16, null)
-                    ), listOf()
+                        CourseWeek.WeekRange(1, 16, null)
+                    )
                 )
             ),
             Course(
-                id = 1,
+                id = 3,
                 name = "Design pattern in practice",
                 teacherName = "Mr. Info",
                 place = "Software.A.302",
@@ -96,13 +101,14 @@ class CourseRepositoryMock : CourseRepository {
                 sectionEnd = 2,
                 dayOfWeek = DayOfWeek.MONDAY,
                 weeks = CourseWeek(
+                    listOf(),
                     listOf(
-                        CourseWeek.WeekSection(1, 16, null)
-                    ), listOf()
+                        CourseWeek.WeekRange(1, 16, null)
+                    )
                 )
             ),
             Course(
-                id = 2,
+                id = 4,
                 name = "Software Engineering and Information Technology",
                 teacherName = "Mr. Hex",
                 place = "Information.B.101",
@@ -115,13 +121,14 @@ class CourseRepositoryMock : CourseRepository {
                 sectionEnd = 4,
                 dayOfWeek = DayOfWeek.MONDAY,
                 weeks = CourseWeek(
+                    listOf(),
                     listOf(
-                        CourseWeek.WeekSection(1, 16, null)
-                    ), listOf()
+                        CourseWeek.WeekRange(1, 16, null)
+                    )
                 )
             ),
             Course(
-                id = 1,
+                id = 5,
                 name = "Design pattern in practice",
                 teacherName = "Mr. Info",
                 place = "Software.A.302",
@@ -134,13 +141,14 @@ class CourseRepositoryMock : CourseRepository {
                 sectionEnd = 2,
                 dayOfWeek = DayOfWeek.MONDAY,
                 weeks = CourseWeek(
+                    listOf(),
                     listOf(
-                        CourseWeek.WeekSection(1, 16, null)
-                    ), listOf()
+                        CourseWeek.WeekRange(1, 16, null)
+                    )
                 )
             ),
             Course(
-                id = 2,
+                id = 6,
                 name = "Software Engineering and Information Technology",
                 teacherName = "Mr. Hex",
                 place = "Information.B.101",
@@ -153,9 +161,10 @@ class CourseRepositoryMock : CourseRepository {
                 sectionEnd = 4,
                 dayOfWeek = DayOfWeek.MONDAY,
                 weeks = CourseWeek(
+                    listOf(),
                     listOf(
-                        CourseWeek.WeekSection(1, 16, null)
-                    ), listOf()
+                        CourseWeek.WeekRange(1, 16, null)
+                    )
                 )
             )
         )

@@ -78,3 +78,6 @@ lint/tmp/
 
 # Secretes
 secrets.properties
+
+# File system
+.DS_Store

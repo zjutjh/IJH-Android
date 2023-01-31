@@ -23,7 +23,16 @@ android {
     }
 }
 
+// The schemas directory contains a schema file for each version of the Room database.
+// This is required to enable Room auto migrations.
+// See https://developer.android.com/reference/kotlin/androidx/room/AutoMigration
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
+    implementation project(":core:common")
+
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     ksp "androidx.room:room-compiler:$room_version"

@@ -2,6 +2,7 @@ package com.zjutjh.ijh.model
 
 import androidx.compose.runtime.Stable
 import com.zjutjh.ijh.exception.CourseParseException
+import java.text.ParseException
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -48,36 +49,60 @@ data class Course(
 }
 
 data class CourseWeek(
-    val weekSections: List<WeekSection>,
     /**
      * Single course weeks
      */
-    val weeks: List<Int>,
+    val singles: List<Int>,
+    val ranges: List<WeekRange>,
 ) {
-    data class WeekSection(
+    data class WeekRange(
         val start: Int,
         val end: Int,
         /**
          * `true` for even week, `false` for odd week, `null` for invalid.
          */
-        val oddOrEvenWeek: Boolean?,
+        val oddOrEvenWeek: Boolean? = null,
     )
+
+    /**
+     * Checks if the specified week is contained in weeks
+     */
+    fun contains(week: Int): Boolean {
+        if (singles.contains(week))
+            return true
+        for (i in ranges) {
+            if (week in i.start..i.end) {
+                val rem = week % 2
+                when {
+                    i.oddOrEvenWeek == null -> return true
+                    i.oddOrEvenWeek && (rem == 0) -> return true
+                    !i.oddOrEvenWeek && (rem == 1) -> return true
+                }
+            }
+        }
+        return false
+    }
+
+    /**
+     * Serialize the object into a readable string.
+     */
+    fun serialize(): String = Serializer.serialize(this)
 
     companion object {
 
         /**
          * @throws CourseParseException
          */
-        fun parseFromWeekString(week: String): CourseWeek {
-            val single: ArrayList<Int> = ArrayList()
-            val sections: ArrayList<WeekSection> = ArrayList()
+        fun parseFromZfWeekString(week: String): CourseWeek {
+            val singles: ArrayList<Int> = ArrayList()
+            val ranges: ArrayList<WeekRange> = ArrayList()
             try {
                 for (time in week.split(',')) {
                     val clearTime = time.removeSuffix("周") // Remove useless suffix
                     val section = clearTime.split('-')
                     when (section.size) {
                         // Single week
-                        1 -> single.add(clearTime.toInt())
+                        1 -> singles.add(clearTime.toInt())
                         2 -> {
                             val start = section[0].toInt()
                             val section1 = section[1]
@@ -91,8 +116,8 @@ data class CourseWeek(
                             } else {
                                 section1.toInt()
                             }
-                            sections.add(
-                                WeekSection(
+                            ranges.add(
+                                WeekRange(
                                     start,
                                     end,
                                     evenWeek,
@@ -106,7 +131,169 @@ data class CourseWeek(
                 throw CourseParseException("Fail to week numbers.")
             }
 
-            return CourseWeek(weekSections = sections, weeks = single)
+            return CourseWeek(ranges = ranges, singles = singles)
+        }
+    }
+
+    object Serializer {
+
+        /**
+         * Serialize the object into a readable string.
+         *
+         * - `S1`: Single week,
+         * - `R1-16`: Week range,
+         * - `O1-16`: Odd week in week range,
+         * - `E1-16`: Even week in week range,
+         */
+        fun serialize(obj: CourseWeek): String =
+            buildString {
+                for (i in obj.singles) {
+                    append('S').append(i)
+                }
+                for (i in obj.ranges) {
+                    if (i.oddOrEvenWeek == null) {
+                        append('R')
+                    } else if (i.oddOrEvenWeek) {
+                        append('E')
+                    } else {
+                        append('O')
+                    }
+                    append(i.start).append('-').append(i.end)
+                }
+            }
+
+        private enum class State {
+            START,
+            S,
+            R1,
+            R2,
+        }
+
+        /**
+         * @throws ParseException
+         */
+        fun deserialize(input: String): CourseWeek {
+            val singles: ArrayList<Int> = ArrayList()
+            val ranges: ArrayList<WeekRange> = ArrayList()
+
+            var state: State = State.START
+            var flag: Boolean? = null
+            var v1 = 0
+            var v2 = 0
+
+            fun setS() {
+                state = State.S
+                v1 = 0
+            }
+
+            fun setR() {
+                state = State.R1
+                flag = null
+                v1 = 0
+                v2 = 0
+            }
+
+            fun setO() {
+                state = State.R1
+                flag = false
+                v1 = 0
+                v2 = 0
+            }
+
+            fun setE() {
+                state = State.R1
+                flag = true
+                v1 = 0
+                v2 = 0
+            }
+
+            fun postS() {
+                if (v1 != 0) {
+                    singles.add(v1)
+                }
+            }
+
+            fun postR() {
+                if (v1 != 0 && v2 != 0) {
+                    ranges.add(
+                        WeekRange(start = v1, end = v2, oddOrEvenWeek = flag)
+                    )
+                }
+            }
+
+
+            for ((index: Int, value: Char) in input.withIndex()) {
+                when (state) {
+                    State.START -> when (value) {
+                        'S' -> setS()
+                        'R' -> setR()
+                        'O' -> setO()
+                        'E' -> setE()
+                        else -> throw ParseException("Unexpected character get.", index)
+                    }
+                    State.S -> when (value) {
+                        in '0'..'9' -> {
+                            v1 = v1 * 10 + value.digitToInt()
+                        }
+                        'S' -> {
+                            postS()
+                            setS()
+                        }
+                        'R' -> {
+                            postS()
+                            setR()
+                        }
+                        'O' -> {
+                            postS()
+                            setO()
+                        }
+                        'E' -> {
+                            postS()
+                            setE()
+                        }
+                        else -> throw ParseException("Unexpected character get.", index)
+                    }
+                    State.R1 -> when (value) {
+                        in '0'..'9' -> {
+                            v1 = v1 * 10 + value.digitToInt()
+                        }
+                        '-' -> state = State.R2
+                        else -> throw ParseException("Unexpected character get.", index)
+                    }
+                    State.R2 -> when (value) {
+                        in '0'..'9' -> {
+                            v2 = v2 * 10 + value.digitToInt()
+                        }
+                        'S' -> {
+                            postR()
+                            setS()
+                        }
+                        'R' -> {
+                            postR()
+                            setR()
+                        }
+                        'O' -> {
+                            postR()
+                            setO()
+                        }
+                        'E' -> {
+                            postR()
+                            setE()
+                        }
+                        else -> throw ParseException("Unexpected character get.", index)
+                    }
+                }
+            }
+
+            // End of flow/string.
+            when (state) {
+                State.START -> Unit
+                State.S -> postS()
+                State.R2 -> postR()
+                else -> throw ParseException("Bad end state.", input.length)
+            }
+
+            return CourseWeek(singles = singles, ranges = ranges)
         }
     }
 }

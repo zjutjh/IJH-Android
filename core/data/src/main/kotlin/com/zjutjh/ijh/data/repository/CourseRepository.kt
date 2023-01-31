@@ -10,5 +10,8 @@ import java.time.ZonedDateTime
  */
 interface CourseRepository {
     val lastSyncTimeStream: Flow<ZonedDateTime?>
+
+    fun getCourses(year: Int, term: Term): Flow<List<Course>>
+
     suspend fun sync(year: Int, term: Term)
 }

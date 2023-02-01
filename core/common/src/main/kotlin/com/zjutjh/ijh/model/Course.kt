@@ -45,6 +45,23 @@ data class Course(
             minute2: Int
         ): Pair<LocalTime, LocalTime> =
             Pair(LocalTime.of(hour1, minute1), LocalTime.of(hour2, minute2))
+
+        fun default(): Course =
+            Course(
+                id = 0,
+                name = String(),
+                teacherName = String(),
+                campus = String(),
+                place = String(),
+                className = String(),
+                type = String(),
+                credits = 0f,
+                hours = 0,
+                sectionStart = 0,
+                sectionEnd = 0,
+                dayOfWeek = DayOfWeek.MONDAY,
+                weeks = CourseWeek.default(),
+            )
     }
 }
 
@@ -62,7 +79,17 @@ data class CourseWeek(
          * `true` for even week, `false` for odd week, `null` for invalid.
          */
         val oddOrEvenWeek: Boolean? = null,
-    )
+    ) {
+        override fun toString(): String {
+            return if (oddOrEvenWeek == null) {
+                "$start-$end"
+            } else if (oddOrEvenWeek) {
+                "$start-${end}双"
+            } else {
+                "$start-${end}单"
+            }
+        }
+    }
 
     /**
      * Checks if the specified week is contained in weeks
@@ -82,6 +109,22 @@ data class CourseWeek(
         }
         return false
     }
+
+    override fun toString(): String =
+        buildString {
+            singles.forEachIndexed { index, i ->
+                if (index != 0) {
+                    append(", ")
+                }
+                append(i)
+            }
+            if (singles.isNotEmpty())
+                append(", ")
+            ranges.forEach{
+                append(it.toString())
+            }
+        }
+
 
     /**
      * Serialize the object into a readable string.
@@ -133,6 +176,12 @@ data class CourseWeek(
 
             return CourseWeek(ranges = ranges, singles = singles)
         }
+
+        fun default(): CourseWeek =
+            CourseWeek(
+                emptyList(),
+                emptyList(),
+            )
     }
 
     object Serializer {

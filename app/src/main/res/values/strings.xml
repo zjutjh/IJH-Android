@@ -46,4 +46,12 @@
     <string name="unit_week">Week %1$d</string>
     <string name="unknown">Unknown</string>
     <string name="ago">" ago"</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="weeks">Weeks</string>
+    <string name="class_str">Class</string>
+    <string name="hours">Hours</string>
+    <string name="credits">Credits</string>
+    <string name="last_sync">Last sync:</string>
+    <string name="calendar">Calendar</string>
 </resources>

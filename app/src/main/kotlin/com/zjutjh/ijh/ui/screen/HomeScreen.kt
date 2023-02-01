@@ -101,7 +101,6 @@ private fun HomeScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
 
-
             ScheduleCard(
                 modifier = Modifier
                     .padding(16.dp)

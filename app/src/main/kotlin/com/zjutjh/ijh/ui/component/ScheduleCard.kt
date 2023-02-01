@@ -1,16 +1,20 @@
 package com.zjutjh.ijh.ui.component
 
 import android.content.res.Configuration.*
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -20,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
@@ -45,57 +50,61 @@ fun ScheduleCard(
     OutlinedCard(
         modifier = modifier,
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column {
+        Column(Modifier.padding(top = 12.dp, start = 24.dp, end = 24.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 Text(
                     text = stringResource(id = R.string.schedule),
-                    modifier = Modifier.padding(start = 24.dp, top = 16.dp),
                     style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Black
                 )
-                Text(
-                    text = stringResource(id = R.string.today_class_schedule),
-                    modifier = Modifier.padding(start = 24.dp, bottom = 4.dp),
-                    style = MaterialTheme.typography.titleSmall
-                )
+                IconButton(
+                    onClick = onCalendarClick
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CalendarMonth,
+                        contentDescription = stringResource(
+                            id = R.string.calendar
+                        )
+                    )
+                }
+            }
 
-                val prompt = buildString {
+            Divider()
+            Spacer(modifier = Modifier.height(4.dp))
+
+            val prompt = remember(termDay, lastSyncDuration) {
+                buildString {
                     if (termDay != null) {
                         append(
-                            stringResource(
-                                id = R.string.unit_week,
+                            context.getString(
+                                R.string.unit_week,
                                 termDay.week
                             )
                         )
                     } else {
                         append(
-                            stringResource(id = R.string.unknown)
+                            context.getString(R.string.unknown)
                         )
                     }
                     append(" | ")
                     if (lastSyncDuration != null) {
                         append(lastSyncDuration.toLocalizedString(context))
-                            .append(stringResource(id = R.string.ago))
+                            .append(context.getString(R.string.ago))
                     } else {
-                        append(stringResource(id = R.string.never))
+                        append(context.getString(R.string.never))
                     }
                 }
-
-                Text(
-                    text = prompt,
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
             }
 
-            IconButton(
-                modifier = Modifier.padding(top = 16.dp, end = 10.dp),
-                onClick = onCalendarClick
-            ) {
-                Icon(imageVector = Icons.Default.CalendarMonth, contentDescription = null)
-            }
+            Text(
+                text = prompt,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.outline
+            )
         }
 
         AnimatedContent(
@@ -123,7 +132,7 @@ fun ScheduleCard(
                     text = stringResource(id = R.string.nothing_to_do)
                 )
             } else {
-                CoursesCards(
+                CoursesCard(
                     courses = it,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -133,7 +142,16 @@ fun ScheduleCard(
 }
 
 @Composable
-fun CoursesCards(courses: List<Course>, modifier: Modifier = Modifier) {
+fun CoursesCard(courses: List<Course>, modifier: Modifier = Modifier) {
+    var openDialog by remember { mutableStateOf(false) }
+    var chosenCourse: Course by remember {
+        mutableStateOf(Course.default())
+    }
+
+    if (openDialog) {
+        CourseDetailDialog(onConfirm = { openDialog = false }, chosenCourse = chosenCourse)
+    }
+
     ElevatedCard(modifier) {
         Column(modifier = Modifier.padding(8.dp)) {
             courses.forEachIndexed { index, it ->
@@ -142,19 +160,74 @@ fun CoursesCards(courses: List<Course>, modifier: Modifier = Modifier) {
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                     )
-                CourseCard(
+                CourseListItem(
                     modifier = Modifier.fillMaxWidth(),
                     course = it,
-                    onClick = { /* TODO */ })
-
+                    onClick = { chosenCourse = it; openDialog = true })
             }
         }
     }
 }
 
 @Composable
-fun CourseCard(course: Course, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Column(modifier.clickable(onClick = onClick)) {
+fun CourseDetailDialog(onConfirm: () -> Unit, chosenCourse: Course) {
+    AlertDialog(
+        onDismissRequest = onConfirm,
+        title = {
+            Text(text = chosenCourse.name)
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm,
+            ) {
+                Text(stringResource(id = R.string.confirm))
+            }
+        },
+        text = {
+            val scrollState = rememberScrollState()
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 300.dp)
+                    .verticalScroll(scrollState)
+                    .verticalScrollbar(scrollState)
+            ) {
+                TextListItem(
+                    title = R.string.place,
+                    text = "${chosenCourse.campus}-${chosenCourse.place}"
+                )
+                TextListItem(title = R.string.time, text = chosenCourse.detailedTime())
+                TextListItem(title = R.string.weeks, text = chosenCourse.weeks.toString())
+                TextListItem(title = R.string.teacher, text = chosenCourse.teacherName)
+                TextListItem(title = R.string.class_str, text = chosenCourse.className)
+                TextListItem(title = R.string.credits, text = chosenCourse.credits.toString())
+                TextListItem(title = R.string.hours, text = chosenCourse.hours.toString())
+            }
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TextListItem(@StringRes title: Int, text: String) {
+    ListItem(
+        headlineText = {
+            Text(text = stringResource(id = title))
+        },
+        supportingText = {
+            Text(text = text)
+        }
+    )
+    Divider()
+}
+
+@Composable
+fun CourseListItem(course: Course, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .clip(MaterialTheme.shapes.small)
+            .clickable(onClick = onClick)
+            .padding(4.dp)
+    ) {
         IconText(
             icon = Icons.Default.Book,
             contentDescription = stringResource(id = R.string.course),
@@ -189,6 +262,20 @@ fun Course.shortTime(): String {
     return "${start.format(formatter)} - ${end.format(formatter)} | $sectionStart-$sectionEnd"
 }
 
+fun Course.detailedTime(): String {
+    val (start, _) = Course.SECTIONS[sectionStart - 1]
+    val (_, end) = Course.SECTIONS[sectionEnd - 1]
+
+    val formatter = DateTimeFormatter.ofPattern("HH:mm")
+    val startTime = start.format(formatter)
+    val endTime = end.format(formatter)
+
+    val locale = LocaleListCompat.getDefault()[0]
+
+    val dayOfWeek = dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, locale)
+    return "${dayOfWeek}($sectionStart-$sectionEnd) | $startTime-$endTime"
+}
+
 @Composable
 fun IconText(
     icon: ImageVector,
@@ -216,7 +303,7 @@ fun IconText(
 
 @Preview
 @Composable
-fun IconTextPreview() {
+private fun IconTextPreview() {
     IJhTheme {
         Surface {
             IconText(
@@ -230,10 +317,10 @@ fun IconTextPreview() {
 
 @Preview
 @Composable
-fun CourseCardPreview() {
+private fun CourseCardPreview() {
     IJhTheme {
         Surface {
-            CourseCard(
+            CourseListItem(
                 course = CourseRepositoryMock.getCourse(),
                 onClick = {}
             )
@@ -244,7 +331,7 @@ fun CourseCardPreview() {
 @Preview(name = "Light")
 @Preview(name = "Dark", uiMode = UI_MODE_NIGHT_YES)
 @Composable
-fun ScheduleSurfacePreview() {
+private fun ScheduleSurfacePreview() {
     val termDay = TermDayState(2023, Term.FIRST, 1, DayOfWeek.MONDAY, true)
     IJhTheme {
         Surface {
@@ -261,7 +348,7 @@ fun ScheduleSurfacePreview() {
 
 @Preview
 @Composable
-fun ScheduleSurfaceEmptyPreview() {
+private fun ScheduleSurfaceEmptyPreview() {
     IJhTheme {
         Surface {
             ScheduleCard(

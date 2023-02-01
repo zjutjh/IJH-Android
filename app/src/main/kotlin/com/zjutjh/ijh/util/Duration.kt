@@ -5,8 +5,8 @@ import com.zjutjh.ijh.R
 import java.time.Duration
 import kotlin.time.toKotlinDuration
 
-fun Duration.toSimplifiedString(context: Context): String = buildString {
-    val duration = this@toSimplifiedString.toKotlinDuration()
+fun Duration.toLocalizedString(context: Context): String = buildString {
+    val duration = this@toLocalizedString.toKotlinDuration()
     duration.absoluteValue.toComponents { days, hours, minutes, seconds, _ ->
         if (duration.isInfinite() || days > 999L) {
             append(context.getString(R.string.never))

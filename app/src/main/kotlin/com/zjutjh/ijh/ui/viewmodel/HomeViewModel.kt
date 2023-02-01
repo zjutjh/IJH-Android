@@ -12,8 +12,6 @@ import com.zjutjh.ijh.ui.model.toTermDayState
 import com.zjutjh.ijh.util.LoadResult
 import com.zjutjh.ijh.util.asLoadResultStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.time.Duration
@@ -50,10 +48,6 @@ class HomeViewModel @Inject constructor(
             initialValue = null
         )
 
-    private val _coursesState: MutableStateFlow<ImmutableList<Course>> =
-        MutableStateFlow(persistentListOf())
-    var coursesState: StateFlow<ImmutableList<Course>> = _coursesState.asStateFlow()
-
     private val _refreshState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val refreshState: StateFlow<Boolean> = _refreshState.asStateFlow()
 
@@ -69,7 +63,7 @@ class HomeViewModel @Inject constructor(
     private val termLocalRefreshChannel: MutableStateFlow<Unit> = MutableStateFlow(Unit)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val termState: StateFlow<LoadResult<TermDayState?>> = weJhInfoRepository.infoStream
+    val termDayState: StateFlow<LoadResult<TermDayState?>> = weJhInfoRepository.infoStream
         .distinctUntilChanged()
         .combine(termLocalRefreshChannel) { t1, _ -> t1 }
         .mapLatest {
@@ -79,6 +73,23 @@ class HomeViewModel @Inject constructor(
         .asLoadResultStateFlow(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
+        )
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val coursesState = termDayState
+        .drop(1)
+        .distinctUntilChanged(LoadResult<*>::isEqual)
+        .flatMapLatest { state ->
+            if (state is LoadResult.Ready && state.data != null) {
+                val day = state.data
+                courseRepository.getCourses(day.year, day.term)
+                    .map { it.filterToday(day) }
+            } else flowOf(emptyList())
+        }
+        .flowOn(Dispatchers.Default)
+        .asLoadResultStateFlow(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly
         )
 
     init {
@@ -91,6 +102,11 @@ class HomeViewModel @Inject constructor(
                 }
         }
     }
+
+    private fun List<Course>.filterToday(day: TermDayState): List<Course> =
+        this.filter {
+            (day.dayOfWeek == it.dayOfWeek) && (day.week in it.weeks)
+        }
 
     /**
      * Sync with upstream
@@ -123,19 +139,24 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun refreshTerm() {
-        runCatching { weJhInfoRepository.sync() }.onFailure {
-            Log.e("HomeSync", "Sync WeJhInfo failed: $it")
-            // Run local refresh when failed
-            termLocalRefreshChannel.emit(Unit)
-        }
+        runCatching { weJhInfoRepository.sync() }
+            .fold({
+                Log.i("HomeSync", "Sync WeJhInfo succeed.")
+            }) {
+                Log.e("HomeSync", "Sync WeJhInfo failed: $it")
+                // Run local refresh when failed
+                termLocalRefreshChannel.emit(Unit)
+            }
     }
 
     private suspend fun refreshCourse() {
-        val termInfo = termState.value
+        val termInfo = termDayState.value
         if (termInfo is LoadResult.Ready && termInfo.data != null) {
             runCatching {
                 courseRepository.sync(termInfo.data.year, termInfo.data.term)
-            }.onFailure {
+            }.fold({
+                Log.i("HomeSync", "Sync Courses succeed.")
+            }) {
                 Log.e("HomeSync", "Sync Courses failed: $it")
             }
         }

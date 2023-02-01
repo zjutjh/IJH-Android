@@ -20,12 +20,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.component.ScheduleCard
+import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.HomeViewModel
 import com.zjutjh.ijh.util.LoadResult
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.Duration
 
 @Composable
@@ -38,6 +41,7 @@ fun HomeRoute(
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
     val refreshState by viewModel.refreshState.collectAsState()
     val courseState by viewModel.coursesState.collectAsStateWithLifecycle()
+    val termDayState by viewModel.termDayState.collectAsStateWithLifecycle()
     val coursesLastSyncState by viewModel.courseLastSyncState.collectAsStateWithLifecycle()
 
     val isLoggedIn = when (val state = loginState) {
@@ -45,10 +49,21 @@ fun HomeRoute(
         is LoadResult.Ready -> state.data
     }
 
+    val courses = when (val state = courseState) {
+        is LoadResult.Loading -> null
+        is LoadResult.Ready -> state.data
+    }
+
+    val termDay = when (val state = termDayState) {
+        is LoadResult.Loading -> null
+        is LoadResult.Ready -> state.data
+    }
+
     HomeScreen(
         refreshing = refreshState,
         isLoggedIn = isLoggedIn,
-        courses = courseState,
+        courses = courses,
+        termDay = termDay,
         coursesLastSyncDuration = coursesLastSyncState,
         onRefresh = viewModel::refreshAll,
         onNavigateToLogin = onNavigateToLogin,
@@ -61,7 +76,8 @@ fun HomeRoute(
 private fun HomeScreen(
     refreshing: Boolean,
     isLoggedIn: Boolean?,
-    courses: List<Course>,
+    courses: List<Course>?,
+    termDay: TermDayState?,
     coursesLastSyncDuration: Duration?,
     onRefresh: () -> Unit,
     onNavigateToLogin: () -> Unit,
@@ -84,11 +100,14 @@ private fun HomeScreen(
         Column(
             modifier = Modifier.padding(paddingValues)
         ) {
+
+
             ScheduleCard(
                 modifier = Modifier
                     .padding(16.dp)
                     .fillMaxWidth(),
                 courses = courses,
+                termDay = termDay,
                 onCalendarClick = onNavigateToClassSchedule,
                 lastSyncDuration = coursesLastSyncDuration,
             )
@@ -243,11 +262,13 @@ private fun NavigationDrawerPreview() {
 @Composable
 private fun HomeScreenPreview() {
     val courses = CourseRepositoryMock.getCourses()
+    val termDay = TermDayState(2023, Term.FIRST, 1, DayOfWeek.MONDAY, true)
     IJhTheme {
         HomeScreen(
             refreshing = false,
             isLoggedIn = true,
             courses,
+            termDay,
             Duration.ofDays(1),
             {},
             {},
@@ -259,11 +280,13 @@ private fun HomeScreenPreview() {
 @Composable
 private fun HomeScrollPreview() {
     val courses = CourseRepositoryMock.getCourses()
+    val termDay = TermDayState(2023, Term.FIRST, 1, DayOfWeek.MONDAY, true)
     IJhTheme {
         HomeScreen(
             refreshing = false,
             isLoggedIn = true,
             courses,
+            termDay,
             Duration.ofDays(1),
             {},
             {},

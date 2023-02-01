@@ -8,7 +8,7 @@
     <string name="course">Course</string>
     <string name="time">Time</string>
     <string name="place">Place</string>
-    <string name="today_class_schedule">Today\'s class schedule. (%1$s)</string>
+    <string name="today_class_schedule">Today\'s class schedule.</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="input_username">Input username</string>
@@ -42,4 +42,8 @@
     <string name="unit_second">" sec"</string>
     <string name="just">Just</string>
     <string name="never">Never</string>
+    <string name="loading">Loading…</string>
+    <string name="unit_week">Week %1$d</string>
+    <string name="unknown">Unknown</string>
+    <string name="ago">" ago"</string>
 </resources>

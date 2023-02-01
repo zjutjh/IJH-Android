@@ -6,6 +6,16 @@ import kotlinx.coroutines.flow.*
 sealed interface LoadResult<out T> {
     object Loading : LoadResult<Nothing>
     class Ready<T>(val data: T) : LoadResult<T>
+
+    fun <T> isEqual(v: LoadResult<T>): Boolean =
+        if (this is Ready && v is Ready) {
+            this.data == v.data
+        } else this is Loading && v is Loading
+
+    fun <R> isEqual(v: LoadResult<R>, areEquivalent: (left: T, right: R) -> Boolean): Boolean =
+        if (this is Ready && v is Ready) {
+            areEquivalent(this.data, v.data)
+        } else this is Loading && v is Loading
 }
 
 fun <T> LoadResult<T>.isLoading(): Boolean = this is LoadResult.Loading

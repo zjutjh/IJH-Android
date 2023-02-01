@@ -67,7 +67,7 @@ data class CourseWeek(
     /**
      * Checks if the specified week is contained in weeks
      */
-    fun contains(week: Int): Boolean {
+    operator fun contains(week: Int): Boolean {
         if (singles.contains(week))
             return true
         for (i in ranges) {

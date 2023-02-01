@@ -107,66 +107,6 @@ class CourseRepositoryMock : CourseRepository {
                     )
                 )
             ),
-            Course(
-                id = 4,
-                name = "Software Engineering and Information Technology",
-                teacherName = "Mr. Hex",
-                place = "Information.B.101",
-                campus = "PF",
-                type = "B",
-                credits = 4.0f,
-                hours = 64,
-                className = "002",
-                sectionStart = 3,
-                sectionEnd = 4,
-                dayOfWeek = DayOfWeek.MONDAY,
-                weeks = CourseWeek(
-                    listOf(),
-                    listOf(
-                        CourseWeek.WeekRange(1, 16, null)
-                    )
-                )
-            ),
-            Course(
-                id = 5,
-                name = "Design pattern in practice",
-                teacherName = "Mr. Info",
-                place = "Software.A.302",
-                campus = "PF",
-                type = "A",
-                credits = 4.0f,
-                hours = 64,
-                className = "001",
-                sectionStart = 1,
-                sectionEnd = 2,
-                dayOfWeek = DayOfWeek.MONDAY,
-                weeks = CourseWeek(
-                    listOf(),
-                    listOf(
-                        CourseWeek.WeekRange(1, 16, null)
-                    )
-                )
-            ),
-            Course(
-                id = 6,
-                name = "Software Engineering and Information Technology",
-                teacherName = "Mr. Hex",
-                place = "Information.B.101",
-                campus = "PF",
-                type = "B",
-                credits = 4.0f,
-                hours = 64,
-                className = "002",
-                sectionStart = 3,
-                sectionEnd = 4,
-                dayOfWeek = DayOfWeek.MONDAY,
-                weeks = CourseWeek(
-                    listOf(),
-                    listOf(
-                        CourseWeek.WeekRange(1, 16, null)
-                    )
-                )
-            )
         )
     }
 }

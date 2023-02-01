@@ -93,7 +93,6 @@ fun ScheduleCard(
                     append(" | ")
                     if (lastSyncDuration != null) {
                         append(lastSyncDuration.toLocalizedString(context))
-                            .append(context.getString(R.string.ago))
                     } else {
                         append(context.getString(R.string.never))
                     }

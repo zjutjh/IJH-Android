@@ -1,13 +1,10 @@
 package com.zjutjh.ijh.ui.component
 
 import android.content.res.Configuration.*
-import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -148,7 +145,7 @@ fun CoursesCard(courses: List<Course>, modifier: Modifier = Modifier) {
     }
 
     if (openDialog) {
-        CourseDetailDialog(onConfirm = { openDialog = false }, chosenCourse = chosenCourse)
+        CourseDetailsDialog(onConfirm = { openDialog = false }, chosenCourse = chosenCourse)
     }
 
     ElevatedCard(modifier) {
@@ -169,58 +166,7 @@ fun CoursesCard(courses: List<Course>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CourseDetailDialog(onConfirm: () -> Unit, chosenCourse: Course) {
-    AlertDialog(
-        onDismissRequest = onConfirm,
-        title = {
-            Text(text = chosenCourse.name)
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-            ) {
-                Text(stringResource(id = R.string.confirm))
-            }
-        },
-        text = {
-            val scrollState = rememberScrollState()
-            Column(
-                modifier = Modifier
-                    .heightIn(max = 300.dp)
-                    .verticalScroll(scrollState)
-                    .verticalScrollbar(scrollState)
-            ) {
-                TextListItem(
-                    title = R.string.place,
-                    text = "${chosenCourse.campus}-${chosenCourse.place}"
-                )
-                TextListItem(title = R.string.time, text = chosenCourse.detailedTime())
-                TextListItem(title = R.string.weeks, text = chosenCourse.weeks.toString())
-                TextListItem(title = R.string.teacher, text = chosenCourse.teacherName)
-                TextListItem(title = R.string.class_str, text = chosenCourse.className)
-                TextListItem(title = R.string.credits, text = chosenCourse.credits.toString())
-                TextListItem(title = R.string.hours, text = chosenCourse.hours.toString())
-            }
-        },
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun TextListItem(@StringRes title: Int, text: String) {
-    ListItem(
-        headlineText = {
-            Text(text = stringResource(id = title))
-        },
-        supportingText = {
-            Text(text = text)
-        }
-    )
-    Divider()
-}
-
-@Composable
-fun CourseListItem(course: Course, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun CourseListItem(course: Course, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier
             .clip(MaterialTheme.shapes.small)
@@ -297,20 +243,6 @@ fun IconText(
             overflow = TextOverflow.Ellipsis,
             maxLines = 1
         )
-    }
-}
-
-@Preview
-@Composable
-private fun IconTextPreview() {
-    IJhTheme {
-        Surface {
-            IconText(
-                icon = Icons.Default.Person,
-                contentDescription = "Person",
-                text = "Person Orange"
-            )
-        }
     }
 }
 

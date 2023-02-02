@@ -118,9 +118,9 @@ data class CourseWeek(
                 }
                 append(i)
             }
-            if (singles.isNotEmpty())
+            if (singles.isNotEmpty() && ranges.isNotEmpty())
                 append(", ")
-            ranges.forEach{
+            ranges.forEach {
                 append(it.toString())
             }
         }

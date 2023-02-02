@@ -4,15 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,9 +19,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.os.LocaleListCompat
+import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.util.stackConflict
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.*
@@ -79,7 +80,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
                     courses = courses
                 )
                 ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.THURSDAY,
+                    dayOfWeek = DayOfWeek.TUESDAY,
                     locale = locale,
                     courses = courses
                 )
@@ -89,7 +90,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
                     courses = courses
                 )
                 ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.TUESDAY,
+                    dayOfWeek = DayOfWeek.THURSDAY,
                     locale = locale,
                     courses = courses
                 )
@@ -181,49 +182,112 @@ fun ClassScheduleColumn(
     courses: List<Course>,
     dayOfWeek: DayOfWeek
 ) {
-    val elements = remember(courses) {
-        courses.filter { it.dayOfWeek == dayOfWeek }
+    val elements: List<Triple<List<Course>, Int, Int>> = remember(courses) {
+        courses.stackConflict(dayOfWeek)
     }
 
-    Layout(modifier = modifier, content = {
-        elements.forEach { course ->
-            ClassScheduleColumnItem(course = course)
-        }
-    }) { measurables, constraints ->
-        val cellHeight = constraints.maxHeight / 12
+    var chosenCourses by remember { mutableStateOf(emptyList<Course>()) }
+    var openDialog by remember { mutableStateOf(false) }
+
+    if (openDialog) {
+        CourseDetailsDialog(
+            onConfirm = { openDialog = false },
+            chosenCourses = chosenCourses
+        )
+    }
+
+    Layout(
+        modifier = modifier.fillMaxHeight(),
+        content = {
+            elements.forEach { courses ->
+                ClassScheduleColumnItem(courses) {
+                    chosenCourses = it
+                    openDialog = true
+                }
+            }
+        },
+    ) { measurables, constraints ->
+        val cellHeight = constraints.minHeight / 12
 
         val placeables = measurables.mapIndexed { index, measurable ->
+            val element = elements[index]
             val height =
-                (elements[index].sectionEnd - elements[index].sectionStart + 1) * cellHeight
+                (element.third - element.second + 1) * cellHeight
 
             measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
         }
 
-        layout(constraints.maxWidth, constraints.maxHeight) {
+        layout(constraints.maxWidth, constraints.minHeight) {
             placeables.forEachIndexed { index, placeable ->
-                val yPosition = (elements[index].sectionStart - 1) * cellHeight
+                val element = elements[index]
+                val yPosition = (element.second - 1) * cellHeight
                 placeable.placeRelative(0, yPosition)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClassScheduleColumnItem(course: Course) {
-    Surface(
-        modifier = Modifier.padding(4.dp),
-        tonalElevation = 1.dp,
-        shape = MaterialTheme.shapes.medium
+fun ClassScheduleColumnItem(
+    courseStack: Triple<List<Course>, Int, Int>,
+    onClick: (List<Course>) -> Unit
+) {
+    val span = courseStack.third - courseStack.second + 1
+
+    ElevatedCard(
+        modifier = Modifier
+            .padding(4.dp),
+        onClick = { onClick(courseStack.first) }
     ) {
-        Column(Modifier.padding(4.dp)) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = course.name,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
+        Column(Modifier.padding(4.dp), verticalArrangement = Arrangement.Center) {
+            if (courseStack.first.size == 1) {
+                val course = courseStack.first.last()
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1.5f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = course.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        maxLines = (1.5 * span).toInt(),
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = course.place,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = (1.5 * span).toInt(),
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else if (courseStack.first.size > 1) {
+                // Conflict
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.conflict_courses),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontStyle = FontStyle.Italic,
+                        textAlign = TextAlign.Center,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
         }
     }
 }

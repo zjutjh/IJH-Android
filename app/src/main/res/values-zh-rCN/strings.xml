@@ -56,4 +56,6 @@
     <string name="last_sync">上次同步：</string>
     <string name="calendar">日历</string>
     <string name="class_schedule">课程表</string>
+    <string name="conflict_courses">冲突课程</string>
+    <string name="course_details">课程详情</string>
 </resources>

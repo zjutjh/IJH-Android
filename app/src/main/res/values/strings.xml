@@ -54,4 +54,5 @@
     <string name="credits">Credits</string>
     <string name="last_sync">Last sync:</string>
     <string name="calendar">Calendar</string>
+    <string name="class_schedule">Class Schedule</string>
 </resources>

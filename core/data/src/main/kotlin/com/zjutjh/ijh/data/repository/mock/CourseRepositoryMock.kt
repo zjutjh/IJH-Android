@@ -4,8 +4,6 @@ import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.CourseWeek
 import com.zjutjh.ijh.model.Term
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.time.DayOfWeek
@@ -46,7 +44,7 @@ class CourseRepositoryMock : CourseRepository {
             )
         )
 
-        fun getCourses(): ImmutableList<Course> = persistentListOf(
+        fun getCourses(): List<Course> = listOf(
             Course(
                 id = 1,
                 name = "Design pattern in practice",
@@ -97,8 +95,8 @@ class CourseRepositoryMock : CourseRepository {
                 credits = 4.0f,
                 hours = 64,
                 className = "001",
-                sectionStart = 1,
-                sectionEnd = 2,
+                sectionStart = 6,
+                sectionEnd = 8,
                 dayOfWeek = DayOfWeek.MONDAY,
                 weeks = CourseWeek(
                     listOf(),

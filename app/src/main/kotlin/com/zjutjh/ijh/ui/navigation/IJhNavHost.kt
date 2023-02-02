@@ -54,6 +54,11 @@ fun IJhNavHost(
                 navController.navigateToProfile(
                     navOptions { launchSingleTop = true }
                 )
+            },
+            onNavigateToClassSchedule = {
+                navController.navigateToClassSchedule(
+                    navOptions { launchSingleTop = true }
+                )
             }
         )
 
@@ -63,6 +68,10 @@ fun IJhNavHost(
         )
 
         profileScreen(
+            navController::popBackStack
+        )
+
+        classScheduleScreen(
             navController::popBackStack
         )
     }

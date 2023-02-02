@@ -7,14 +7,14 @@ import androidx.navigation.NavOptions
 import com.google.accompanist.navigation.animation.composable
 import com.zjutjh.ijh.ui.screen.LoginScreen
 
-private const val LoginRoute = "login"
+private const val loginRoute = "login"
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.loginScreen(
     onPopBackStack: () -> Unit,
     onPopUpAndNavigateToHomeScreen: () -> Unit,
 ) {
-    composable(LoginRoute) {
+    composable(loginRoute) {
         LoginScreen(
             onNavigateBack = onPopBackStack,
             onNavigateContinue = onPopUpAndNavigateToHomeScreen
@@ -23,4 +23,4 @@ fun NavGraphBuilder.loginScreen(
 }
 
 fun NavController.navigateToLogin(navOptions: NavOptions?) =
-    this.navigate(LoginRoute, navOptions)
+    this.navigate(loginRoute, navOptions)

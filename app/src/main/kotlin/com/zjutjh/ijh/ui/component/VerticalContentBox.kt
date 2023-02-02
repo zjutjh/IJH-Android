@@ -8,7 +8,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun VerticalContentBox(
+fun VerticalScrollableContentBox(
     paddingValues: PaddingValues,
     content: @Composable BoxScope.() -> Unit,
 ) {
@@ -19,6 +19,20 @@ fun VerticalContentBox(
             .padding(paddingValues)
             .fillMaxSize()
             .verticalScroll(scrollState),
+        contentAlignment = Alignment.TopCenter,
+        content = content,
+    )
+}
+
+@Composable
+fun VerticalContentBox(
+    paddingValues: PaddingValues,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    Box(
+        modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxSize(),
         contentAlignment = Alignment.TopCenter,
         content = content,
     )

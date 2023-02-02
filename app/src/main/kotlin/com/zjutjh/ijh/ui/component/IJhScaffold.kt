@@ -28,7 +28,7 @@ fun IJhScaffold(
         snackbarHost = { snackbarHost(navigationBarsPadding) },
         contentWindowInsets = windowInset,
         content = {
-            VerticalContentBox(
+            VerticalScrollableContentBox(
                 paddingValues = it,
                 content = { content(navigationBarsPadding) },
             )

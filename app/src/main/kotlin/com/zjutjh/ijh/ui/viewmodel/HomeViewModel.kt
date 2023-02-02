@@ -76,7 +76,7 @@ class HomeViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val coursesState = termDayState
+    val coursesState: StateFlow<LoadResult<List<Course>>> = termDayState
         .drop(1)
         .distinctUntilChanged(LoadResult<*>::isEqual)
         .flatMapLatest { state ->

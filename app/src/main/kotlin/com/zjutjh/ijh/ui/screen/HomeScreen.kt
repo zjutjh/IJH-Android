@@ -36,11 +36,11 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToClassSchedule: () -> Unit = { /* TODO */ },
+    onNavigateToClassSchedule: () -> Unit,
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
     val refreshState by viewModel.refreshState.collectAsState()
-    val courseState by viewModel.coursesState.collectAsStateWithLifecycle()
+    val coursesState by viewModel.coursesState.collectAsStateWithLifecycle()
     val termDayState by viewModel.termDayState.collectAsStateWithLifecycle()
     val coursesLastSyncState by viewModel.courseLastSyncState.collectAsStateWithLifecycle()
 
@@ -49,7 +49,7 @@ fun HomeRoute(
         is LoadResult.Ready -> state.data
     }
 
-    val courses = when (val state = courseState) {
+    val courses = when (val state = coursesState) {
         is LoadResult.Loading -> null
         is LoadResult.Ready -> state.data
     }
@@ -122,7 +122,7 @@ private fun HomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScaffold(
+private fun HomeScaffold(
     isLoggedIn: Boolean?,
     drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
     pullRefreshState: PullRefreshState,
@@ -162,7 +162,7 @@ fun HomeScaffold(
 }
 
 @Composable
-fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
+private fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
     ModalDrawerSheet(modifier = Modifier.widthIn(max = 300.dp)) {
         Column(
             modifier = Modifier.padding(12.dp)
@@ -200,7 +200,7 @@ fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(
+private fun HomeTopBar(
     isLoggedIn: Boolean?,
     onMenuButtonClick: () -> Unit,
     onAccountButtonClick: () -> Unit,

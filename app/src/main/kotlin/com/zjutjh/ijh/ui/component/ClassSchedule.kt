@@ -233,7 +233,7 @@ fun ClassScheduleColumnItem(
     courseStack: Triple<List<Course>, Int, Int>,
     onClick: (List<Course>) -> Unit
 ) {
-    val span = courseStack.third - courseStack.second + 1
+    val span = courseStack.third - courseStack.second
 
     ElevatedCard(
         modifier = Modifier
@@ -246,14 +246,13 @@ fun ClassScheduleColumnItem(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1.5f),
+                        .weight(1f + (span * 0.5f)),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = course.name,
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
-                        maxLines = (1.5 * span).toInt(),
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -268,7 +267,6 @@ fun ClassScheduleColumnItem(
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
-                        maxLines = (1.5 * span).toInt(),
                         overflow = TextOverflow.Ellipsis
                     )
                 }
@@ -283,7 +281,6 @@ fun ClassScheduleColumnItem(
                         style = MaterialTheme.typography.labelMedium,
                         fontStyle = FontStyle.Italic,
                         textAlign = TextAlign.Center,
-                        maxLines = 3,
                         overflow = TextOverflow.Ellipsis
                     )
                 }

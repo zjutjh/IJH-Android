@@ -17,7 +17,7 @@ fun Modifier.verticalScrollbar(
     state: ScrollState,
     width: Dp = 4.dp,
 ): Modifier = composed {
-    val targetAlpha = if (state.isScrollInProgress) 0.2f else 0f
+    val targetAlpha = if (state.isScrollInProgress) 0.3f else 0f
     val duration = if (state.isScrollInProgress) 150 else 500
 
     val alpha by animateFloatAsState(
@@ -35,9 +35,14 @@ fun Modifier.verticalScrollbar(
         val needDrawScrollbar = state.maxValue != 0 && (state.isScrollInProgress || alpha > 0.0f)
 
         if (needDrawScrollbar) {
-            val scrollbarLength = (state.maxValue.toFloat() / this.size.height) * this.size.height
+            val value = state.value.toFloat()
+            val maxValue = state.maxValue.toFloat()
+
+            val visibleHeight = (this.size.height - maxValue)
+            val scrollbarLength = (visibleHeight / this.size.height) * visibleHeight
+
             val scrollbarOffsetY =
-                (state.value.toFloat() / state.maxValue.toFloat()) * (this.size.height - scrollbarLength)
+                (value / maxValue) * (visibleHeight - scrollbarLength) + value
 
             drawRect(
                 color = color,
@@ -54,7 +59,7 @@ fun Modifier.horizontalScrollbar(
     startPadding: Dp = 0.dp,
     barWidth: Dp = 4.dp,
 ): Modifier = composed {
-    val targetAlpha = if (state.isScrollInProgress) 0.2f else 0f
+    val targetAlpha = if (state.isScrollInProgress) 0.3f else 0f
     val duration = if (state.isScrollInProgress) 150 else 500
 
     val alpha by animateFloatAsState(
@@ -73,10 +78,13 @@ fun Modifier.horizontalScrollbar(
 
         if (needDrawScrollbar) {
             val padding = startPadding.toPx()
-            val width = this.size.width - padding
-            val scrollbarLength = (state.maxValue.toFloat() / width) * width
+            val value = state.value.toFloat()
+            val maxValue = state.maxValue.toFloat()
+            val visibleWidth = this.size.width - padding - maxValue
+
+            val scrollbarLength = (visibleWidth / this.size.width) * visibleWidth
             val scrollbarOffsetX =
-                (state.value.toFloat() / state.maxValue.toFloat()) * (width - scrollbarLength)
+                (value / maxValue) * (visibleWidth - scrollbarLength) + value
 
             drawRect(
                 color = color,
@@ -104,14 +112,19 @@ fun Modifier.verticalPinedScrollbar(
 
         // When maxValue is equal to 0, it means no scrolling.
         if (state.maxValue != 0) {
-            val scrollbarHeight = (state.maxValue.toFloat() / this.size.height) * this.size.height
+            val value = state.value.toFloat()
+            val maxValue = state.maxValue.toFloat()
+
+            val visibleHeight = (this.size.height - maxValue)
+            val scrollbarLength = (visibleHeight / this.size.height) * visibleHeight
+
             val scrollbarOffsetY =
-                (state.value.toFloat() / state.maxValue.toFloat()) * (this.size.height - scrollbarHeight)
+                (value / maxValue) * (visibleHeight - scrollbarLength) + value
 
             drawRect(
                 color = color,
                 topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
-                size = Size(width.toPx(), scrollbarHeight),
+                size = Size(width.toPx(), scrollbarLength),
                 alpha = 0.2f,
             )
         }

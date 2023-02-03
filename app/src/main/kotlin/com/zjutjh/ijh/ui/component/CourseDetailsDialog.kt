@@ -32,7 +32,7 @@ fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourse: Course) {
             val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
-                    .heightIn(max = 300.dp)
+                    .heightIn(max = 400.dp)
                     .verticalScroll(scrollState)
                     .verticalScrollbar(scrollState)
             ) {
@@ -71,7 +71,7 @@ fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourses: List<Course>) {
             text = {
                 var state by remember { mutableStateOf(0) }
                 Column {
-                    TabRow(selectedTabIndex = state) {
+                    ScrollableTabRow(selectedTabIndex = state) {
                         chosenCourses.forEachIndexed { index, course ->
                             Tab(
                                 selected = state == index,
@@ -96,7 +96,7 @@ fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourses: List<Course>) {
 
                     Column(
                         modifier = Modifier
-                            .heightIn(max = 300.dp)
+                            .heightIn(max = 400.dp)
                             .verticalScroll(scrollState)
                             .verticalScrollbar(scrollState)
                     ) {

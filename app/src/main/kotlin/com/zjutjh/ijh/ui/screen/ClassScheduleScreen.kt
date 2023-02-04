@@ -58,6 +58,7 @@ private fun ClassScheduleScaffold(
 ) {
     Scaffold(
         topBar = { ClassScheduleTopBar(onBackClick) },
+        contentWindowInsets = WindowInsets.safeDrawing,
         content = content,
     )
 }

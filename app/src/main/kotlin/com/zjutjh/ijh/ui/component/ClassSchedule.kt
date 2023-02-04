@@ -9,8 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -19,7 +17,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.os.LocaleListCompat
-import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.theme.IJhTheme
@@ -46,26 +43,30 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
                         .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
                 ) {
                     Divider()
-                    val modifier1 = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                    for (i in 1..12) {
-                        Row(
-                            modifier = modifier1,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = i.toString(),
-                                textAlign = TextAlign.Center
-                            )
-                            Divider(
-                                modifier = Modifier
-                                    .width(1.dp)
-                                    .fillMaxHeight()
-                            )
+                    Row {
+                        Column(modifier = Modifier.weight(1f)) {
+                            val modifier1 = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                            for (i in 1..12) {
+                                Box(
+                                    modifier = modifier1,
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        text = i.toString(),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
                         }
+                        Divider(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                        )
                     }
+
                 }
             }
 
@@ -182,7 +183,7 @@ fun ClassScheduleColumn(
     courses: List<Course>,
     dayOfWeek: DayOfWeek
 ) {
-    val elements: List<Triple<List<Course>, Int, Int>> = remember(courses) {
+    val elements: List<Triple<List<Course>, Int, Int>> = remember {
         courses.stackConflict(dayOfWeek)
     }
 
@@ -227,6 +228,9 @@ fun ClassScheduleColumn(
     }
 }
 
+/**
+ * The lowest level item in the schedule table.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClassScheduleColumnItem(
@@ -235,55 +239,72 @@ fun ClassScheduleColumnItem(
 ) {
     val span = courseStack.third - courseStack.second
 
+    if (courseStack.first.size == 1) {
+        ScheduleCardContent(
+            courses = courseStack.first,
+            onClick = { onClick(courseStack.first) },
+            span = span
+        )
+    } else if (courseStack.first.size > 1) {
+        // Conflict
+        BadgedBox(
+            badge = {
+                Badge(
+                    modifier = Modifier.offset((-12).dp, (12).dp)
+                ) {
+                    Text(
+                        text = courseStack.first.size.toString(),
+                    )
+                }
+            },
+        ) {
+            ScheduleCardContent(
+                courses = courseStack.first,
+                onClick = { onClick(courseStack.first) },
+                span = span
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span: Int) {
     ElevatedCard(
         modifier = Modifier
             .padding(4.dp),
-        onClick = { onClick(courseStack.first) }
+        elevation = CardDefaults.elevatedCardElevation(3.dp),
+        onClick = onClick,
     ) {
         Column(Modifier.padding(4.dp), verticalArrangement = Arrangement.Center) {
-            if (courseStack.first.size == 1) {
-                val course = courseStack.first.last()
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f + (span * 0.5f)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = course.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = course.place,
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            } else if (courseStack.first.size > 1) {
-                // Conflict
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.conflict_courses),
-                        style = MaterialTheme.typography.labelMedium,
-                        fontStyle = FontStyle.Italic,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+            val course = remember { courses.last() }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f + (span * 0.5f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = course.name,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = course.place,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }

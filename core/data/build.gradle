@@ -26,7 +26,7 @@ dependencies {
     implementation project(":core:database")
 
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
+    implementation "com.google.protobuf:protobuf-javalite:$protobuf_version"
 
     // Dependency injection (Hilt)
     implementation "com.google.dagger:hilt-android:$hilt_version"

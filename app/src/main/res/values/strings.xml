@@ -57,4 +57,5 @@
     <string name="class_schedule">Class Schedule</string>
     <string name="conflict_courses">Conflict courses</string>
     <string name="course_details">Course details</string>
+    <string name="during_vacation">During vacation</string>
 </resources>

@@ -7,11 +7,9 @@ import java.time.LocalDate
 
 fun WeJhPreference.Info.asExternalModel(): WeJhInfo =
     WeJhInfo(
-        isBegin = isBegin,
         term = term.toTerm(),
         year = year,
         termStartDate = LocalDate.ofEpochDay(termStartDate),
-        week = week,
         lastSyncTime = lastSyncTime.toZonedDateTime(),
         schoolBusUrl = schoolBusUrl,
     )

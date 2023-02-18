@@ -82,8 +82,10 @@ class HomeViewModel @Inject constructor(
         .flatMapLatest { state ->
             if (state is LoadResult.Ready && state.data != null) {
                 val day = state.data
-                courseRepository.getCourses(day.year, day.term)
-                    .map { it.filterToday(day) }
+                if (day.isInTerm) {
+                    courseRepository.getCourses(day.year, day.term)
+                        .map { it.filterToday(day) }
+                } else flowOf(emptyList())
             } else flowOf(emptyList())
         }
         .flowOn(Dispatchers.Default)

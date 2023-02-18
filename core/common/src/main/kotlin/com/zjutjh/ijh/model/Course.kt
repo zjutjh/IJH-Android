@@ -5,6 +5,7 @@ import com.zjutjh.ijh.exception.CourseParseException
 import java.text.ParseException
 import java.time.DayOfWeek
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Stable
 data class Course(
@@ -38,6 +39,9 @@ data class Course(
             hmToLocalTimePair(20, 20, 21, 5),
         )
 
+        val TIME_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("H:mm")
+        private const val COURSE_DURATION: Int = 45 * 60
+
         private fun hmToLocalTimePair(
             hour1: Int,
             minute1: Int,
@@ -45,6 +49,21 @@ data class Course(
             minute2: Int
         ): Pair<LocalTime, LocalTime> =
             Pair(LocalTime.of(hour1, minute1), LocalTime.of(hour2, minute2))
+
+        fun currentSection(time: LocalTime = LocalTime.now()): Pair<Int, Float> {
+            for (i in SECTIONS.indices) {
+                val (start, end) = SECTIONS[i]
+                if (time < start) {
+                    // Class is not started
+                    return Pair(i, -1f)
+                } else if (time <= end) {
+                    val current = time.toSecondOfDay() - start.toSecondOfDay()
+                    return Pair(i, current.toFloat() / (COURSE_DURATION))
+                }
+            }
+            // Not found
+            return Pair(-1, -1f)
+        }
 
         fun default(): Course =
             Course(

@@ -10,13 +10,11 @@ message WeJhPreference {
   optional uint64 courses_last_sync_time = 3;
 
   message Info {
-    bool isBegin = 1;
-    uint32 year = 2;
-    uint32 term = 3;
-    uint64 term_start_date = 4;
-    uint32 week = 5;
-    uint64 last_sync_time = 6;
-    string school_bus_url = 7;
+    uint32 year = 1;
+    uint32 term = 2;
+    uint64 term_start_date = 3;
+    uint64 last_sync_time = 4;
+    string school_bus_url = 5;
   }
 
   message User {

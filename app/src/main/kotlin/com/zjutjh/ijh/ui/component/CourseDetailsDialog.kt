@@ -120,8 +120,6 @@ fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourses: List<Course>) {
     }
 }
 
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TextListItem(@StringRes title: Int, text: String) {
     ListItem(

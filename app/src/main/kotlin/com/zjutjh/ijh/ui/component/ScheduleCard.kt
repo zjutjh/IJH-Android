@@ -76,12 +76,18 @@ fun ScheduleCard(
             val prompt = remember(termDay, lastSyncDuration) {
                 buildString {
                     if (termDay != null) {
-                        append(
-                            context.getString(
-                                R.string.unit_week,
-                                termDay.week
+                        if (termDay.isInTerm) {
+                            append(
+                                context.getString(
+                                    R.string.unit_week,
+                                    termDay.week
+                                )
                             )
-                        )
+                        } else {
+                            append(
+                                context.getString(R.string.during_vacation)
+                            )
+                        }
                     } else {
                         append(
                             context.getString(R.string.unknown)
@@ -211,9 +217,8 @@ fun Course.detailedTime(): String {
     val (start, _) = Course.SECTIONS[sectionStart - 1]
     val (_, end) = Course.SECTIONS[sectionEnd - 1]
 
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-    val startTime = start.format(formatter)
-    val endTime = end.format(formatter)
+    val startTime = start.format(Course.TIME_FORMATTER)
+    val endTime = end.format(Course.TIME_FORMATTER)
 
     val locale = LocaleListCompat.getDefault()[0]
 
@@ -231,13 +236,13 @@ fun IconText(
 ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
+            modifier = Modifier.size(15.dp),
             imageVector = icon,
             contentDescription = contentDescription,
-            modifier = Modifier.size(15.dp)
         )
         Spacer(modifier = Modifier.padding(horizontal = 1.5.dp))
         Text(
-            text,
+            text = text,
             style = style,
             fontWeight = fontWeight,
             overflow = TextOverflow.Ellipsis,

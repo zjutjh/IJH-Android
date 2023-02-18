@@ -8,6 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -15,101 +18,95 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.util.stackConflict
 import java.time.DayOfWeek
+import java.time.LocalDateTime
 import java.time.format.TextStyle
 import java.util.*
+import kotlin.math.roundToInt
 
 @Composable
 fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
     val locale = remember { LocaleListCompat.getDefault()[0] }
+    val dateTime = remember { LocalDateTime.now() }
+
+    val (section, proportion) =
+        remember { Course.currentSection(dateTime.toLocalTime()) }
 
     Surface(modifier = modifier) {
-        Box {
-            // Left section bar
-            Column(
-                Modifier
-                    .width(30.dp)
-                    .zIndex(1f)
-            ) {
-                Spacer(modifier = Modifier.height(30.dp))
-                Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
-                ) {
-                    Divider()
-                    Row {
-                        Column(modifier = Modifier.weight(1f)) {
-                            val modifier1 = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                            for (i in 1..12) {
-                                Box(
-                                    modifier = modifier1,
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Text(
-                                        text = i.toString(),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                        }
-                        Divider(
-                            modifier = Modifier
-                                .width(1.dp)
-                                .fillMaxHeight()
-                        )
-                    }
-
-                }
-            }
-
-            // Table
+        val indicatorColor = MaterialTheme.colorScheme.primary
+        Box(
+            modifier = Modifier.drawBehind {
+                if (section < 0 || (section == 0 && proportion < 0)) return@drawBehind
+                val paddingTop = 31.dp.toPx()
+                val paddingStart = 30.dp.toPx()
+                val cellHeight = (size.height - paddingTop) / 12
+                val y = paddingTop + cellHeight * section + cellHeight * proportion
+                drawLine(
+                    color = indicatorColor,
+                    start = Offset(paddingStart, y),
+                    end = Offset(size.width, y),
+                    strokeWidth = 2.dp.toPx(),
+                )
+            },
+        ) {
             ClassScheduleRow(
                 startPadding = 30.dp,
             ) {
-                // Monday
-                ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.MONDAY,
-                    locale = locale!!,
-                    courses = courses
-                )
-                ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.TUESDAY,
-                    locale = locale,
-                    courses = courses
-                )
-                ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.WEDNESDAY,
-                    locale = locale,
-                    courses = courses
-                )
-                ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.THURSDAY,
-                    locale = locale,
-                    courses = courses
-                )
-                ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.FRIDAY,
-                    locale = locale,
-                    courses = courses
-                )
-                ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.SATURDAY,
-                    locale = locale,
-                    courses = courses
-                )
-                ClassScheduleRowItem(
-                    dayOfWeek = DayOfWeek.SUNDAY,
-                    locale = locale,
-                    courses = courses
-                )
+                val today = dateTime.dayOfWeek
+
+                DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
+                    ClassScheduleRowItem(
+                        dayOfWeek = dayOfWeek,
+                        locale = locale!!,
+                        courses = courses,
+                        leftDivider = index == 0,
+                        highlight = dayOfWeek == today,
+                    )
+                }
+            }
+
+            Divider(Modifier.offset(y = 29.dp))
+
+            // Left section bar
+            Column(
+                Modifier.width(30.dp)
+            ) {
+                Spacer(modifier = Modifier.height(30.dp))
+                Row(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                ) {
+                    Column(Modifier.weight(1f)) {
+
+                        val modifier1 = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                        for (i in 1..12) {
+                            Column(
+                                modifier = if (section == i - 1) modifier1.background(
+                                    MaterialTheme.colorScheme.secondaryContainer
+                                ) else modifier1,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = i.toString(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight()
+                    )
+                }
             }
         }
     }
@@ -130,9 +127,8 @@ fun ClassScheduleRow(
             .horizontalScrollbar(scrollState, startPadding),
         content = content
     ) { measurables, constraints ->
-        val padding = startPadding.toPx().toInt()
-        val width =
-            (constraints.minWidth - padding) / 5 // Only 5 items are visible
+        val padding = startPadding.toPx().roundToInt()
+        val width = (constraints.minWidth - padding) / 5 // Only 5 items are visible
 
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints.copy(minWidth = width, maxWidth = width))
@@ -155,21 +151,45 @@ fun ClassScheduleRowItem(
     modifier: Modifier = Modifier,
     dayOfWeek: DayOfWeek,
     locale: Locale,
-    courses: List<Course>
+    courses: List<Course>,
+    leftDivider: Boolean = false,
+    highlight: Boolean = false,
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = if (highlight) {
+            val colorFrom = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f)
+            val colorTo = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0f)
+
+            modifier.background(
+                Brush.verticalGradient(
+                    Pair(0f, colorFrom),
+                    Pair(1f, colorTo),
+                ),
+                MaterialTheme.shapes.extraSmall
+            )
+        } else modifier
+    ) {
         Box(
             modifier = Modifier
-                .height(30.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .height(30.dp),
             contentAlignment = Alignment.Center
         ) {
+            if (leftDivider) {
+                Divider(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .offset(x = (-1).dp)
+                        .align(Alignment.TopStart)
+                )
+            }
+
             Text(
                 text = dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
                 textAlign = TextAlign.Center
             )
         }
-        Divider()
         ClassScheduleColumn(
             courses = courses,
             dayOfWeek = dayOfWeek
@@ -247,22 +267,20 @@ fun ClassScheduleColumnItem(
         )
     } else if (courseStack.first.size > 1) {
         // Conflict
-        BadgedBox(
-            badge = {
-                Badge(
-                    modifier = Modifier.offset((-12).dp, (12).dp)
-                ) {
-                    Text(
-                        text = courseStack.first.size.toString(),
-                    )
-                }
-            },
-        ) {
+        Box {
             ScheduleCardContent(
                 courses = courseStack.first,
                 onClick = { onClick(courseStack.first) },
                 span = span
             )
+
+            Badge(
+                modifier = Modifier.align(Alignment.TopEnd),
+            ) {
+                Text(
+                    text = courseStack.first.size.toString(),
+                )
+            }
         }
     }
 }

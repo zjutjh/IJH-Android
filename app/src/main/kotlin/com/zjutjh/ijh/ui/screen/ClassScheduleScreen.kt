@@ -1,9 +1,10 @@
 package com.zjutjh.ijh.ui.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FilterAlt
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -75,6 +76,11 @@ private fun ClassScheduleTopBar(
         navigationIcon = {
             BackIconButton(onBackClick)
         },
+        actions = {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(Icons.Outlined.FilterAlt, null)
+            }
+        }
     )
 }
 

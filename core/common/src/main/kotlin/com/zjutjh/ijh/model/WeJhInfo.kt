@@ -6,11 +6,9 @@ import java.time.ZonedDateTime
 
 @Stable
 data class WeJhInfo(
-    val isBegin: Boolean,
     val term: Term,
     val year: Int,
     val termStartDate: LocalDate,
-    val week: Int,
     val lastSyncTime: ZonedDateTime,
     val schoolBusUrl: String,
 )

@@ -24,11 +24,9 @@ data class NetworkWeJhInfo(
 
 fun NetworkWeJhInfo.asExternalModel(): WeJhInfo =
     WeJhInfo(
-        isBegin = isBegin,
         term = term.toTerm(),
         year = termYear.toInt(),
         termStartDate = LocalDate.parse(termStartDate),
-        week = week,
         lastSyncTime = ZonedDateTime.parse(time),
         schoolBusUrl = schoolBusUrl,
     )

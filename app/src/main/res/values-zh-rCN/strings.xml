@@ -58,4 +58,5 @@
     <string name="class_schedule">课程表</string>
     <string name="conflict_courses">冲突课程</string>
     <string name="course_details">课程详情</string>
+    <string name="during_vacation">放假中</string>
 </resources>

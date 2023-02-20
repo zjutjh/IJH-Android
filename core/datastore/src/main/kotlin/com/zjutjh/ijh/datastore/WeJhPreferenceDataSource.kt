@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import com.zjutjh.ijh.datastore.converter.asLocalModel
 import com.zjutjh.ijh.datastore.model.WeJhPreference
 import com.zjutjh.ijh.datastore.model.copy
+import com.zjutjh.ijh.model.WeJhInfo
 import com.zjutjh.ijh.model.WeJhUser
 import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
@@ -62,6 +63,9 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
                 this.info = info
             }
         }
+
+    suspend fun setInfo(info: WeJhInfo) =
+        setInfo(info.asLocalModel())
 
     suspend fun deleteInfo() =
         dataStore.updateData {

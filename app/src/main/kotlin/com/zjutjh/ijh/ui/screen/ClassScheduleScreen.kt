@@ -42,9 +42,7 @@ private fun ClassScheduleScreen(
         Column(
             modifier = Modifier.padding(paddingValues)
         ) {
-            if (courses == null) {
-                CircularProgressIndicator()
-            } else {
+            if (courses != null) {
                 ClassSchedule(courses = courses)
             }
         }

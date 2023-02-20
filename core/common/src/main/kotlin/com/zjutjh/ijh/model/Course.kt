@@ -23,6 +23,21 @@ data class Course(
     val dayOfWeek: DayOfWeek,
     val weeks: CourseWeek,
 ) {
+
+    fun equalsIgnoreId(other: Course): Boolean =
+        name == other.name &&
+                teacherName == other.teacherName &&
+                campus == other.campus &&
+                place == other.place &&
+                className == other.className &&
+                type == other.type &&
+                credits == other.credits &&
+                hours == other.hours &&
+                sectionStart == other.sectionStart &&
+                sectionEnd == other.sectionEnd &&
+                dayOfWeek == other.dayOfWeek &&
+                weeks == other.weeks
+
     companion object {
         val SECTIONS = arrayOf(
             hmToLocalTimePair(8, 0, 8, 45),

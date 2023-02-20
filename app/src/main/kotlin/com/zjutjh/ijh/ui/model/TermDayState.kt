@@ -23,6 +23,6 @@ fun WeJhInfo.toTermDayState(): TermDayState {
         term = term,
         week = week.toInt(),
         dayOfWeek = date.dayOfWeek,
-        isInTerm = duration > 0 && week in 1..20,
+        isInTerm = duration >= 0 && week in 1..20,
     )
 }

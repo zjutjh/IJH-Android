@@ -7,6 +7,7 @@ import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.data.repository.WeJhInfoRepository
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.toTermDayState
 import com.zjutjh.ijh.util.LoadResult
@@ -64,7 +65,6 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val termDayState: StateFlow<LoadResult<TermDayState?>> = weJhInfoRepository.infoStream
-        .distinctUntilChanged()
         .combine(termLocalRefreshChannel) { t1, _ -> t1 }
         .mapLatest {
             it?.toTermDayState()
@@ -75,11 +75,12 @@ class HomeViewModel @Inject constructor(
             started = SharingStarted.Eagerly,
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     val coursesState: StateFlow<LoadResult<List<Course>>> = termDayState
         .drop(1)
         .distinctUntilChanged(LoadResult<*>::isEqual)
         .flatMapLatest { state ->
+            Log.v("Flow", "new flow.")
             if (state is LoadResult.Ready && state.data != null) {
                 val day = state.data
                 if (day.isInTerm) {
@@ -87,6 +88,12 @@ class HomeViewModel @Inject constructor(
                         .map { it.filterToday(day) }
                 } else flowOf(emptyList())
             } else flowOf(emptyList())
+        }
+        .debounce(10) // filter out too frequent refresh
+        .distinctUntilChanged { old, new ->
+            if (old.size == new.size) {
+                old.zip(new).all { (old, new) -> old.equalsIgnoreId(new) }
+            } else false
         }
         .flowOn(Dispatchers.Default)
         .asLoadResultStateFlow(
@@ -127,12 +134,14 @@ class HomeViewModel @Inject constructor(
         _refreshState.update { true }
         val timer = scope.async { delay(300L) }
 
-        // Parallel jobs
-        refreshTerm()
+        val term = refreshTerm()
 
         val isLoggedIn = loginState.value
-        if (isLoggedIn is LoadResult.Ready && isLoggedIn.data)
-            refreshCourse()
+        if (isLoggedIn is LoadResult.Ready && isLoggedIn.data) {
+            if (term != null) {
+                refreshCourse(term.first, term.second)
+            }
+        }
 
         Log.i("HomeSync", "Synchronization complete.")
 
@@ -140,27 +149,33 @@ class HomeViewModel @Inject constructor(
         _refreshState.update { false }
     }
 
-    private suspend fun refreshTerm() {
+    private suspend fun refreshTerm(): Pair<Int, Term>? {
         runCatching { weJhInfoRepository.sync() }
             .fold({
                 Log.i("HomeSync", "Sync WeJhInfo succeed.")
+                return it
             }) {
                 Log.e("HomeSync", "Sync WeJhInfo failed: $it")
                 // Run local refresh when failed
                 termLocalRefreshChannel.emit(Unit)
+                if (termDayState.value is LoadResult.Ready) {
+                    val termDay = (termDayState.value as LoadResult.Ready).data
+                    return if (termDay != null) {
+                        termDay.year to termDay.term
+                    } else null
+                }
             }
+        return null
     }
 
-    private suspend fun refreshCourse() {
-        val termInfo = termDayState.value
-        if (termInfo is LoadResult.Ready && termInfo.data != null) {
-            runCatching {
-                courseRepository.sync(termInfo.data.year, termInfo.data.term)
-            }.fold({
-                Log.i("HomeSync", "Sync Courses succeed.")
-            }) {
-                Log.e("HomeSync", "Sync Courses failed: $it")
-            }
+    private suspend fun refreshCourse(year: Int, term: Term) {
+        runCatching {
+            courseRepository.sync(year, term)
+        }.fold({
+            Log.i("HomeSync", "Sync Courses succeed.")
+        }) {
+            Log.e("HomeSync", "Sync Courses failed: $it")
         }
     }
+
 }

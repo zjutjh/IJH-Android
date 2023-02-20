@@ -8,10 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -38,22 +37,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
         remember { Course.currentSection(dateTime.toLocalTime()) }
 
     Surface(modifier = modifier) {
-        val indicatorColor = MaterialTheme.colorScheme.primary
-        Box(
-            modifier = Modifier.drawBehind {
-                if (section < 0 || (section == 0 && proportion < 0)) return@drawBehind
-                val paddingTop = 31.dp.toPx()
-                val paddingStart = 30.dp.toPx()
-                val cellHeight = (size.height - paddingTop) / 12
-                val y = paddingTop + cellHeight * section + cellHeight * proportion
-                drawLine(
-                    color = indicatorColor,
-                    start = Offset(paddingStart, y),
-                    end = Offset(size.width, y),
-                    strokeWidth = 2.dp.toPx(),
-                )
-            },
-        ) {
+        Box {
             ClassScheduleRow(
                 startPadding = 30.dp,
             ) {
@@ -72,6 +56,23 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
 
             Divider(Modifier.offset(y = 29.dp))
 
+            if (section > 0 || (section == 0 && proportion > 0))
+                Divider(modifier = Modifier.layout { measurable, constraints ->
+                    val paddingTop = 31.dp.toPx()
+                    val paddingStart = 30.dp.toPx()
+                    val cellHeight = (constraints.maxHeight - paddingTop) / 12
+                    val y = if (proportion < 0) {
+                        paddingTop + cellHeight * section
+                    } else {
+                        paddingTop + cellHeight * section + cellHeight * proportion
+                    }
+                    val placeable =
+                        measurable.measure(constraints.copy(maxWidth = constraints.maxWidth - paddingStart.roundToInt()))
+                    layout(placeable.width, placeable.height) {
+                        placeable.placeRelative(paddingStart.roundToInt(), y.roundToInt())
+                    }
+                }, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
+
             // Left section bar
             Column(
                 Modifier.width(30.dp)
@@ -88,7 +89,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
                             .fillMaxWidth()
                         for (i in 1..12) {
                             Column(
-                                modifier = if (section == i - 1) modifier1.background(
+                                modifier = if (proportion >= 0 && section == i - 1) modifier1.background(
                                     MaterialTheme.colorScheme.secondaryContainer
                                 ) else modifier1,
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -145,7 +146,6 @@ fun ClassScheduleRow(
     }
 }
 
-
 @Composable
 fun ClassScheduleRowItem(
     modifier: Modifier = Modifier,
@@ -158,14 +158,13 @@ fun ClassScheduleRowItem(
     Column(
         modifier = if (highlight) {
             val colorFrom = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f)
-            val colorTo = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0f)
+            val colorTo = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.1f)
 
             modifier.background(
                 Brush.verticalGradient(
                     Pair(0f, colorFrom),
                     Pair(1f, colorTo),
                 ),
-                MaterialTheme.shapes.extraSmall
             )
         } else modifier
     ) {
@@ -289,12 +288,15 @@ fun ClassScheduleColumnItem(
 @Composable
 private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span: Int) {
     ElevatedCard(
-        modifier = Modifier
-            .padding(4.dp),
+        modifier = Modifier.padding(4.dp),
         elevation = CardDefaults.elevatedCardElevation(3.dp),
         onClick = onClick,
+        shape = MaterialTheme.shapes.small
     ) {
-        Column(Modifier.padding(4.dp), verticalArrangement = Arrangement.Center) {
+        Column(
+            Modifier.padding(4.dp),
+            verticalArrangement = Arrangement.Center
+        ) {
             val course = remember { courses.last() }
 
             Box(

@@ -22,24 +22,43 @@ import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.util.stackConflict
+import kotlinx.coroutines.delay
 import java.time.DayOfWeek
+import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.TextStyle
 import java.util.*
 import kotlin.math.roundToInt
+import kotlin.time.toKotlinDuration
 
 @Composable
-fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, dateTime: LocalDateTime?) {
+fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highlight: Boolean) {
     val locale = remember { LocaleListCompat.getDefault()[0] }
 
-    val section = if (dateTime != null) Course.currentSection(dateTime.toLocalTime()) else null
+    // Indicator refresh clock
+    var dateTime by remember { mutableStateOf(LocalDateTime.now()) }
+    LaunchedEffect(highlight) {
+        if (highlight) {
+            val duration = Duration.ofSeconds(10).toKotlinDuration()
+            while (true) {
+                delay(duration)
+                dateTime = LocalDateTime.now()
+            }
+        }
+    }
+
+    val section by remember {
+        derivedStateOf {
+            Course.currentSection(dateTime.toLocalTime())
+        }
+    }
 
     Surface(modifier = modifier) {
         Box {
             ClassScheduleRow(
                 startPadding = 30.dp,
             ) {
-                val today = dateTime?.dayOfWeek
+                val today = dateTime.dayOfWeek
 
                 DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
                     ClassScheduleRowItem(
@@ -47,15 +66,15 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, dateTime
                         locale = locale!!,
                         courses = courses,
                         leftDivider = index == 0,
-                        highlight = dayOfWeek == today,
+                        highlight = highlight && dayOfWeek == today,
                     )
                 }
             }
 
-            Divider(Modifier.offset(y = 29.dp))
+            Divider(Modifier.offset(y = 30.dp))
 
             // Current section proportion indicator
-            if (section != null) {
+            if (highlight) {
                 if (section.first > 0 || (section.first == 0 && section.second > 0))
                     Divider(modifier = Modifier.layout { measurable, constraints ->
                         val paddingTop = 30.dp.toPx()
@@ -77,41 +96,37 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, dateTime
             }
 
             // Left section bar
-            Column(
-                Modifier.width(30.dp)
+            Row(
+                modifier = Modifier
+                    .width(30.dp)
+                    .padding(top = 31.dp)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
             ) {
-                Spacer(modifier = Modifier.height(30.dp))
-                Row(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
-                ) {
-                    Column(Modifier.weight(1f)) {
-
-                        val modifier1 = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                        for (i in 1..12) {
-                            Column(
-                                modifier = if (section != null && section.second >= 0 && section.first == i - 1)
-                                    modifier1.background(
-                                        MaterialTheme.colorScheme.secondaryContainer
-                                    ) else modifier1,
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = i.toString(),
-                                    textAlign = TextAlign.Center
-                                )
-                            }
+                Column(Modifier.weight(1f)) {
+                    val modifier1 = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                    for (i in 1..12) {
+                        Column(
+                            modifier = if (section.second >= 0 && section.first == i - 1)
+                                modifier1.background(
+                                    MaterialTheme.colorScheme.secondaryContainer
+                                ) else modifier1,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = i.toString(),
+                                textAlign = TextAlign.Center
+                            )
                         }
                     }
-                    Divider(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .fillMaxHeight()
-                    )
                 }
+                Divider(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                )
             }
         }
     }
@@ -175,7 +190,7 @@ fun ClassScheduleRowItem(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(30.dp),
+                .height(31.dp),
             contentAlignment = Alignment.Center
         ) {
             if (leftDivider) {
@@ -231,12 +246,12 @@ fun ClassScheduleColumn(
             }
         },
     ) { measurables, constraints ->
-        val cellHeight = constraints.minHeight / 12
+        val cellHeight = constraints.minHeight / 12f
 
         val placeables = measurables.mapIndexed { index, measurable ->
             val element = elements[index]
             val height =
-                (element.third - element.second + 1) * cellHeight
+                ((element.third - element.second + 1) * cellHeight).roundToInt()
 
             measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
         }
@@ -244,7 +259,7 @@ fun ClassScheduleColumn(
         layout(constraints.maxWidth, constraints.minHeight) {
             placeables.forEachIndexed { index, placeable ->
                 val element = elements[index]
-                val yPosition = (element.second - 1) * cellHeight
+                val yPosition = ((element.second - 1) * cellHeight).roundToInt()
                 placeable.placeRelative(0, yPosition)
             }
         }
@@ -292,10 +307,10 @@ fun ClassScheduleColumnItem(
 @Composable
 private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span: Int) {
     ElevatedCard(
-        modifier = Modifier.padding(4.dp),
+        modifier = Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
         elevation = CardDefaults.elevatedCardElevation(3.dp),
         onClick = onClick,
-        shape = MaterialTheme.shapes.small
+        shape = MaterialTheme.shapes.extraSmall
     ) {
         Column(
             Modifier.padding(4.dp),
@@ -339,6 +354,6 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
 private fun ClassSchedulePreview() {
     IJhTheme {
         val courses = CourseRepositoryMock.getCourses()
-        ClassSchedule(courses = courses, dateTime = LocalDateTime.now())
+        ClassSchedule(courses = courses, highlight = true)
     }
 }

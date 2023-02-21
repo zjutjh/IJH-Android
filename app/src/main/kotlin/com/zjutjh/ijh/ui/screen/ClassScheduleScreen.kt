@@ -22,10 +22,6 @@ import com.zjutjh.ijh.ui.model.TermWeekState
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
 import com.zjutjh.ijh.util.LoadResult
-import kotlinx.coroutines.delay
-import java.time.Duration
-import java.time.LocalDateTime
-import kotlin.time.toKotlinDuration
 
 @Composable
 fun ClassScheduleRoute(
@@ -58,16 +54,6 @@ private fun ClassScheduleScreen(
     selectedTermWeek: TermWeekState?,
     onNavigateBack: () -> Unit
 ) {
-    // Indicator refresh clock
-    var currentDateTime by remember { mutableStateOf(LocalDateTime.now()) }
-    LaunchedEffect(Unit) {
-        val duration = Duration.ofSeconds(10).toKotlinDuration()
-        while (true) {
-            delay(duration)
-            currentDateTime = LocalDateTime.now()
-        }
-    }
-
     // Highlight if it is in week view and the current week is selected
     val highlight = !termView && (selectedTermWeek == null || currentTermWeek == selectedTermWeek)
 
@@ -81,7 +67,7 @@ private fun ClassScheduleScreen(
             if (courses != null) {
                 ClassSchedule(
                     courses = courses,
-                    dateTime = if (highlight) currentDateTime else null
+                    highlight = highlight,
                 )
             }
         }

@@ -29,19 +29,17 @@ import java.util.*
 import kotlin.math.roundToInt
 
 @Composable
-fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
+fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, dateTime: LocalDateTime?) {
     val locale = remember { LocaleListCompat.getDefault()[0] }
-    val dateTime = remember { LocalDateTime.now() }
 
-    val (section, proportion) =
-        remember { Course.currentSection(dateTime.toLocalTime()) }
+    val section = if (dateTime != null) Course.currentSection(dateTime.toLocalTime()) else null
 
     Surface(modifier = modifier) {
         Box {
             ClassScheduleRow(
                 startPadding = 30.dp,
             ) {
-                val today = dateTime.dayOfWeek
+                val today = dateTime?.dayOfWeek
 
                 DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
                     ClassScheduleRowItem(
@@ -56,22 +54,27 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
 
             Divider(Modifier.offset(y = 29.dp))
 
-            if (section > 0 || (section == 0 && proportion > 0))
-                Divider(modifier = Modifier.layout { measurable, constraints ->
-                    val paddingTop = 31.dp.toPx()
-                    val paddingStart = 30.dp.toPx()
-                    val cellHeight = (constraints.maxHeight - paddingTop) / 12
-                    val y = if (proportion < 0) {
-                        paddingTop + cellHeight * section
-                    } else {
-                        paddingTop + cellHeight * section + cellHeight * proportion
-                    }
-                    val placeable =
-                        measurable.measure(constraints.copy(maxWidth = constraints.maxWidth - paddingStart.roundToInt()))
-                    layout(placeable.width, placeable.height) {
-                        placeable.placeRelative(paddingStart.roundToInt(), y.roundToInt())
-                    }
-                }, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
+            // Current section proportion indicator
+            if (section != null) {
+                if (section.first > 0 || (section.first == 0 && section.second > 0))
+                    Divider(modifier = Modifier.layout { measurable, constraints ->
+                        val paddingTop = 30.dp.toPx()
+                        val paddingStart = 30.dp.toPx()
+                        val thickness = 1.dp.toPx()
+
+                        val cellHeight = (constraints.maxHeight - paddingTop) / 12
+                        val y = if (section.second < 0) {
+                            paddingTop + cellHeight * section.first
+                        } else {
+                            paddingTop + cellHeight * section.first + (cellHeight - thickness) * section.second
+                        }
+                        val placeable =
+                            measurable.measure(constraints.copy(maxWidth = constraints.maxWidth - paddingStart.roundToInt()))
+                        layout(placeable.width, placeable.height) {
+                            placeable.placeRelative(paddingStart.roundToInt(), y.roundToInt())
+                        }
+                    }, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
+            }
 
             // Left section bar
             Column(
@@ -89,9 +92,10 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>) {
                             .fillMaxWidth()
                         for (i in 1..12) {
                             Column(
-                                modifier = if (proportion >= 0 && section == i - 1) modifier1.background(
-                                    MaterialTheme.colorScheme.secondaryContainer
-                                ) else modifier1,
+                                modifier = if (section != null && section.second >= 0 && section.first == i - 1)
+                                    modifier1.background(
+                                        MaterialTheme.colorScheme.secondaryContainer
+                                    ) else modifier1,
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
@@ -335,6 +339,6 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
 private fun ClassSchedulePreview() {
     IJhTheme {
         val courses = CourseRepositoryMock.getCourses()
-        ClassSchedule(courses = courses)
+        ClassSchedule(courses = courses, dateTime = LocalDateTime.now())
     }
 }

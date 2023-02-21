@@ -268,7 +268,7 @@ private fun CourseCardPreview() {
 @Preview(name = "Dark", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun ScheduleSurfacePreview() {
-    val termDay = TermDayState(2023, Term.FIRST, 1, DayOfWeek.MONDAY, true)
+    val termDay = TermDayState(2023, Term.FIRST, 1, true, DayOfWeek.MONDAY)
     IJhTheme {
         Surface {
             ScheduleCard(

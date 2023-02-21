@@ -80,7 +80,6 @@ class HomeViewModel @Inject constructor(
         .drop(1)
         .distinctUntilChanged(LoadResult<*>::isEqual)
         .flatMapLatest { state ->
-            Log.v("Flow", "new flow.")
             if (state is LoadResult.Ready && state.data != null) {
                 val day = state.data
                 if (day.isInTerm) {
@@ -89,7 +88,7 @@ class HomeViewModel @Inject constructor(
                 } else flowOf(emptyList())
             } else flowOf(emptyList())
         }
-        .debounce(10) // filter out too frequent refresh
+        .debounce(100) // filter out too frequent changes
         .distinctUntilChanged { old, new ->
             if (old.size == new.size) {
                 old.zip(new).all { (old, new) -> old.equalsIgnoreId(new) }

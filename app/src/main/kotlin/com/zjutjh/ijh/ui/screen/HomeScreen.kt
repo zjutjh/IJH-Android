@@ -261,7 +261,7 @@ private fun NavigationDrawerPreview() {
 @Composable
 private fun HomeScreenPreview() {
     val courses = CourseRepositoryMock.getCourses()
-    val termDay = TermDayState(2023, Term.FIRST, 1, DayOfWeek.MONDAY, true)
+    val termDay = TermDayState(2023, Term.FIRST, 1, true, DayOfWeek.MONDAY)
     IJhTheme {
         HomeScreen(
             refreshing = false,
@@ -279,7 +279,7 @@ private fun HomeScreenPreview() {
 @Composable
 private fun HomeScrollPreview() {
     val courses = CourseRepositoryMock.getCourses()
-    val termDay = TermDayState(2023, Term.FIRST, 1, DayOfWeek.MONDAY, true)
+    val termDay = TermDayState(2023, Term.FIRST, 1, true, DayOfWeek.MONDAY)
     IJhTheme {
         HomeScreen(
             refreshing = false,

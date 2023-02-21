@@ -5,13 +5,13 @@ import com.zjutjh.ijh.model.WeJhInfo
 import java.time.DayOfWeek
 import java.time.LocalDate
 
-data class TermDayState(
-    val year: Int,
-    val term: Term,
-    val week: Int,
+class TermDayState(
+    year: Int,
+    term: Term,
+    week: Int,
+    isInTerm: Boolean,
     val dayOfWeek: DayOfWeek,
-    val isInTerm: Boolean,
-)
+) : TermWeekState(year, term, week, isInTerm)
 
 fun WeJhInfo.toTermDayState(): TermDayState {
     val date = LocalDate.now()

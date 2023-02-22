@@ -1,8 +1,6 @@
 package com.zjutjh.ijh.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 import com.zjutjh.ijh.database.model.CourseEntity
 import com.zjutjh.ijh.model.Term
 import kotlinx.coroutines.flow.Flow
@@ -35,13 +33,8 @@ interface CourseDao {
     @Insert
     suspend fun insertCourses(courses: List<CourseEntity>): List<Long>
 
-    @Query(
-        """
-        DELETE FROM courses
-        WHERE id IN (:ids)
-    """
-    )
-    suspend fun deleteCourses(ids: List<Long>)
+    @Delete
+    suspend fun deleteCourses(courses: List<CourseEntity>)
 
     @Query(
         """
@@ -50,4 +43,11 @@ interface CourseDao {
     """
     )
     suspend fun deleteCourses(year: Int, term: Term)
+
+    @Transaction
+    suspend fun deleteAndInsertCourses(delete: List<CourseEntity>, insert: List<CourseEntity>) {
+        deleteCourses(delete)
+        insertCourses(insert)
+    }
+
 }

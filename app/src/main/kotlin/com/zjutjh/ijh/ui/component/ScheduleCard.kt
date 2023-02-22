@@ -25,6 +25,7 @@ import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.Section
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.theme.IJhTheme
@@ -206,19 +207,19 @@ private fun CourseListItem(course: Course, onClick: () -> Unit, modifier: Modifi
 }
 
 fun Course.shortTime(): String {
-    val (start, _) = Course.SECTIONS[sectionStart - 1]
-    val (_, end) = Course.SECTIONS[sectionEnd - 1]
+    val (start, _) = Section.PAIRS[sectionStart - 1]
+    val (_, end) = Section.PAIRS[sectionEnd - 1]
 
     val formatter = DateTimeFormatter.ofPattern("HH:mm")
     return "${start.format(formatter)} - ${end.format(formatter)} | $sectionStart-$sectionEnd"
 }
 
 fun Course.detailedTime(): String {
-    val (start, _) = Course.SECTIONS[sectionStart - 1]
-    val (_, end) = Course.SECTIONS[sectionEnd - 1]
+    val (start, _) = Section.PAIRS[sectionStart - 1]
+    val (_, end) = Section.PAIRS[sectionEnd - 1]
 
-    val startTime = start.format(Course.TIME_FORMATTER)
-    val endTime = end.format(Course.TIME_FORMATTER)
+    val startTime = start.format(Section.TIME_FORMATTER)
+    val endTime = end.format(Section.TIME_FORMATTER)
 
     val locale = LocaleListCompat.getDefault()[0]
 

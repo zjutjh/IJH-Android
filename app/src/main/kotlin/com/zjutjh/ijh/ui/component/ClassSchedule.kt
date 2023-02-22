@@ -147,7 +147,7 @@ fun ClassScheduleRow(
             .horizontalScrollbar(scrollState, startPadding),
         content = content
     ) { measurables, constraints ->
-        val padding = startPadding.toPx().roundToInt()
+        val padding = startPadding.roundToPx()
         val width = (constraints.minWidth - padding) / 5 // Only 5 items are visible
 
         val placeables = measurables.map { measurable ->

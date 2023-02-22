@@ -75,7 +75,7 @@ class HomeViewModel @Inject constructor(
             started = SharingStarted.Eagerly,
         )
 
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     val coursesState: StateFlow<LoadResult<List<Course>>> = termDayState
         .drop(1)
         .distinctUntilChanged(LoadResult<*>::isEqual)
@@ -87,12 +87,6 @@ class HomeViewModel @Inject constructor(
                         .map { it.filterToday(day) }
                 } else flowOf(emptyList())
             } else flowOf(emptyList())
-        }
-        .debounce(100) // filter out too frequent changes
-        .distinctUntilChanged { old, new ->
-            if (old.size == new.size) {
-                old.zip(new).all { (old, new) -> old.equalsIgnoreId(new) }
-            } else false
         }
         .flowOn(Dispatchers.Default)
         .asLoadResultStateFlow(

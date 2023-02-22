@@ -31,3 +31,18 @@ fun ZfClassTable.LessonsTable.asLocalModel(year: Int, term: Term): CourseEntity 
         weeks = CourseWeek.parseFromZfWeekString(week)
     )
 }
+
+fun CourseEntity.equalsIgnoreId(other: CourseEntity): Boolean {
+    return name == other.name &&
+            teacherName == other.teacherName &&
+            campus == other.campus &&
+            place == other.place &&
+            className == other.className &&
+            type == other.type &&
+            credits == other.credits &&
+            hours == other.hours &&
+            sectionStart == other.sectionStart &&
+            sectionEnd == other.sectionEnd &&
+            dayOfWeek == other.dayOfWeek &&
+            weeks == other.weeks
+}

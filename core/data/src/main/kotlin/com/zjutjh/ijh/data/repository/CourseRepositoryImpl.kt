@@ -1,6 +1,7 @@
 package com.zjutjh.ijh.data.repository
 
 import com.zjutjh.ijh.data.model.asLocalModel
+import com.zjutjh.ijh.data.model.equalsIgnoreId
 import com.zjutjh.ijh.database.dao.CourseDao
 import com.zjutjh.ijh.database.model.CourseEntity
 import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
@@ -9,8 +10,7 @@ import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.network.ZfDataSource
 import dagger.hilt.android.scopes.ActivityRetainedScoped
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
@@ -35,11 +35,38 @@ class CourseRepositoryImpl @Inject constructor(
         }
 
     override suspend fun sync(year: Int, term: Term) {
+        val old = dao.getCourses(year, term).first()
+
         val classTable = zfDataSource.getClassTable(year.toString(), term.value).lessonsTable
-        if (classTable != null) {
-            dao.deleteCourses(year, term)
-            dao.insertCourses(classTable.map { it.asLocalModel(year, term) })
-            localPreference.setCoursesLastSyncTime(ZonedDateTime.now())
+        if (classTable != null && classTable.isNotEmpty()) {
+            val new = classTable.map { it.asLocalModel(year, term) }
+
+            if (old.isEmpty())
+                dao.insertCourses(new)
+            else
+                updateCourses(old, new)
+        } else if (old.isNotEmpty()) {
+            dao.deleteCourses(old)
         }
+
+        localPreference.setCoursesLastSyncTime(ZonedDateTime.now())
+    }
+
+    // Insert new or updated elements and delete outdated elements
+    private suspend fun updateCourses(old: List<CourseEntity>, new: List<CourseEntity>) {
+        val toDelete = old.toMutableList()
+        val toInsert = new.toMutableList()
+
+        toDelete.removeIf {
+            val index = toInsert.indexOfFirst { it.equalsIgnoreId(it) }
+            if (index != -1) {
+                toInsert.removeAt(index)
+                true
+            } else false
+        }
+
+        if (toDelete.isEmpty() && toInsert.isEmpty()) return
+
+        dao.deleteAndInsertCourses(toDelete, toInsert)
     }
 }

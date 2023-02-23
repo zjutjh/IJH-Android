@@ -69,6 +69,14 @@ class ClassScheduleViewModel @Inject constructor(
             initialValue = null
         )
 
+    fun switchTermView() {
+        _termView.value = !_termView.value
+    }
+
+    fun selectTerm(termWeekState: TermWeekState) {
+        _selectedTermDayState.value = termWeekState
+    }
+
     // Activity scoped view model to preload data
     suspend fun preload() {
         coursesState.dropWhile { it == null }.first()

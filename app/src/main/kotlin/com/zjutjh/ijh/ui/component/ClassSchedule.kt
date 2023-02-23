@@ -213,11 +213,11 @@ fun ClassScheduleColumn(
     modifier: Modifier = Modifier,
     courses: List<Course>,
 ) {
-    val elements: List<Triple<List<Course>, Int, Int>> = remember {
+    val elements: List<Triple<List<Course>, Int, Int>> = remember(courses) {
         courses.stackConflict()
     }
 
-    var chosenCourses by remember { mutableStateOf(emptyList<Course>()) }
+    var chosenCourses by remember(courses) { mutableStateOf(emptyList<Course>()) }
     var openDialog by remember { mutableStateOf(false) }
 
     if (openDialog) {

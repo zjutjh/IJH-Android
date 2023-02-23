@@ -46,7 +46,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             IJhTheme {
-                IJhApp()
+                IJhApp(
+                    this.defaultViewModelProviderFactory,
+                    this.defaultViewModelCreationExtras,
+                )
             }
         }
     }

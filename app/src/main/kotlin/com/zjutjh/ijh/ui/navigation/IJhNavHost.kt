@@ -3,12 +3,16 @@ package com.zjutjh.ijh.ui.navigation
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
+import kotlinx.coroutines.launch
 
 private const val ANIM_DURATION: Int = 300
 
@@ -17,8 +21,11 @@ private const val ANIM_DURATION: Int = 300
 fun IJhNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberAnimatedNavController(),
+    classScheduleViewModel: ClassScheduleViewModel = viewModel(),
     startDestination: String = homeRoute
 ) {
+    val scope = rememberCoroutineScope()
+
     AnimatedNavHost(
         modifier = modifier,
         navController = navController,
@@ -56,9 +63,12 @@ fun IJhNavHost(
                 )
             },
             onNavigateToClassSchedule = {
-                navController.navigateToClassSchedule(
-                    navOptions { launchSingleTop = true }
-                )
+                scope.launch {
+                    navController.navigateToClassSchedule(
+                        classScheduleViewModel,
+                        navOptions { launchSingleTop = true }
+                    )
+                }
             }
         )
 
@@ -72,6 +82,7 @@ fun IJhNavHost(
         )
 
         classScheduleScreen(
+            classScheduleViewModel,
             navController::popBackStack
         )
     }

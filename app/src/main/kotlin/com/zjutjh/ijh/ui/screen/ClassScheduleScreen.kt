@@ -21,7 +21,6 @@ import com.zjutjh.ijh.ui.component.ClassSchedule
 import com.zjutjh.ijh.ui.model.TermWeekState
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
-import com.zjutjh.ijh.util.LoadResult
 
 @Composable
 fun ClassScheduleRoute(
@@ -30,12 +29,7 @@ fun ClassScheduleRoute(
 ) {
     val termView by viewModel.termView.collectAsStateWithLifecycle()
     val termState by viewModel.termState.collectAsStateWithLifecycle()
-    val coursesState by viewModel.coursesState.collectAsStateWithLifecycle()
-
-    val courses = when (val state = coursesState) {
-        is LoadResult.Loading -> null
-        is LoadResult.Ready -> state.data
-    }
+    val courses by viewModel.coursesState.collectAsStateWithLifecycle()
 
     ClassScheduleScreen(
         courses = courses,
@@ -64,12 +58,11 @@ private fun ClassScheduleScreen(
         Column(
             modifier = Modifier.padding(paddingValues)
         ) {
-            if (courses != null) {
+            if (courses != null)
                 ClassSchedule(
                     courses = courses,
                     highlight = highlight,
                 )
-            }
         }
     }
 }

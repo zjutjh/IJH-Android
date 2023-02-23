@@ -72,7 +72,7 @@ class HomeViewModel @Inject constructor(
         .flowOn(Dispatchers.Default)
         .asLoadResultStateFlow(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.WhileSubscribed(),
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -91,7 +91,7 @@ class HomeViewModel @Inject constructor(
         .flowOn(Dispatchers.Default)
         .asLoadResultStateFlow(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly
+            started = SharingStarted.WhileSubscribed(5_000)
         )
 
     init {

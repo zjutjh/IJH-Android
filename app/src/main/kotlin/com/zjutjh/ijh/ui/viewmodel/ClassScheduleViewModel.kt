@@ -1,17 +1,16 @@
 package com.zjutjh.ijh.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.data.repository.WeJhInfoRepository
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.TermWeekState
 import com.zjutjh.ijh.ui.model.toTermDayState
-import com.zjutjh.ijh.util.LoadResult
-import com.zjutjh.ijh.util.asLoadResultStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -34,33 +33,45 @@ class ClassScheduleViewModel @Inject constructor(
     private val _termView = MutableStateFlow(false)
     val termView = _termView.asStateFlow()
 
-    val termState = localTermDayState
+    val termState: StateFlow<Pair<TermDayState?, TermWeekState?>> = localTermDayState
+        .distinctUntilChanged()
         .combine(_selectedTermDayState) { localTermDayState, selectedTermDayState ->
             localTermDayState to selectedTermDayState
         }
+        .flowOn(Dispatchers.Default)
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.WhileSubscribed(),
             initialValue = Pair(null, null)
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val coursesState: StateFlow<LoadResult<List<Course>>> = termState
-        .drop(1)
-        .combine(_termView) { termState, termView ->
-            Pair(termState, termView)
-        }
-        .flatMapLatest { (state, view) ->
+    val coursesState: StateFlow<List<Course>?> = termState
+        .dropWhile { (l, r) -> l == null && r == null }
+        .flatMapLatest { state ->
             val termState = state.second ?: state.first
             if (termState != null) {
-                if (view) courseRepository.getCourses(termState.year, termState.term)
-                    .map { it.filter { course -> course.weeks.contains(termState.week) } }
-                else courseRepository.getCourses(termState.year, termState.term)
-            } else flowOf(emptyList())
+                courseRepository.getCourses(termState.year, termState.term)
+                    .map { it to termState.week }
+            } else flowOf(Pair(emptyList(), 1))
+        }
+        .combine(_termView) { courses, termView ->
+            if (termView) {
+                courses.first
+            } else {
+                courses.first.filter { course -> course.weeks.contains(courses.second) }
+            }
         }
         .flowOn(Dispatchers.Default)
-        .asLoadResultStateFlow(
+        .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null
         )
+
+    // Activity scoped view model to preload data
+    suspend fun preload() {
+        coursesState.dropWhile { it == null }.first()
+        Log.i("ClassSchedule", "Preload finished.")
+    }
 }

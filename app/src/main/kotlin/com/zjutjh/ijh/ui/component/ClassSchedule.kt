@@ -33,13 +33,13 @@ import kotlin.time.toKotlinDuration
 
 @Composable
 fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highlight: Boolean) {
-    val locale = remember { LocaleListCompat.getDefault()[0] }
+    val locale = remember { LocaleListCompat.getDefault()[0]!! }
 
     // Indicator refresh clock
     var dateTime by remember { mutableStateOf(LocalDateTime.now()) }
     LaunchedEffect(highlight) {
         if (highlight) {
-            val duration = Duration.ofSeconds(10).toKotlinDuration()
+            val duration = Duration.ofSeconds(5).toKotlinDuration()
             while (true) {
                 delay(duration)
                 dateTime = LocalDateTime.now()
@@ -47,11 +47,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
         }
     }
 
-    val section by remember {
-        derivedStateOf {
-            Course.currentSection(dateTime.toLocalTime())
-        }
-    }
+    val section = Course.currentSection(dateTime.toLocalTime())
 
     Surface(modifier = modifier) {
         Box {
@@ -62,9 +58,8 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
 
                 DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
                     ClassScheduleRowItem(
-                        dayOfWeek = dayOfWeek,
-                        locale = locale!!,
-                        courses = courses,
+                        title = dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
+                        courses = courses.filter { it.dayOfWeek == dayOfWeek },
                         leftDivider = index == 0,
                         highlight = highlight && dayOfWeek == today,
                     )
@@ -168,8 +163,7 @@ fun ClassScheduleRow(
 @Composable
 fun ClassScheduleRowItem(
     modifier: Modifier = Modifier,
-    dayOfWeek: DayOfWeek,
-    locale: Locale,
+    title: String,
     courses: List<Course>,
     leftDivider: Boolean = false,
     highlight: Boolean = false,
@@ -204,13 +198,12 @@ fun ClassScheduleRowItem(
             }
 
             Text(
-                text = dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
+                text = title,
                 textAlign = TextAlign.Center
             )
         }
         ClassScheduleColumn(
             courses = courses,
-            dayOfWeek = dayOfWeek
         )
     }
 }
@@ -219,10 +212,9 @@ fun ClassScheduleRowItem(
 fun ClassScheduleColumn(
     modifier: Modifier = Modifier,
     courses: List<Course>,
-    dayOfWeek: DayOfWeek
 ) {
     val elements: List<Triple<List<Course>, Int, Int>> = remember {
-        courses.stackConflict(dayOfWeek)
+        courses.stackConflict()
     }
 
     var chosenCourses by remember { mutableStateOf(emptyList<Course>()) }

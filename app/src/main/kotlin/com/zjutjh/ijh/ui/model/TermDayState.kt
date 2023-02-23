@@ -11,7 +11,23 @@ class TermDayState(
     week: Int,
     isInTerm: Boolean,
     val dayOfWeek: DayOfWeek,
-) : TermWeekState(year, term, week, isInTerm)
+) : TermWeekState(year, term, week, isInTerm) {
+    override fun equals(other: Any?): Boolean {
+        return when (other) {
+            null -> false
+            is TermDayState -> {
+                super.equals(other) && dayOfWeek == other.dayOfWeek
+            }
+            else -> false
+        }
+    }
+
+    override fun hashCode(): Int {
+        var result = super.hashCode()
+        result = 31 * result + dayOfWeek.hashCode()
+        return result
+    }
+}
 
 fun WeJhInfo.toTermDayState(): TermDayState {
     val date = LocalDate.now()

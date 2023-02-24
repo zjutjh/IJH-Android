@@ -1,22 +1,15 @@
 package com.zjutjh.ijh.ui.navigation
 
-import androidx.activity.ComponentActivity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStore
-import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.NavHostController
 import androidx.navigation.navOptions
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
 import kotlinx.coroutines.launch
 
 private const val ANIM_DURATION: Int = 300
@@ -25,21 +18,11 @@ private const val ANIM_DURATION: Int = 300
 @Composable
 fun IJhNavHost(
     modifier: Modifier = Modifier,
-    viewModelProviderFactory: ViewModelProvider.Factory =
-        (LocalContext.current as ComponentActivity).defaultViewModelProviderFactory,
-    viewModelCreationExtras: CreationExtras =
-        (LocalContext.current as ComponentActivity).defaultViewModelCreationExtras,
+    sharedViewModelStoreOwner: ViewModelStoreMappingOwner,
     navController: NavHostController = rememberAnimatedNavController(),
     startDestination: String = homeRoute
 ) {
     val scope = rememberCoroutineScope()
-    val preloadViewModelOwner = remember {
-        object : ViewModelStoreOwner {
-            override val viewModelStore = ViewModelStore()
-            fun clear() = viewModelStore.clear()
-        }
-    }
-    val classScheduleViewModel = MutableStateFlow(null as ClassScheduleViewModel?)
 
     AnimatedNavHost(
         modifier = modifier,
@@ -79,16 +62,8 @@ fun IJhNavHost(
             },
             onNavigateToClassSchedule = {
                 scope.launch {
-                    val vm =
-                        ViewModelProvider(
-                            preloadViewModelOwner.viewModelStore,
-                            viewModelProviderFactory,
-                            viewModelCreationExtras
-                        )[ClassScheduleViewModel::class.java]
-
-                    classScheduleViewModel.value = vm
                     navController.navigateToClassSchedule(
-                        vm,
+                        sharedViewModelStoreOwner,
                         navOptions { launchSingleTop = true }
                     )
                 }
@@ -105,11 +80,9 @@ fun IJhNavHost(
         )
 
         classScheduleScreen(
-            classScheduleViewModel
+            sharedViewModelStoreOwner
         ) {
             navController.popBackStack()
-            classScheduleViewModel.value = null
-            preloadViewModelOwner.clear()
         }
     }
 }

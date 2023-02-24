@@ -9,8 +9,12 @@ import androidx.core.animation.ObjectAnimator
 import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.zjutjh.ijh.ui.IJhApp
 import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,7 +25,6 @@ class MainActivity : ComponentActivity() {
         // Add a callback that's called when the splash screen is animating to
         // the app content.
         splashScreen.setOnExitAnimationListener { splashScreenView ->
-
             val animator = ObjectAnimator.ofFloat(
                 splashScreenView.view,
                 View.TRANSLATION_Y,
@@ -38,8 +41,21 @@ class MainActivity : ComponentActivity() {
             // Run animation.
             animator.start()
         }
-
         super.onCreate(savedInstanceState)
+
+        val sharedViewModelStoreOwner =
+            ViewModelStoreMappingOwner(
+                defaultViewModelProviderFactory,
+                defaultViewModelCreationExtras
+            )
+
+        lifecycle.addObserver(object : LifecycleEventObserver {
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                if (event == Lifecycle.Event.ON_DESTROY && !isChangingConfigurations) {
+                    sharedViewModelStoreOwner.clear()
+                }
+            }
+        })
 
         // Make system bars inside the application's layout scope
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -47,8 +63,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             IJhTheme {
                 IJhApp(
-                    this.defaultViewModelProviderFactory,
-                    this.defaultViewModelCreationExtras,
+                    sharedViewModelStoreOwner
                 )
             }
         }

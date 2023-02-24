@@ -1,20 +1,17 @@
 package com.zjutjh.ijh.ui
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.CreationExtras
 import com.zjutjh.ijh.ui.navigation.IJhNavHost
+import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
 
 /**
  * App level UI [Composable]
  */
 @Composable
 fun IJhApp(
-    viewModelProviderFactory: ViewModelProvider.Factory,
-    viewModelCreationExtras: CreationExtras
+    sharedViewModelStoreOwner: ViewModelStoreMappingOwner,
 ) {
     IJhNavHost(
-        viewModelProviderFactory = viewModelProviderFactory,
-        viewModelCreationExtras = viewModelCreationExtras,
+        sharedViewModelStoreOwner = sharedViewModelStoreOwner,
     )
 }

@@ -7,7 +7,6 @@ import com.google.accompanist.navigation.animation.composable
 import com.zjutjh.ijh.ui.screen.ClassScheduleRoute
 import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
 import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
-import kotlinx.coroutines.delay
 
 private const val classScheduleRoute = "classSchedule"
 
@@ -37,6 +36,5 @@ suspend fun NavController.navigateToClassSchedule(
     val vm = mappingOwner.provider(classScheduleRoute)[ClassScheduleViewModel::class.java]
 
     vm.preload()
-    delay(100)
     this.navigate(classScheduleRoute, navOptions)
 }

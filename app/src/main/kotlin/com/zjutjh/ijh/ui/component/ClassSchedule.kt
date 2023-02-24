@@ -74,13 +74,12 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
                     Divider(modifier = Modifier.layout { measurable, constraints ->
                         val paddingTop = 30.dp.toPx()
                         val paddingStart = 30.dp.toPx()
-                        val thickness = 1.dp.toPx()
 
                         val cellHeight = (constraints.maxHeight - paddingTop) / 12
                         val y = if (section.second < 0) {
                             paddingTop + cellHeight * section.first
                         } else {
-                            paddingTop + cellHeight * section.first + (cellHeight - thickness) * section.second
+                            paddingTop + cellHeight * section.first + cellHeight * section.second
                         }
                         val placeable =
                             measurable.measure(constraints.copy(maxWidth = constraints.maxWidth - paddingStart.roundToInt()))
@@ -103,7 +102,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
                         .fillMaxWidth()
                     for (i in 1..12) {
                         Column(
-                            modifier = if (section.second >= 0 && section.first == i - 1)
+                            modifier = if (highlight && section.second >= 0 && section.first == i - 1)
                                 modifier1.background(
                                     MaterialTheme.colorScheme.secondaryContainer
                                 ) else modifier1,
@@ -308,7 +307,7 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
             Modifier.padding(4.dp),
             verticalArrangement = Arrangement.Center
         ) {
-            val course = remember { courses.last() }
+            val course = remember(courses) { courses.last() }
 
             Box(
                 modifier = Modifier

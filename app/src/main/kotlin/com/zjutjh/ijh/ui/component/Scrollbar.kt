@@ -3,6 +3,7 @@ package com.zjutjh.ijh.ui.component
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -48,6 +49,42 @@ fun Modifier.verticalScrollbar(
                 color = color,
                 topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
                 size = Size(width.toPx(), scrollbarLength),
+                alpha = alpha
+            )
+        }
+    }
+}
+
+fun Modifier.verticalScrollbar(
+    state: LazyListState,
+    width: Dp = 4.dp,
+) = composed {
+    val targetAlpha = if (state.isScrollInProgress) 0.3f else 0f
+    val duration = if (state.isScrollInProgress) 150 else 500
+
+    val alpha by animateFloatAsState(
+        targetValue = targetAlpha,
+        animationSpec = tween(durationMillis = duration)
+    )
+
+    val color = MaterialTheme.colorScheme.outline
+
+    return@composed drawWithContent {
+        drawContent()
+
+        val firstVisibleElementIndex = state.firstVisibleItemIndex
+        val needDrawScrollbar = state.isScrollInProgress || alpha > 0.0f
+
+        // Draw scrollbar if scrolling or if the animation is still running and lazy column has content
+        if (needDrawScrollbar) {
+            val elementHeight = this.size.height / state.layoutInfo.totalItemsCount
+            val scrollbarOffsetY = firstVisibleElementIndex * elementHeight
+            val scrollbarHeight = state.layoutInfo.visibleItemsInfo.size * elementHeight
+
+            drawRect(
+                color = color,
+                topLeft = Offset(this.size.width - width.toPx(), scrollbarOffsetY),
+                size = Size(width.toPx(), scrollbarHeight),
                 alpha = alpha
             )
         }

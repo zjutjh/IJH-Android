@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.data.repository.WeJhInfoRepository
+import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.TermWeekState
@@ -17,8 +18,19 @@ import javax.inject.Inject
 @HiltViewModel
 class ClassScheduleViewModel @Inject constructor(
     weJhInfoRepository: WeJhInfoRepository,
+    weJhUserRepository: WeJhUserRepository,
     private val courseRepository: CourseRepository,
 ) : ViewModel() {
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val startYear = weJhUserRepository.userStream
+        .mapLatest { it?.studentId?.substring(0, 4)?.toIntOrNull() ?: 2019 }
+        .flowOn(Dispatchers.Default)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = 2019
+        )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val localTermDayState = weJhInfoRepository.infoStream

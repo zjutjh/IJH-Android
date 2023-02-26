@@ -63,7 +63,7 @@ fun ScheduleCard(
                     onClick = onCalendarClick
                 ) {
                     Icon(
-                        imageVector = Icons.Default.CalendarMonth,
+                        imageVector = Icons.Default.CalendarViewWeek,
                         contentDescription = stringResource(
                             id = R.string.calendar
                         )

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.outlined.CalendarViewWeek
 import androidx.compose.material.icons.outlined.DateRange
@@ -16,6 +18,8 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -134,26 +138,57 @@ private fun ClassScheduleTopBar(
 ) {
     val termWeek = selectedTermWeek ?: currentTermWeek
 
-    var openPicker by remember { mutableStateOf(false) }
+    var pickerOpened by remember { mutableStateOf(false) }
+    fun openPicker() {
+        pickerOpened = true
+    }
+    fun closePicker() {
+        pickerOpened = false
+    }
 
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
-            Row(
-                modifier = Modifier
-                    .clickable { openPicker = true },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                val title = if (termWeek == null) {
-                    stringResource(id = R.string.unselected)
-                } else if (termView) {
-                    "${termWeek.year} (${termWeek.term.value})"
-                } else if (termWeek.isInTerm) {
-                    stringResource(id = R.string.unit_week, termWeek.week)
-                } else {
-                    stringResource(id = R.string.during_vacation)
+            if (termWeek == null) {
+                MoreClickableText(
+                    text = stringResource(id = R.string.unselected),
+                    onClick = ::openPicker
+                )
+            } else if (termView) {
+                MoreClickableText(
+                    text = "${termWeek.year} (${termWeek.term.value})",
+                    onClick = ::openPicker
+                )
+            } else if (termWeek.isInTerm) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Previous week button
+                    IconButton(
+                        onClick = { onSelectTerm(termWeek.previousWeek()) },
+                        enabled = termWeek.hasPreviousWeek()
+                    ) {
+                        Icon(imageVector = Icons.Default.ChevronLeft, contentDescription = null)
+                    }
+                    Text(
+                        modifier = Modifier
+                            .widthIn(min = 85.dp)
+                            .clickable(onClick = ::openPicker),
+                        text = stringResource(id = R.string.unit_week, termWeek.week),
+                        textAlign = TextAlign.Center,
+                    )
+                    // Next week button
+                    IconButton(
+                        onClick = { onSelectTerm(termWeek.nextWeek()) },
+                        enabled = termWeek.hasNextWeek()
+                    ) {
+                        Icon(imageVector = Icons.Default.ChevronRight, contentDescription = null)
+                    }
                 }
-                Text(text = title)
-                Icon(imageVector = Icons.Default.UnfoldMore, contentDescription = null)
+            } else {
+                MoreClickableText(
+                    text = stringResource(id = R.string.during_vacation),
+                    onClick = ::openPicker
+                )
             }
         },
         navigationIcon = {
@@ -170,29 +205,44 @@ private fun ClassScheduleTopBar(
         }
     )
 
-    if (openPicker) {
+    if (pickerOpened) {
         if (termView) {
             TermPicker(
                 startYear = startYear,
                 currentTermWeek = currentTermWeek,
                 selectedTermWeek = selectedTermWeek,
-                onDismiss = { openPicker = false },
+                onDismiss = ::closePicker,
                 onConfirm = {
                     onSelectTerm(it)
-                    openPicker = false
+                    pickerOpened = false
                 },
             )
         } else {
             WeekPicker(
                 currentTermWeek = currentTermWeek,
                 selectedTermWeek = selectedTermWeek,
-                onDismiss = { openPicker = false },
+                onDismiss = ::closePicker,
                 onConfirm = {
                     onSelectTerm(it)
-                    openPicker = false
+                    pickerOpened = false
                 },
             )
         }
+    }
+}
+
+@Composable
+private fun MoreClickableText(
+    text: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clickable(onClick = onClick),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(text = text)
+        Icon(imageVector = Icons.Default.UnfoldMore, contentDescription = null)
     }
 }
 
@@ -239,7 +289,6 @@ fun TermPicker(
             }
         },
         text = {
-            // TODO: Optimizing by custom layout
             val dividerColor = MaterialTheme.colorScheme.outlineVariant
             Row(
                 Modifier
@@ -253,7 +302,9 @@ fun TermPicker(
                             end = Offset(x, size.height),
                             strokeWidth = 1.dp.toPx()
                         )
-                    }) {
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 // Year picker
                 val currentYear = remember {
                     currentTermWeek?.year ?: java.time.Year.now().value
@@ -274,6 +325,7 @@ fun TermPicker(
                                     selectedYear = year
                                 }
                                 .padding(16.dp),
+                            fontWeight = FontWeight.Bold,
                             color = if (year == selectedYear) MaterialTheme.colorScheme.primary else Color.Unspecified
                         )
                     }
@@ -292,6 +344,7 @@ fun TermPicker(
                                     selectedTerm = term
                                 }
                                 .padding(16.dp),
+                            fontWeight = FontWeight.Bold,
                             color = if (term == selectedTerm) MaterialTheme.colorScheme.primary else Color.Unspecified
                         )
                     }
@@ -315,7 +368,7 @@ fun WeekPicker(
         else mutableStateOf(termWeek.week)
     }
     AlertDialog(
-        modifier = Modifier.widthIn(max = 250.dp),
+        modifier = Modifier.widthIn(max = 275.dp),
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(onClick = {
@@ -337,35 +390,32 @@ fun WeekPicker(
             }
         },
         text = {
-            // TODO: Optimizing by custom layout
-            Box(
+            // Week picker
+            val weekScrollState =
+                rememberLazyListState(initialFirstVisibleItemIndex = selectedWeek - 1)
+            LazyColumn(
                 Modifier
-                    .heightIn(max = 200.dp)
+                    .height(250.dp)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(vertical = 100.dp),
+                state = weekScrollState,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Week picker
-                val weekScrollState =
-                    rememberLazyListState(initialFirstVisibleItemIndex = selectedWeek - 1)
-                LazyColumn(
-                    Modifier.fillMaxWidth(),
-//                    contentPadding = PaddingValues(vertical = 80.dp),
-                    state = weekScrollState,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(20) {
-                        val week = it + 1
-                        Text(
-                            text = stringResource(id = R.string.unit_week, week),
-                            modifier = Modifier
-                                .clickable {
-                                    scope.launch {
-                                        weekScrollState.animateScrollToItem(week - 1)
-                                    }
-                                    selectedWeek = week
+                items(TermWeekState.WEEK_END) {
+                    val week = it + 1
+                    Text(
+                        text = stringResource(id = R.string.unit_week, week),
+                        modifier = Modifier
+                            .clickable {
+                                scope.launch {
+                                    weekScrollState.animateScrollToItem(week - 1)
                                 }
-                                .padding(16.dp),
-                            color = if (week == selectedWeek) MaterialTheme.colorScheme.primary else Color.Unspecified
-                        )
-                    }
+                                selectedWeek = week
+                            }
+                            .padding(16.dp),
+                        fontWeight = FontWeight.Bold,
+                        color = if (week == selectedWeek) MaterialTheme.colorScheme.primary else Color.Unspecified
+                    )
                 }
             }
         }

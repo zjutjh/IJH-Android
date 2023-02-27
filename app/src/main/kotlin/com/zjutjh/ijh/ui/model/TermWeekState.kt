@@ -25,4 +25,33 @@ open class TermWeekState(
         result = 31 * result + isInTerm.hashCode()
         return result
     }
+
+    fun previousWeek(): TermWeekState {
+        return if (week == WEEK_START) {
+            throw IllegalStateException("Week cannot be less than $WEEK_START")
+        } else {
+            TermWeekState(year, term, week - 1, isInTerm)
+        }
+    }
+
+    fun nextWeek(): TermWeekState {
+        return if (week == WEEK_END) {
+            throw IllegalStateException("Week cannot be greater than $WEEK_END")
+        } else {
+            TermWeekState(year, term, week + 1, isInTerm)
+        }
+    }
+
+    fun hasPreviousWeek(): Boolean {
+        return week > WEEK_START
+    }
+
+    fun hasNextWeek(): Boolean {
+        return week < WEEK_END
+    }
+
+    companion object {
+        const val WEEK_START = 1
+        const val WEEK_END = 20
+    }
 }

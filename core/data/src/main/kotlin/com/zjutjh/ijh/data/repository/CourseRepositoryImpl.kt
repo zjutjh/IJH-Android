@@ -57,8 +57,8 @@ class CourseRepositoryImpl @Inject constructor(
         val toDelete = old.toMutableList()
         val toInsert = new.toMutableList()
 
-        toDelete.removeIf {
-            val index = toInsert.indexOfFirst { it.equalsIgnoreId(it) }
+        toDelete.removeIf {delete ->
+            val index = toInsert.indexOfFirst { delete.equalsIgnoreId(it) }
             if (index != -1) {
                 toInsert.removeAt(index)
                 true

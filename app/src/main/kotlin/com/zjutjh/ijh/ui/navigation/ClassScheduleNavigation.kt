@@ -1,5 +1,6 @@
 package com.zjutjh.ijh.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.remember
 import androidx.navigation.*
@@ -15,17 +16,20 @@ fun NavGraphBuilder.classScheduleScreen(
     mappingOwner: ViewModelStoreMappingOwner,
     onNavigateBack: () -> Unit,
 ) {
+    fun onBack() {
+        mappingOwner.remove(classScheduleRoute)
+        onNavigateBack()
+    }
+
     composable(classScheduleRoute) {
         val vm = remember {
             mappingOwner.provider(classScheduleRoute)[ClassScheduleViewModel::class.java]
         }
         ClassScheduleRoute(
             viewModel = vm,
-            onNavigateBack = {
-                onNavigateBack()
-                mappingOwner.remove(classScheduleRoute)
-            },
+            onNavigateBack = ::onBack,
         )
+        BackHandler(onBack = ::onBack)
     }
 }
 

@@ -136,7 +136,7 @@ fun ClassScheduleRow(
 
     Layout(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .horizontalScroll(scrollState)
             .horizontalScrollbar(scrollState, startPadding),
         content = content
@@ -147,8 +147,7 @@ fun ClassScheduleRow(
         val placeables = measurables.map { measurable ->
             measurable.measure(constraints.copy(minWidth = width, maxWidth = width))
         }
-
-        layout((width * 7) + padding, constraints.maxHeight) {
+        layout((width * 7) + padding, constraints.minHeight) {
             var xPosition = padding
 
             placeables.forEach { placeable ->
@@ -294,39 +293,6 @@ fun ClassScheduleColumnItem(
     }
 }
 
-val courseColors = listOf(
-    Green0,
-    Blue0,
-    Cyan0,
-    Cyan1,
-    Orange0,
-    Desert,
-    Red0,
-    Purple0,
-    Pink0,
-    Green1,
-    Purple1,
-    Blue1,
-    Yellow,
-    Green2,
-    Purple2,
-    Green3,
-    Red1,
-    Pink1,
-    Orange1,
-    Blue2,
-    Purple3,
-    Green4,
-    Purple4,
-    Purple5,
-    Blue3,
-    Red2,
-    Red3,
-    Pink2,
-    Blue4,
-    Blue5,
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span: Int) {
@@ -384,6 +350,31 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
         }
     }
 }
+
+/**
+ * For better hashing, the total number of colors should be a prime number.
+ */
+val courseColors = listOf(
+    RainbowPink,
+    RainbowPeach,
+    RainbowLightGreen,
+    RainbowLightBlue,
+    RainbowLavender,
+    RainbowViolet,
+    RainbowCoral,
+    RainbowOrange,
+    RainbowChampagne,
+    RainbowLime,
+    Green0,
+    Blue0,
+    Cyan0,
+    Orange0,
+    Desert,
+    Red0,
+    Blue5,
+    Purple3,
+    Red2,
+)
 
 @Preview
 @Composable

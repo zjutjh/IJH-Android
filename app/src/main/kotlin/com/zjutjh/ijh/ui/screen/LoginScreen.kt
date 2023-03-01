@@ -137,7 +137,6 @@ fun LoginScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginFormTextField(
     modifier: Modifier = Modifier,

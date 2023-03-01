@@ -7,6 +7,7 @@ import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.data.repository.WeJhInfoRepository
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.TermWeekState
 import com.zjutjh.ijh.ui.model.toTermDayState
@@ -81,12 +82,42 @@ class ClassScheduleViewModel @Inject constructor(
             initialValue = null
         )
 
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
+
+    private var                  currentJob: Job? = null
+
+    fun refresh() {
+        currentJob = viewModelScope.launch {
+            currentJob?.cancelAndJoin()
+            _isRefreshing.value = true
+            val term = termState.value.second ?: termState.value.first
+            if (term != null)
+                courseRepository.sync(term.year, term.term)
+            _isRefreshing.value = false
+        }
+    }
+
+    private fun refresh(year: Int, term: Term) {
+        currentJob = viewModelScope.launch {
+            currentJob?.cancelAndJoin()
+            _isRefreshing.value = true
+            courseRepository.sync(year, term)
+            _isRefreshing.value = false
+        }
+    }
+
     fun switchTermView() {
         _termView.value = !_termView.value
     }
 
-    fun selectTerm(termWeekState: TermWeekState) {
+    fun selectTerm(termWeekState: TermWeekState, refresh: Boolean = false) {
         _selectedTermDayState.value = termWeekState
+        if (refresh) refresh(termWeekState.year,termWeekState.term)
+    }
+
+    fun unselectTerm() {
+        _selectedTermDayState.value = null
     }
 
     // Activity scoped view model to preload data

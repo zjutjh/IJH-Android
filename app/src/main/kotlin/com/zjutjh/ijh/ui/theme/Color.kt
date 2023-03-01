@@ -71,6 +71,18 @@ val seed = Color(0xFF00639E)
 /**
  * Custom colors
  */
+val RainbowPink = Color(0xFFFEC4C4)
+val RainbowPeach = Color(0xFFFEECCE)
+val RainbowLightYellow = Color(0xFFFFF6C9)
+val RainbowLightGreen = Color(0xFFCCFCC3)
+val RainbowLightBlue = Color(0xFFB3BDED)
+val RainbowLavender = Color(0xFFD8B7E5)
+val RainbowViolet = Color(0xFFE0A7E5)
+val RainbowRose = Color(0xFFE5A7D1)
+val RainbowCoral = Color(0xFFF0A7BD)
+val RainbowOrange = Color(0xFFF9C8AA)
+val RainbowChampagne = Color(0xFFFFEFAA)
+val RainbowLime = Color(0xFFDFFFAA)
 val Green0 = Color(0xFF53D1B6)
 val Blue0 = Color(0xFF81C6E7)
 val Cyan0 = Color(0xFF51BBBF)

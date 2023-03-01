@@ -18,6 +18,15 @@ open class TermWeekState(
         }
     }
 
+    fun equalsIgnoreWeek(other: TermWeekState?): Boolean {
+        return when (other) {
+            null -> false
+            else -> {
+                year == other.year && term == other.term
+            }
+        }
+    }
+
     override fun hashCode(): Int {
         var result = year
         result = 31 * result + term.hashCode()

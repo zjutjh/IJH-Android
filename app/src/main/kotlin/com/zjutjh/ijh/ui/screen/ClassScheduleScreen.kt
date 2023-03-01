@@ -1,22 +1,30 @@
 package com.zjutjh.ijh.ui.screen
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.outlined.CalendarViewWeek
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.*
+import androidx.compose.material3.pullrefresh.PullRefreshIndicator
+import androidx.compose.material3.pullrefresh.pullRefresh
+import androidx.compose.material3.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,6 +52,7 @@ fun ClassScheduleRoute(
     val termView by viewModel.termView.collectAsStateWithLifecycle()
     val termState by viewModel.termState.collectAsStateWithLifecycle()
     val courses by viewModel.coursesState.collectAsStateWithLifecycle()
+    val refreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     ClassScheduleScreen(
         startYear = startYear,
@@ -51,8 +60,11 @@ fun ClassScheduleRoute(
         termView = termView,
         currentTermWeek = termState.first,
         selectedTermWeek = termState.second,
+        refreshing = refreshing,
         switchTermView = viewModel::switchTermView,
+        onUnselect = viewModel::unselectTerm,
         onSelectTerm = viewModel::selectTerm,
+        onRefresh = viewModel::refresh,
         onNavigateBack = onNavigateBack
     )
 }
@@ -64,8 +76,11 @@ private fun ClassScheduleScreen(
     termView: Boolean,
     currentTermWeek: TermWeekState?,
     selectedTermWeek: TermWeekState?,
+    refreshing: Boolean,
     switchTermView: () -> Unit,
-    onSelectTerm: (TermWeekState) -> Unit,
+    onUnselect: () -> Unit,
+    onRefresh: () -> Unit,
+    onSelectTerm: (TermWeekState, Boolean) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     // Highlight if it is in week view and the current week is selected
@@ -76,46 +91,90 @@ private fun ClassScheduleScreen(
             currentTermWeek
         ) { !termView && (selectedTermWeek == null || selectedTermWeek == currentTermWeek) }
 
+    val revocable = remember(
+        termView,
+        selectedTermWeek,
+        currentTermWeek
+    ) {
+        if (selectedTermWeek == null) false
+        else if (termView) !selectedTermWeek.equalsIgnoreWeek(currentTermWeek)
+        else selectedTermWeek != currentTermWeek
+    }
+
+    val pullRefreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = onRefresh)
+
     ClassScheduleScaffold(
+        modifier = Modifier.pullRefresh(pullRefreshState),
         startYear = startYear,
         currentTermWeek = currentTermWeek,
         selectedTermWeek = selectedTermWeek,
         termView = termView,
+        revocable = revocable,
         switchTermView = switchTermView,
+        onUnselect = onUnselect,
         onSelectTerm = onSelectTerm,
         onBackClick = onNavigateBack
     ) { paddingValues ->
-        Column(
-            modifier = Modifier.padding(paddingValues)
-        ) {
-            if (courses != null)
-                ClassSchedule(
-                    courses = courses,
-                    highlight = highlight,
-                )
+        Layout(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxHeight()
+                .verticalScroll(rememberScrollState()),
+            content = {
+                Box(contentAlignment = Alignment.TopCenter) {
+                    if (courses != null)
+                        ClassSchedule(
+                            modifier = Modifier.padding(10.dp),
+                            courses = courses,
+                            highlight = highlight,
+                        )
+
+                    PullRefreshIndicator(
+                        refreshing = refreshing,
+                        state = pullRefreshState,
+                        scale = true
+                    )
+                }
+            },
+        ) { measurables, constraints ->
+            val placeables = measurables.map { measurable ->
+                measurable.measure(constraints.copy(maxHeight = constraints.minHeight))
+            }
+            layout(constraints.maxWidth, constraints.minHeight) {
+                placeables.forEach {
+                    it.placeRelative(0, 0)
+                }
+            }
         }
+
     }
 }
 
 @Composable
 private fun ClassScheduleScaffold(
+    modifier: Modifier = Modifier,
     startYear: Int,
     currentTermWeek: TermWeekState?,
     selectedTermWeek: TermWeekState?,
     termView: Boolean,
+    revocable: Boolean,
     switchTermView: () -> Unit,
-    onSelectTerm: (TermWeekState) -> Unit,
+    onUnselect: () -> Unit,
+    onSelectTerm: (TermWeekState, Boolean) -> Unit,
     onBackClick: () -> Unit,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             ClassScheduleTopBar(
                 startYear,
                 currentTermWeek,
                 selectedTermWeek,
                 termView,
+                revocable,
                 switchTermView,
+                onUnselect,
                 onSelectTerm,
                 onBackClick
             )
@@ -132,8 +191,10 @@ private fun ClassScheduleTopBar(
     currentTermWeek: TermWeekState?,
     selectedTermWeek: TermWeekState?,
     termView: Boolean,
+    revocable: Boolean,
     switchTermView: () -> Unit,
-    onSelectTerm: (TermWeekState) -> Unit,
+    onUnselect: () -> Unit,
+    onSelectTerm: (TermWeekState, Boolean) -> Unit,
     onBackClick: () -> Unit,
 ) {
     val termWeek = selectedTermWeek ?: currentTermWeek
@@ -142,6 +203,7 @@ private fun ClassScheduleTopBar(
     fun openPicker() {
         pickerOpened = true
     }
+
     fun closePicker() {
         pickerOpened = false
     }
@@ -164,7 +226,7 @@ private fun ClassScheduleTopBar(
                 ) {
                     // Previous week button
                     IconButton(
-                        onClick = { onSelectTerm(termWeek.previousWeek()) },
+                        onClick = { onSelectTerm(termWeek.previousWeek(), false) },
                         enabled = termWeek.hasPreviousWeek()
                     ) {
                         Icon(imageVector = Icons.Default.ChevronLeft, contentDescription = null)
@@ -178,7 +240,7 @@ private fun ClassScheduleTopBar(
                     )
                     // Next week button
                     IconButton(
-                        onClick = { onSelectTerm(termWeek.nextWeek()) },
+                        onClick = { onSelectTerm(termWeek.nextWeek(), false) },
                         enabled = termWeek.hasNextWeek()
                     ) {
                         Icon(imageVector = Icons.Default.ChevronRight, contentDescription = null)
@@ -195,6 +257,11 @@ private fun ClassScheduleTopBar(
             BackIconButton(onBackClick)
         },
         actions = {
+            AnimatedVisibility(visible = revocable, enter = fadeIn(), exit = fadeOut()) {
+                IconButton(onClick = onUnselect) {
+                    Icon(Icons.Default.Undo, null)
+                }
+            }
             IconButton(onClick = switchTermView) {
                 if (termView) {
                     Icon(Icons.Outlined.CalendarViewWeek, null)
@@ -213,7 +280,7 @@ private fun ClassScheduleTopBar(
                 selectedTermWeek = selectedTermWeek,
                 onDismiss = ::closePicker,
                 onConfirm = {
-                    onSelectTerm(it)
+                    onSelectTerm(it, true)
                     pickerOpened = false
                 },
             )
@@ -223,7 +290,7 @@ private fun ClassScheduleTopBar(
                 selectedTermWeek = selectedTermWeek,
                 onDismiss = ::closePicker,
                 onConfirm = {
-                    onSelectTerm(it)
+                    onSelectTerm(it, false)
                     pickerOpened = false
                 },
             )
@@ -426,7 +493,14 @@ fun WeekPicker(
 @Composable
 private fun TopBarPreview() {
     IJhTheme {
-        ClassScheduleTopBar(2019, null, null, false, {}, {}) {}
+        ClassScheduleTopBar(
+            2019, null, null,
+            termView = false,
+            revocable = true,
+            switchTermView = {},
+            onSelectTerm = { _, _ -> },
+            onUnselect = {},
+        ) {}
     }
 }
 
@@ -435,6 +509,7 @@ private fun TopBarPreview() {
 private fun ClassScheduleScreenPreview() {
     val courses = CourseRepositoryMock.getCourses()
     IJhTheme {
-        ClassScheduleScreen(2019, courses, false, null, null, {}, {}) {}
+        ClassScheduleScreen(2019, courses, false, null,
+            null, false, {}, {}, {}, { _, _ -> }) {}
     }
 }

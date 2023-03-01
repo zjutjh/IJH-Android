@@ -20,6 +20,17 @@ data class Course(
     val dayOfWeek: DayOfWeek,
     val weeks: CourseWeek,
 ) {
+    fun coloringHashCode(): UInt {
+        var result = name.hashCode()
+        result = 31 * result + teacherName.hashCode()
+        result = 31 * result + campus.hashCode()
+        result = 31 * result + className.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + credits.hashCode()
+        result = 31 * result + hours
+        return result.toUInt()
+    }
+
     companion object {
         fun currentSection(time: LocalTime = LocalTime.now()): Pair<Int, Float> {
             for (i in Section.PAIRS.indices) {

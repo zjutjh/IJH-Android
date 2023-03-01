@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
-import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.ui.theme.*
 import com.zjutjh.ijh.util.stackConflict
 import kotlinx.coroutines.delay
 import java.time.DayOfWeek
@@ -294,6 +294,39 @@ fun ClassScheduleColumnItem(
     }
 }
 
+val courseColors = listOf(
+    Green0,
+    Blue0,
+    Cyan0,
+    Cyan1,
+    Orange0,
+    Desert,
+    Red0,
+    Purple0,
+    Pink0,
+    Green1,
+    Purple1,
+    Blue1,
+    Yellow,
+    Green2,
+    Purple2,
+    Green3,
+    Red1,
+    Pink1,
+    Orange1,
+    Blue2,
+    Purple3,
+    Green4,
+    Purple4,
+    Purple5,
+    Blue3,
+    Red2,
+    Red3,
+    Pink2,
+    Blue4,
+    Blue5,
+)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span: Int) {
@@ -303,38 +336,50 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
         onClick = onClick,
         shape = MaterialTheme.shapes.extraSmall
     ) {
-        Column(
-            Modifier.padding(4.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            val course = remember(courses) { courses.last() }
+        val course = remember(courses) { courses.last() }
+        val colorNumber = remember(course) {
+            course.coloringHashCode().rem(courseColors.size.toUInt()).toInt()
+        }
 
+        Row {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f + (span * 0.5f)),
-                contentAlignment = Alignment.Center,
+                Modifier
+                    .width(4.dp)
+                    .fillMaxHeight()
+                    .background(courseColors[colorNumber])
+            )
+            Column(
+                Modifier.padding(1.dp),
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = course.name,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = course.place,
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    overflow = TextOverflow.Ellipsis
-                )
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f + (span * 0.5f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = course.name,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = course.place,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }

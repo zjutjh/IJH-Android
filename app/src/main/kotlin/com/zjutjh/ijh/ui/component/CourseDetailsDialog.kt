@@ -123,10 +123,10 @@ fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourses: List<Course>) {
 @Composable
 private fun TextListItem(@StringRes title: Int, text: String) {
     ListItem(
-        headlineContent = {
+        headlineText = {
             Text(text = stringResource(id = title))
         },
-        supportingContent = {
+        supportingText = {
             Text(text = text)
         }
     )

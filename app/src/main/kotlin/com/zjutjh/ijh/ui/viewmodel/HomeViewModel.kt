@@ -136,7 +136,7 @@ class HomeViewModel @Inject constructor(
             }
         }
 
-        Log.i("HomeSync", "Synchronization complete.")
+        Log.i("Home", "Synchronization complete.")
 
         timer.await()
         _refreshState.update { false }
@@ -145,10 +145,10 @@ class HomeViewModel @Inject constructor(
     private suspend fun refreshTerm(): Pair<Int, Term>? {
         runCatching { weJhInfoRepository.sync() }
             .fold({
-                Log.i("HomeSync", "Sync WeJhInfo succeed.")
+                Log.i("Home", "Sync WeJhInfo succeed.")
                 return it
             }) {
-                Log.e("HomeSync", "Sync WeJhInfo failed: $it")
+                Log.e("Home", "Sync WeJhInfo failed: $it")
                 // Run local refresh when failed
                 termLocalRefreshChannel.emit(Unit)
                 if (termDayState.value is LoadResult.Ready) {
@@ -165,9 +165,9 @@ class HomeViewModel @Inject constructor(
         runCatching {
             courseRepository.sync(year, term)
         }.fold({
-            Log.i("HomeSync", "Sync Courses succeed.")
+            Log.i("Home", "Sync Courses succeed.")
         }) {
-            Log.e("HomeSync", "Sync Courses failed: $it")
+            Log.e("Home", "Sync Courses failed: $it")
         }
     }
 

@@ -85,15 +85,15 @@ class ClassScheduleViewModel @Inject constructor(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    private var                  currentJob: Job? = null
+    private var currentJob: Job? = null
 
     fun refresh() {
         currentJob = viewModelScope.launch {
             currentJob?.cancelAndJoin()
             _isRefreshing.value = true
-            val term = termState.value.second ?: termState.value.first
-            if (term != null)
-                courseRepository.sync(term.year, term.term)
+            val state = termState.value.second ?: termState.value.first
+            if (state != null)
+                refreshCourses(state.year, state.term)
             _isRefreshing.value = false
         }
     }
@@ -102,8 +102,16 @@ class ClassScheduleViewModel @Inject constructor(
         currentJob = viewModelScope.launch {
             currentJob?.cancelAndJoin()
             _isRefreshing.value = true
-            courseRepository.sync(year, term)
+            refreshCourses(year, term)
             _isRefreshing.value = false
+        }
+    }
+
+    private suspend fun refreshCourses(year: Int, term: Term) {
+        try {
+            courseRepository.sync(year, term)
+        } catch (e: Exception) {
+            Log.e("Schedule", "Sync Courses failed: $e")
         }
     }
 
@@ -113,7 +121,7 @@ class ClassScheduleViewModel @Inject constructor(
 
     fun selectTerm(termWeekState: TermWeekState, refresh: Boolean = false) {
         _selectedTermDayState.value = termWeekState
-        if (refresh) refresh(termWeekState.year,termWeekState.term)
+        if (refresh) refresh(termWeekState.year, termWeekState.term)
     }
 
     fun unselectTerm() {
@@ -123,6 +131,6 @@ class ClassScheduleViewModel @Inject constructor(
     // Activity scoped view model to preload data
     suspend fun preload() {
         coursesState.dropWhile { it == null }.first()
-        Log.i("ClassSchedule", "Preload finished.")
+        Log.i("Schedule", "Preload finished.")
     }
 }

@@ -79,24 +79,25 @@ data class CourseWeek(
             val ranges: ArrayList<WeekRange> = ArrayList()
             try {
                 for (time in week.split(',')) {
-                    val clearTime = time.removeSuffix("周") // Remove useless suffix
+                    var evenWeek: Boolean? = null
+                    val clearTime = if (time.endsWith('周')) {
+                        time.substring(0, time.length - 1)
+                    } else if (time.endsWith("周(单)")) {
+                        evenWeek = false
+                        time.substring(0, time.length - 4)
+                    } else if (time.endsWith("周(双)")) {
+                        evenWeek = true
+                        time.substring(0, time.length - 4)
+                    } else {
+                        time
+                    }
                     val section = clearTime.split('-')
                     when (section.size) {
                         // Single week
                         1 -> singles.add(clearTime.toInt())
                         2 -> {
                             val start = section[0].toInt()
-                            val section1 = section[1]
-                            var evenWeek: Boolean? = null
-                            val end: Int = if (section1.endsWith('单')) {
-                                evenWeek = false
-                                section1.substring(0, section1.length - 1).toInt()
-                            } else if (section1.endsWith('双')) {
-                                evenWeek = true
-                                section1.substring(0, section1.length - 1).toInt()
-                            } else {
-                                section1.toInt()
-                            }
+                            val end = section[1].toInt()
                             ranges.add(
                                 WeekRange(
                                     start,
@@ -109,7 +110,7 @@ data class CourseWeek(
                     }
                 }
             } catch (e: NumberFormatException) {
-                throw CourseParseException("Fail to week numbers.")
+                throw CourseParseException("Fail to parse week numbers.")
             }
 
             return CourseWeek(ranges = ranges, singles = singles)

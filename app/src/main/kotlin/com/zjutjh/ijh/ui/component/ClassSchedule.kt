@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -310,7 +309,7 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
         Row {
             Box(
                 Modifier
-                    .width(4.dp)
+                    .width(3.dp)
                     .fillMaxHeight()
                     .background(courseColors[colorNumber])
             )
@@ -327,11 +326,12 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
                 ) {
                     Text(
                         text = course.name,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+                Divider()
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -340,9 +340,8 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
                 ) {
                     Text(
                         text = course.place,
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelMedium,
                         textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
                         overflow = TextOverflow.Ellipsis
                     )
                 }

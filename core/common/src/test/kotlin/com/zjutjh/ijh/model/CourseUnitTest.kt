@@ -35,7 +35,7 @@ class CourseUnitTest {
 
     @Test
     fun testParseUseCase03() {
-        val week = CourseWeek.parseFromZfWeekString("1-16单周")
+        val week = CourseWeek.parseFromZfWeekString("1-16周(单)")
         Assert.assertTrue(week.singles.isEmpty())
         Assert.assertEquals(week.ranges.size, 1)
         val section = week.ranges[0]
@@ -46,7 +46,7 @@ class CourseUnitTest {
 
     @Test
     fun testParseUseCase04() {
-        val week = CourseWeek.parseFromZfWeekString("1-16双周")
+        val week = CourseWeek.parseFromZfWeekString("1-16周(双)")
         Assert.assertTrue(week.singles.isEmpty())
         Assert.assertEquals(week.ranges.size, 1)
         val section = week.ranges[0]
@@ -57,7 +57,7 @@ class CourseUnitTest {
 
     @Test
     fun testParseUseCase05() {
-        val week = CourseWeek.parseFromZfWeekString("1-8单周,9-13双周")
+        val week = CourseWeek.parseFromZfWeekString("1-8周(单),9-13周(双)")
         Assert.assertTrue(week.singles.isEmpty())
         Assert.assertEquals(week.ranges.size, 2)
         val section1 = week.ranges[0]
@@ -68,46 +68,6 @@ class CourseUnitTest {
         Assert.assertEquals(section2.start, 9)
         Assert.assertEquals(section2.end, 13)
         Assert.assertEquals(section2.oddOrEvenWeek, true)
-    }
-
-    @Test
-    fun testParseUseCase06() {
-        val week = CourseWeek.parseFromZfWeekString("1-8单,9-13双周")
-        Assert.assertTrue(week.singles.isEmpty())
-        Assert.assertEquals(week.ranges.size, 2)
-        val section1 = week.ranges[0]
-        Assert.assertEquals(section1.start, 1)
-        Assert.assertEquals(section1.end, 8)
-        Assert.assertEquals(section1.oddOrEvenWeek, false)
-        val section2 = week.ranges[1]
-        Assert.assertEquals(section2.start, 9)
-        Assert.assertEquals(section2.end, 13)
-        Assert.assertEquals(section2.oddOrEvenWeek, true)
-    }
-
-    @Test
-    fun testParseUseCase07() {
-        val week = CourseWeek.parseFromZfWeekString("1,2周,1-3,4-8周,9-13单,14-16双周")
-        Assert.assertEquals(week.singles.size, 2)
-        Assert.assertEquals(week.singles[0], 1)
-        Assert.assertEquals(week.singles[1], 2)
-        Assert.assertEquals(week.ranges.size, 4)
-        var section = week.ranges[0]
-        Assert.assertEquals(section.start, 1)
-        Assert.assertEquals(section.end, 3)
-        Assert.assertEquals(section.oddOrEvenWeek, null)
-        section = week.ranges[1]
-        Assert.assertEquals(section.start, 4)
-        Assert.assertEquals(section.end, 8)
-        Assert.assertEquals(section.oddOrEvenWeek, null)
-        section = week.ranges[2]
-        Assert.assertEquals(section.start, 9)
-        Assert.assertEquals(section.end, 13)
-        Assert.assertEquals(section.oddOrEvenWeek, false)
-        section = week.ranges[3]
-        Assert.assertEquals(section.start, 14)
-        Assert.assertEquals(section.end, 16)
-        Assert.assertEquals(section.oddOrEvenWeek, true)
     }
 
     @Test

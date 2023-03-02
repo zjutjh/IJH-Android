@@ -55,7 +55,7 @@ fun ClassScheduleRoute(
     val refreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     ClassScheduleScreen(
-        startYear = startYear,
+        startYear = startYear ?: 2019,
         courses = courses,
         termView = termView,
         currentTermWeek = termState.first,
@@ -257,11 +257,11 @@ private fun ClassScheduleTopBar(
             BackIconButton(onBackClick)
         },
         actions = {
-            AnimatedVisibility(visible = revocable, enter = fadeIn(), exit = fadeOut()) {
+            if (revocable)
                 IconButton(onClick = onUnselect) {
                     Icon(Icons.Default.Undo, null)
                 }
-            }
+
             IconButton(onClick = switchTermView) {
                 if (termView) {
                     Icon(Icons.Outlined.CalendarViewWeek, null)

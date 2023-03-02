@@ -29,8 +29,8 @@ class ClassScheduleViewModel @Inject constructor(
         .flowOn(Dispatchers.Default)
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = 2019
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -131,6 +131,7 @@ class ClassScheduleViewModel @Inject constructor(
     // Activity scoped view model to preload data
     suspend fun preload() {
         coursesState.dropWhile { it == null }.first()
+        startYear.dropWhile { it == null }.first()
         Log.i("Schedule", "Preload finished.")
     }
 }

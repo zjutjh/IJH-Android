@@ -1,12 +1,14 @@
 syntax = "proto3";
 
+import "com/zjutjh/ijh/datastore/local_session.proto";
+
 option java_package = "com.zjutjh.ijh.datastore.model";
 option java_multiple_files = true;
 
 message WeJhPreference {
   optional Info info = 1;
   optional User user = 2;
-  optional Session session = 3;
+  optional LocalSession session = 3;
 
   optional uint64 courses_last_sync_time = 4;
 
@@ -16,11 +18,6 @@ message WeJhPreference {
     uint64 term_start_date = 3;
     uint64 last_sync_time = 4;
     string school_bus_url = 5;
-  }
-
-  message Session {
-    string token = 1;
-    uint64 expiration_time = 2;
   }
 
   message User {

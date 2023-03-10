@@ -2,6 +2,7 @@ package com.zjutjh.ijh.datastore
 
 import androidx.datastore.core.DataStore
 import com.zjutjh.ijh.datastore.converter.asLocalModel
+import com.zjutjh.ijh.datastore.model.LocalSession
 import com.zjutjh.ijh.datastore.model.WeJhPreference
 import com.zjutjh.ijh.datastore.model.copy
 import com.zjutjh.ijh.model.WeJhInfo
@@ -74,7 +75,7 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
             }
         }
 
-    suspend fun setSession(session: WeJhPreference.Session) =
+    suspend fun setSession(session: LocalSession) =
         dataStore.updateData {
             it.copy {
                 this.session = session

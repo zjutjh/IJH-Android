@@ -1,12 +1,15 @@
 package com.zjutjh.ijh.data.repository.mock
 
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
+import com.zjutjh.ijh.model.Session
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import java.time.ZonedDateTime
 
 class WeJhUserRepositoryMock : WeJhUserRepository {
     override val userStream: Flow<com.zjutjh.ijh.model.WeJhUser> = flowOf(mockWeJhUser())
+
+    override val sessionStream: Flow<Session?> = flowOf(Session("TOKEN", ZonedDateTime.now()))
 
     override suspend fun login(username: String, password: String) = Unit
 

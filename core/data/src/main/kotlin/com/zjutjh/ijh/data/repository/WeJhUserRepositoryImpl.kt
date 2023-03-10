@@ -3,7 +3,9 @@ package com.zjutjh.ijh.data.repository
 import com.zjutjh.ijh.data.model.asLocalModel
 import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
 import com.zjutjh.ijh.datastore.converter.asExternalModel
+import com.zjutjh.ijh.datastore.model.sessionOrNull
 import com.zjutjh.ijh.datastore.model.userOrNull
+import com.zjutjh.ijh.model.Session
 import com.zjutjh.ijh.model.WeJhUser
 import com.zjutjh.ijh.network.WeJhUserNetworkDataSource
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +20,11 @@ class WeJhUserRepositoryImpl @Inject constructor(
     override val userStream: Flow<WeJhUser?> =
         local.data.map {
             it.userOrNull?.asExternalModel()
+        }
+
+    override val sessionStream: Flow<Session?> =
+        local.data.map {
+            it.sessionOrNull?.asExternalModel()
         }
 
     override suspend fun login(username: String, password: String) {

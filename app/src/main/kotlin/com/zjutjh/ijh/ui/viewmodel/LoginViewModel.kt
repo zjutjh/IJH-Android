@@ -2,8 +2,12 @@ package com.zjutjh.ijh.ui.viewmodel
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.squareup.moshi.JsonDataException
@@ -58,7 +62,7 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
 
                     result.fold(
                         onSuccess = {
-                            Log.i("Login", "Success: $it")
+                            Log.i("Login", "Success.")
                             onSuccess()
                         },
                         onFailure = {
@@ -155,7 +159,6 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
         }
     }
 
-    @OptIn(ExperimentalMaterial3Api::class)
     suspend fun showDismissibleSnackbar(message: String): SnackbarResult =
         _uiState.snackbarHostState.showSnackbar(
             DismissibleSnackbarVisuals(message),

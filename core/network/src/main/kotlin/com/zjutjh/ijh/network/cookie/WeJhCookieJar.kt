@@ -2,7 +2,7 @@ package com.zjutjh.ijh.network.cookie
 
 import android.util.Log
 import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
-import com.zjutjh.ijh.datastore.model.WeJhPreferenceKt
+import com.zjutjh.ijh.datastore.model.localSession
 import com.zjutjh.ijh.datastore.model.sessionOrNull
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
+import okhttp3.internal.http.HttpDate
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,9 +38,16 @@ class WeJhCookieJar @Inject constructor(private val local: WeJhPreferenceDataSou
         val cookie = if (url.host() == COOKIE_DOMAIN) {
             cookies.find { cookie: Cookie -> cookie.name() == COOKIE_NAME } ?: return
         } else return
-        val localSession = WeJhPreferenceKt.session {
-            this.token = cookie.value()
-            this.expirationTime = cookie.expiresAt()
+
+        val value = cookie.value()
+        val expiresAt = cookie.expiresAt()
+
+        // Invalid Set-Cookie
+        if (value.isEmpty() || expiresAt == HttpDate.MAX_DATE) return
+
+        val localSession = localSession {
+            this.token = value
+            this.expirationTime = expiresAt / 1000 // Millis to Seconds
         }
         scope.launch {
             local.setSession(localSession)

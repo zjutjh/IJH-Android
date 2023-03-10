@@ -1,6 +1,6 @@
 package com.zjutjh.ijh.network.di
 
-import com.zjutjh.ijh.network.cookie.WeJhAuthorizedCookieJar
+import com.zjutjh.ijh.network.cookie.WeJhCookieJar
 import com.zjutjh.ijh.network.interceptor.ApiProcessInterceptor
 import dagger.Module
 import dagger.Provides
@@ -31,7 +31,7 @@ object NetworkModule {
     @Provides
     @Singleton
     @WeJhAuthorizedOkHttpClient
-    fun provideWeJHAuthorizedOkHttpClient(cookieJar: WeJhAuthorizedCookieJar): OkHttpClient =
+    fun provideWeJHAuthorizedOkHttpClient(cookieJar: WeJhCookieJar): OkHttpClient =
         okHttpClientCommonBuilder()
             .cookieJar(cookieJar)
             .build()

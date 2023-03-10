@@ -7,8 +7,6 @@ import java.time.ZonedDateTime
 data class WeJhUser(
     val uid: Long,
     val username: String,
-    val sessionToken: String,
-    val sessionExpiresAt: ZonedDateTime,
     val studentId: String,
     val createTime: ZonedDateTime,
     val phoneNumber: String,

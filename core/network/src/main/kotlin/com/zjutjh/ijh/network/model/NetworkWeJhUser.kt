@@ -10,10 +10,6 @@ import java.time.format.DateTimeFormatter
 data class NetworkWeJhUser(
     val id: Long,
     val username: String,
-    @Transient
-    var sessionToken: String? = null,
-    @Transient
-    var sessionExpiresAt: ZonedDateTime? = null,
     @Json(name = "studentID")
     val studentId: String,
     val createTime: String,
@@ -33,8 +29,6 @@ data class NetworkWeJhUser(
 fun NetworkWeJhUser.asExternalModel() = WeJhUser(
     uid = id,
     username = username,
-    sessionToken = sessionToken!!,
-    sessionExpiresAt = sessionExpiresAt!!,
     studentId = studentId,
     phoneNumber = phoneNumber,
     createTime = ZonedDateTime.parse(createTime, DateTimeFormatter.ISO_OFFSET_DATE_TIME),

@@ -10,10 +10,6 @@ import java.time.ZonedDateTime
 fun WeJhPreference.User.asExternalModel() = WeJhUser(
     uid = uid,
     username = username,
-    sessionToken = sessionToken,
-    sessionExpiresAt = ZonedDateTime.ofInstant(
-        Instant.ofEpochSecond(sessionExpirationTime), ZoneOffset.UTC
-    ),
     studentId = studentId,
     createTime = ZonedDateTime.ofInstant(
         Instant.ofEpochSecond(createTime), ZoneOffset.systemDefault()
@@ -33,8 +29,6 @@ fun WeJhUser.asLocalModel(): WeJhPreference.User =
     WeJhPreferenceKt.user {
         uid = this@asLocalModel.uid
         username = this@asLocalModel.username
-        sessionToken = this@asLocalModel.sessionToken
-        sessionExpirationTime = this@asLocalModel.sessionExpiresAt.toEpochSecond()
         studentId = this@asLocalModel.studentId
         createTime = this@asLocalModel.createTime.toEpochSecond()
         phoneNumber = this@asLocalModel.phoneNumber

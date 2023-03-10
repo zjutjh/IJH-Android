@@ -56,7 +56,7 @@ fun ClassScheduleRoute(
 
     ClassScheduleScreen(
         startYear = startYear ?: 2019,
-        courses = courses,
+        courses = courses ?: emptyList(),
         termView = termView,
         currentTermWeek = termState.first,
         selectedTermWeek = termState.second,
@@ -72,7 +72,7 @@ fun ClassScheduleRoute(
 @Composable
 private fun ClassScheduleScreen(
     startYear: Int,
-    courses: List<Course>?,
+    courses: List<Course>,
     termView: Boolean,
     currentTermWeek: TermWeekState?,
     selectedTermWeek: TermWeekState?,
@@ -122,12 +122,11 @@ private fun ClassScheduleScreen(
                 .verticalScroll(rememberScrollState()),
             content = {
                 Box(contentAlignment = Alignment.TopCenter) {
-                    if (courses != null)
-                        ClassSchedule(
-                            modifier = Modifier.padding(10.dp),
-                            courses = courses,
-                            highlight = highlight,
-                        )
+                    ClassSchedule(
+                        modifier = Modifier.padding(10.dp),
+                        courses = courses,
+                        highlight = highlight,
+                    )
 
                     PullRefreshIndicator(
                         refreshing = refreshing,

@@ -73,4 +73,18 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
                 clearInfo()
             }
         }
+
+    suspend fun setSession(session: WeJhPreference.Session) =
+        dataStore.updateData {
+            it.copy {
+                this.session = session
+            }
+        }
+
+    suspend fun deleteSession() =
+        dataStore.updateData {
+            it.copy {
+                clearSession()
+            }
+        }
 }

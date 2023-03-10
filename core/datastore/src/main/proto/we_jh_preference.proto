@@ -6,8 +6,9 @@ option java_multiple_files = true;
 message WeJhPreference {
   optional Info info = 1;
   optional User user = 2;
+  optional Session session = 3;
 
-  optional uint64 courses_last_sync_time = 3;
+  optional uint64 courses_last_sync_time = 4;
 
   message Info {
     uint32 year = 1;
@@ -17,16 +18,19 @@ message WeJhPreference {
     string school_bus_url = 5;
   }
 
+  message Session {
+    string token = 1;
+    uint64 expiration_time = 2;
+  }
+
   message User {
     string username = 1;
-    string session_token = 2;
-    uint64 session_expiration_time = 3;
-    int64 uid = 4;
-    string student_id = 5;
-    uint64 create_time = 6;
-    string phone_number = 7;
-    uint32 user_type = 8;
-    Bind bind = 9;
+    int64 uid = 2;
+    string student_id = 3;
+    uint64 create_time = 4;
+    string phone_number = 5;
+    uint32 user_type = 6;
+    Bind bind = 7;
 
     message Bind {
       bool zf = 1;

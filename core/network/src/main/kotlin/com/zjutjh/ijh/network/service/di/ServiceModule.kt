@@ -43,6 +43,7 @@ object ServiceModule {
         @WeJhAuthorizedOkHttpClient client: OkHttpClient
     ): WeJhUserService =
         retrofitWeJhServiceBuilder()
+            .baseUrl(BuildConfig.WE_JH_API_BASE_URL + "user/")
             .client(client)
             .build()
             .create()

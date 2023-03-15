@@ -20,7 +20,7 @@ import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.theme.*
-import com.zjutjh.ijh.util.stackConflict
+import com.zjutjh.ijh.util.CourseStack
 import kotlinx.coroutines.delay
 import java.time.DayOfWeek
 import java.time.Duration
@@ -210,8 +210,8 @@ fun ClassScheduleColumn(
     modifier: Modifier = Modifier,
     courses: List<Course>,
 ) {
-    val elements: List<Triple<List<Course>, Int, Int>> = remember(courses) {
-        courses.stackConflict()
+    val elements: List<CourseStack> = remember(courses) {
+        CourseStack.stackConflict(courses)
     }
 
     var chosenCourses by remember(courses) { mutableStateOf(emptyList<Course>()) }
@@ -240,7 +240,7 @@ fun ClassScheduleColumn(
         val placeables = measurables.mapIndexed { index, measurable ->
             val element = elements[index]
             val height =
-                ((element.third - element.second + 1) * cellHeight).roundToInt()
+                ((element.end - element.start + 1) * cellHeight).roundToInt()
 
             measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
         }
@@ -248,7 +248,7 @@ fun ClassScheduleColumn(
         layout(constraints.maxWidth, constraints.minHeight) {
             placeables.forEachIndexed { index, placeable ->
                 val element = elements[index]
-                val yPosition = ((element.second - 1) * cellHeight).roundToInt()
+                val yPosition = ((element.start - 1) * cellHeight).roundToInt()
                 placeable.placeRelative(0, yPosition)
             }
         }
@@ -261,23 +261,24 @@ fun ClassScheduleColumn(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClassScheduleColumnItem(
-    courseStack: Triple<List<Course>, Int, Int>,
+    courseStack: CourseStack,
     onClick: (List<Course>) -> Unit
 ) {
-    val span = courseStack.third - courseStack.second
+    val span = courseStack.end - courseStack.start
+    val courses = courseStack.courses
 
-    if (courseStack.first.size == 1) {
+    if (courses.size == 1) {
         ScheduleCardContent(
-            courses = courseStack.first,
-            onClick = { onClick(courseStack.first) },
+            courses = courses,
+            onClick = { onClick(courses) },
             span = span
         )
-    } else if (courseStack.first.size > 1) {
+    } else if (courseStack.courses.size > 1) {
         // Conflict
         Box {
             ScheduleCardContent(
-                courses = courseStack.first,
-                onClick = { onClick(courseStack.first) },
+                courses = courses,
+                onClick = { onClick(courses) },
                 span = span
             )
 
@@ -285,7 +286,7 @@ fun ClassScheduleColumnItem(
                 modifier = Modifier.align(Alignment.TopEnd),
             ) {
                 Text(
-                    text = courseStack.first.size.toString(),
+                    text = courses.size.toString(),
                 )
             }
         }

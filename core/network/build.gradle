@@ -50,7 +50,6 @@ dependencies {
     ksp "com.squareup.moshi:moshi-kotlin-codegen:1.14.0"
 
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
-    implementation "com.google.protobuf:protobuf-javalite:$protobuf_version"
 
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-compiler:$hilt_version"

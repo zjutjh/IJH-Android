@@ -11,6 +11,8 @@ interface WeJhUserRepository {
 
     suspend fun login(username: String, password: String)
 
+    suspend fun renewSession()
+
     suspend fun logout()
 
     suspend fun sync()

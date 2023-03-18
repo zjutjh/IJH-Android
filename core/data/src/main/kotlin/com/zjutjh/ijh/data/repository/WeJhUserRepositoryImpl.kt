@@ -32,6 +32,11 @@ class WeJhUserRepositoryImpl @Inject constructor(
         local.setUser(user.asLocalModel())
     }
 
+    override suspend fun renewSession() {
+        val user = network.loginBySession()
+        local.setUser(user.asLocalModel())
+    }
+
     override suspend fun logout() {
         local.deleteSession()
         local.deleteUser()

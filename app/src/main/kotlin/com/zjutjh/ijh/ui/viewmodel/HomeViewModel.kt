@@ -96,9 +96,25 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
+            // Check session state
+            val session = weJhUserRepository.sessionStream.first()
+            if (session != null) {
+                val duration = Duration.between(ZonedDateTime.now(), session.expiresAt)
+                Log.v("Home", "WeJH Session state: $duration; Negative: ${duration.isNegative}.")
+                if (duration.isNegative) {
+                    weJhUserRepository.logout()
+                    Log.i("Home", "WeJH session expired, logged out.")
+                } else if (duration.toDays() in 0..2) {
+                    try {
+                        weJhUserRepository.renewSession()
+                        Log.i("Home", "WeJH Session renewed.")
+                    } catch (e : Exception) {
+                        Log.e("Home", "Failed to renew WeJH Session: $e")
+                    }
+                }
+            }
             // Subscribe latest login state, and trigger refresh.
             loginState
-                .drop(1) // Wait until available
                 .collectLatest {
                     refreshAll(this)
                 }

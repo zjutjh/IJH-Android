@@ -12,4 +12,7 @@ interface WeJhUserService {
 
     @POST("login")
     suspend fun login(@Body body: LoginBody): WeJhUserResult
+
+    @POST("login/session")
+    suspend fun loginBySession(): WeJhUserResult
 }

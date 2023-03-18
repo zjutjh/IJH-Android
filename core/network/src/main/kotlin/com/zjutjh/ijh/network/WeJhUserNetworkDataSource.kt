@@ -12,5 +12,8 @@ class WeJhUserNetworkDataSource @Inject constructor(
     suspend fun login(username: String, password: String): NetworkWeJhUser =
         weJhUserService.login(LoginBody(username, password)).user
 
+    suspend fun loginBySession(): NetworkWeJhUser =
+        weJhUserService.loginBySession().user
+
     suspend fun getUserInfo(): NetworkWeJhUser = weJhUserService.getUserInfo().user
 }

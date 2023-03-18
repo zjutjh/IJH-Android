@@ -13,6 +13,8 @@ class WeJhUserRepositoryMock : WeJhUserRepository {
 
     override suspend fun login(username: String, password: String) = Unit
 
+    override suspend fun renewSession() = Unit
+
     override suspend fun logout() = Unit
 
     override suspend fun sync() = Unit

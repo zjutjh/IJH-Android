@@ -5,6 +5,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -15,12 +17,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
@@ -57,7 +61,7 @@ fun ScheduleCard(
                 Text(
                     text = stringResource(id = R.string.schedule),
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Black
+                    fontWeight = FontWeight.Bold
                 )
                 IconButton(
                     onClick = onCalendarClick
@@ -181,16 +185,16 @@ private fun CourseListItem(course: Course, onClick: () -> Unit, modifier: Modifi
             .padding(4.dp)
     ) {
         IconText(
-            icon = Icons.Default.Book,
-            contentDescription = stringResource(id = R.string.course),
-            text = course.name,
-            fontWeight = FontWeight.Black,
+            icon = Icons.Default.Place,
+            contentDescription = stringResource(id = R.string.place),
+            text = course.place,
+            fontWeight = FontWeight.Bold,
             style = MaterialTheme.typography.titleMedium
         )
         IconText(
-            icon = Icons.Default.Place,
-            contentDescription = stringResource(id = R.string.place),
-            text = course.place
+            icon = Icons.Default.Book,
+            contentDescription = stringResource(id = R.string.course),
+            text = course.name
         )
         IconText(
             icon = Icons.Default.Schedule,
@@ -230,26 +234,39 @@ fun Course.detailedTime(): String {
 @Composable
 fun IconText(
     icon: ImageVector,
-    contentDescription: String?,
     text: String,
+    contentDescription: String? = null,
     fontWeight: FontWeight? = null,
     style: TextStyle = TextStyle.Default
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            modifier = Modifier.size(15.dp),
-            imageVector = icon,
-            contentDescription = contentDescription,
-        )
-        Spacer(modifier = Modifier.padding(horizontal = 1.5.dp))
-        Text(
-            text = text,
-            style = style,
-            fontWeight = fontWeight,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1
-        )
+    val id = "icon"
+    val annotatedString = buildAnnotatedString {
+        appendInlineContent(id, "[icon]")
+        append(text)
     }
+    val inlineContent = mapOf(
+        id to InlineTextContent(
+            Placeholder(
+                width = 18.sp,
+                height = 1.em,
+                placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter,
+            )
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+            )
+        }
+    )
+
+    Text(
+        text = annotatedString,
+        inlineContent = inlineContent,
+        style = style,
+        fontWeight = fontWeight,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1
+    )
 }
 
 @Preview

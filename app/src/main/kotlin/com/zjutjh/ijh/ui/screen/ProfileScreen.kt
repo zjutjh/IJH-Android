@@ -1,11 +1,12 @@
 package com.zjutjh.ijh.ui.screen
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandVertically
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,6 +18,7 @@ import com.zjutjh.ijh.data.repository.mock.WeJhUserRepositoryMock
 import com.zjutjh.ijh.model.WeJhUser
 import com.zjutjh.ijh.ui.component.BackIconButton
 import com.zjutjh.ijh.ui.component.IJhScaffold
+import com.zjutjh.ijh.ui.component.TextListItem
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.ProfileViewModel
 
@@ -36,6 +38,7 @@ fun ProfileRoute(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun ProfileScreen(
     userState: WeJhUser?,
@@ -44,23 +47,73 @@ private fun ProfileScreen(
 ) {
     ProfileScaffold(onBackClick = onNavigateBack) { paddingValues ->
         Column(
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(paddingValues),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            AnimatedVisibility(visible = userState != null, enter = expandVertically()) {
+            if (userState != null)
                 ElevatedCard(
                     modifier = Modifier
                         .widthIn(max = 450.dp)
                         .padding(16.dp)
                         .fillMaxWidth(0.9f),
                 ) {
-                    Text(
-                        modifier = Modifier.padding(12.dp),
-                        text = userState?.username ?: "",
-                        style = MaterialTheme.typography.titleLarge
+                    TextListItem(title = R.string.student_id, text = userState.studentId)
+                    ListItem(
+                        headlineContent = {
+                            Text(text = stringResource(id = R.string.bind))
+                        },
+                        supportingContent = {
+                            FlowRow {
+                                FilterChip(
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    selected = userState.bind.zf,
+                                    onClick = { /*TODO*/ },
+                                    label = {
+                                        Text(text = stringResource(id = R.string.zf_account))
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Done,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                )
+                                FilterChip(
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    selected = userState.bind.lib,
+                                    onClick = { /*TODO*/ },
+                                    label = {
+                                        Text(text = stringResource(id = R.string.lib_account))
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Done,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                )
+                                FilterChip(
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                    selected = userState.bind.yxy,
+                                    onClick = { /*TODO*/ },
+                                    label = {
+                                        Text(text = stringResource(id = R.string.yxy_account))
+                                    },
+                                    leadingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Done,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     )
                 }
-            }
-            TextButton(onClick = onLogout) {
+
+            TextButton(
+                onClick = onLogout,
+            ) {
                 Text(stringResource(id = R.string.sign_out))
             }
         }

@@ -60,4 +60,10 @@
     <string name="course_details">课程详情</string>
     <string name="during_vacation">放假中</string>
     <string name="unselected">未选择</string>
+    <string name="student_id">学号</string>
+    <string name="bind">绑定</string>
+    <string name="home_page">主页</string>
+    <string name="zf_account">正方教务系统</string>
+    <string name="lib_account">图书馆账号</string>
+    <string name="yxy_account">易校园账号</string>
 </resources>

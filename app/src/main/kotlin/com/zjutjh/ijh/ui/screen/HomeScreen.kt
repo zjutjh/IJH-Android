@@ -1,6 +1,7 @@
 package com.zjutjh.ijh.ui.screen
 
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,6 +13,7 @@ import androidx.compose.material3.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -84,7 +86,7 @@ private fun HomeScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToClassSchedule: () -> Unit,
 ) {
-    val drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerState = DrawerState(initialValue = DrawerValue.Closed)
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = onRefresh,
@@ -96,6 +98,7 @@ private fun HomeScreen(
         pullRefreshState,
         onNavigateToProfile,
         onNavigateToLogin,
+        onNavigateToClassSchedule,
     ) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues)
@@ -124,21 +127,23 @@ private fun HomeScreen(
 @Composable
 private fun HomeScaffold(
     isLoggedIn: Boolean?,
-    drawerState: DrawerState = rememberDrawerState(initialValue = DrawerValue.Closed),
+    drawerState: DrawerState = DrawerState(DrawerValue.Closed),
     pullRefreshState: PullRefreshState,
     onAccountButtonClick: () -> Unit,
     onLoginButtonClick: () -> Unit,
+    onNavigateToClassSchedule: () -> Unit,
     content: @Composable BoxScope.(PaddingValues) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerContent = {
-            HomeDrawerContent(onCloseButtonClick = {
-                scope.launch {
-                    drawerState.close()
-                }
-            })
+            HomeDrawerContent(
+                onNavigateToClassSchedule = onNavigateToClassSchedule,
+                onClose = {
+                    scope.launch { drawerState.close() }
+                },
+            )
         },
         drawerState = drawerState,
     ) {
@@ -162,7 +167,10 @@ private fun HomeScaffold(
 }
 
 @Composable
-private fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
+private fun HomeDrawerContent(
+    onNavigateToClassSchedule: () -> Unit,
+    onClose: () -> Unit,
+) {
     ModalDrawerSheet(modifier = Modifier.widthIn(max = 300.dp)) {
         Column(
             modifier = Modifier.padding(12.dp)
@@ -179,7 +187,7 @@ private fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
-                IconButton(onClick = onCloseButtonClick) {
+                IconButton(onClick = onClose) {
                     Icon(
                         imageVector = Icons.Default.MenuOpen,
                         contentDescription = stringResource(id = R.string.collapse),
@@ -187,15 +195,35 @@ private fun HomeDrawerContent(onCloseButtonClick: () -> Unit) {
                 }
             }
 
-            NavigationDrawerItem(icon = {
-                Icon(imageVector = Icons.Default.Home, contentDescription = null)
-            }, label = {
-                Text(
-                    text = "Home", modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            }, selected = true, onClick = {})
+            HomeNavigationDrawerItem(
+                icon = Icons.Default.ViewWeek,
+                label = R.string.class_schedule,
+                onClick = onNavigateToClassSchedule,
+            )
         }
     }
+}
+
+@Composable
+private fun HomeNavigationDrawerItem(
+    icon: ImageVector,
+    @StringRes label: Int,
+    onClick: () -> Unit,
+    contentDescription: String? = null,
+) {
+    NavigationDrawerItem(
+        icon = {
+            Icon(imageVector = icon, contentDescription = contentDescription)
+        },
+        label = {
+            Text(
+                text = stringResource(id = label),
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        },
+        selected = false,
+        onClick = onClick,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -252,7 +280,8 @@ private fun NavigationDrawerPreview() {
             drawerState = DrawerState(initialValue = DrawerValue.Open),
             rememberPullRefreshState(refreshing = false, onRefresh = { /*TODO*/ }),
             {},
-            {}) {}
+            {}, {},
+        ) {}
     }
 }
 

@@ -59,4 +59,10 @@
     <string name="course_details">Course details</string>
     <string name="during_vacation">During vacation</string>
     <string name="unselected">Unselected</string>
+    <string name="student_id">Student ID</string>
+    <string name="bind">Bind</string>
+    <string name="home_page">Home</string>
+    <string name="zf_account">ZF Account</string>
+    <string name="lib_account">Library Account</string>
+    <string name="yxy_account">YXY Account</string>
 </resources>

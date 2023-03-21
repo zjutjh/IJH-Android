@@ -12,12 +12,14 @@ fun NavGraphBuilder.homeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToClassSchedule: () -> Unit,
+    onNavigateToAbout: () -> Unit,
 ) {
     composable(homeRoute) {
         HomeRoute(
             onNavigateToLogin = onNavigateToLogin,
             onNavigateToProfile = onNavigateToProfile,
             onNavigateToClassSchedule = onNavigateToClassSchedule,
+            onNavigateToAbout = onNavigateToAbout,
         )
     }
 }
@@ -26,7 +28,7 @@ fun NavController.navigateToHome(navOptions: NavOptions? = null) =
     this.navigate(homeRoute, navOptions)
 
 /**
- * Pop up previous existed screens and navigate to [HomeScreen] with new ViewModel
+ * Pop up previous existed screens and navigate to [HomeRoute] with new ViewModel
  */
 fun NavController.popUpAndNavigateToHome() =
     this.navigate(homeRoute) {

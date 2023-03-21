@@ -65,4 +65,11 @@
     <string name="zf_account">ZF Account</string>
     <string name="lib_account">Library Account</string>
     <string name="yxy_account">YXY Account</string>
+    <string name="about">About</string>
+    <string name="about_text">Client is developed by [dev], \nService is provided by [serv].</string>
+    <string name="app_developer" translatable="false">IInfo</string>
+    <string name="service_provider" translatable="false">WeJH</string>
+    <string name="developer_url" translatable="false">https://github.com/I-Info</string>
+    <string name="service_url" translatable="false">https://github.com/zjutjh/WeJH-Go</string>
+    <string name="project_url" translatable="false">https://github.com/I-Info/IJH-Android</string>
 </resources>

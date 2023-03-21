@@ -29,6 +29,7 @@ import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.HomeViewModel
 import com.zjutjh.ijh.util.LoadResult
+import com.zjutjh.ijh.util.emptyFun
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Duration
@@ -39,6 +40,7 @@ fun HomeRoute(
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToClassSchedule: () -> Unit,
+    onNavigateToAbout: () -> Unit,
 ) {
     val loginState by viewModel.loginState.collectAsStateWithLifecycle()
     val refreshState by viewModel.refreshState.collectAsState()
@@ -71,6 +73,7 @@ fun HomeRoute(
         onNavigateToLogin = onNavigateToLogin,
         onNavigateToProfile = onNavigateToProfile,
         onNavigateToClassSchedule = onNavigateToClassSchedule,
+        onNavigateToAbout = onNavigateToAbout,
     )
 }
 
@@ -85,8 +88,11 @@ private fun HomeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToClassSchedule: () -> Unit,
+    onNavigateToAbout: () -> Unit,
 ) {
-    val drawerState = DrawerState(initialValue = DrawerValue.Closed)
+    // To discard drawer state on recompose.
+    // Should use `remember` instead of `rememberDrawerState`
+    val drawerState = remember { DrawerState(initialValue = DrawerValue.Closed) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = refreshing,
         onRefresh = onRefresh,
@@ -99,6 +105,7 @@ private fun HomeScreen(
         onNavigateToProfile,
         onNavigateToLogin,
         onNavigateToClassSchedule,
+        onNavigateToAbout,
     ) { paddingValues ->
         Column(
             modifier = Modifier.padding(paddingValues)
@@ -127,11 +134,12 @@ private fun HomeScreen(
 @Composable
 private fun HomeScaffold(
     isLoggedIn: Boolean?,
-    drawerState: DrawerState = DrawerState(DrawerValue.Closed),
+    drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     pullRefreshState: PullRefreshState,
     onAccountButtonClick: () -> Unit,
     onLoginButtonClick: () -> Unit,
     onNavigateToClassSchedule: () -> Unit,
+    onNavigateToAbout: () -> Unit,
     content: @Composable BoxScope.(PaddingValues) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -140,6 +148,7 @@ private fun HomeScaffold(
         drawerContent = {
             HomeDrawerContent(
                 onNavigateToClassSchedule = onNavigateToClassSchedule,
+                onNavigateToAbout = onNavigateToAbout,
                 onClose = {
                     scope.launch { drawerState.close() }
                 },
@@ -169,6 +178,7 @@ private fun HomeScaffold(
 @Composable
 private fun HomeDrawerContent(
     onNavigateToClassSchedule: () -> Unit,
+    onNavigateToAbout: () -> Unit,
     onClose: () -> Unit,
 ) {
     ModalDrawerSheet(modifier = Modifier.widthIn(max = 300.dp)) {
@@ -199,6 +209,12 @@ private fun HomeDrawerContent(
                 icon = Icons.Default.ViewWeek,
                 label = R.string.class_schedule,
                 onClick = onNavigateToClassSchedule,
+            )
+            Divider()
+            HomeNavigationDrawerItem(
+                icon = Icons.Default.Info,
+                label = R.string.about,
+                onClick = onNavigateToAbout
             )
         }
     }
@@ -278,9 +294,8 @@ private fun NavigationDrawerPreview() {
         HomeScaffold(
             true,
             drawerState = DrawerState(initialValue = DrawerValue.Open),
-            rememberPullRefreshState(refreshing = false, onRefresh = { /*TODO*/ }),
-            {},
-            {}, {},
+            rememberPullRefreshState(refreshing = false, onRefresh = ::emptyFun),
+            {}, {}, {}, {}
         ) {}
     }
 }
@@ -300,6 +315,7 @@ private fun HomeScreenPreview() {
             Duration.ofDays(1),
             {},
             {},
+            {},
             {}) {}
     }
 }
@@ -316,6 +332,7 @@ private fun HomeScrollPreview() {
             courses,
             termDay,
             Duration.ofDays(1),
+            {},
             {},
             {},
             {}) {}

@@ -66,4 +66,6 @@
     <string name="zf_account">正方教务系统</string>
     <string name="lib_account">图书馆账号</string>
     <string name="yxy_account">易校园账号</string>
+    <string name="about">关于</string>
+    <string name="about_text">客户端由 [dev] 开发，服务由 [serv] 提供。</string>
 </resources>

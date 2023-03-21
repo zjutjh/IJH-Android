@@ -1,6 +1,8 @@
 package com.zjutjh.ijh.ui.component
 
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -19,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.Section
 import com.zjutjh.ijh.ui.theme.*
 import com.zjutjh.ijh.util.CourseStack
 import kotlinx.coroutines.delay
@@ -33,7 +37,14 @@ import kotlin.time.toKotlinDuration
 @Composable
 fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highlight: Boolean) {
     val locale = remember { LocaleListCompat.getDefault()[0]!! }
-
+    val context = LocalContext.current
+    val toast = remember {
+        Toast.makeText(
+            context,
+            String(),
+            Toast.LENGTH_SHORT
+        )
+    }
     // Indicator refresh clock
     var dateTime by remember { mutableStateOf(LocalDateTime.now()) }
     LaunchedEffect(highlight) {
@@ -65,6 +76,54 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
                 }
             }
 
+            // Left section bar
+            Surface(
+                modifier = Modifier
+                    .width(30.dp)
+                    .padding(top = 31.dp),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
+            ) {
+                Row {
+                    Column(Modifier.weight(1f)) {
+                        val commonModifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+
+                        for (i in 0..11) {
+                            val modifier1 =
+                                if (highlight && section.second >= 0 && section.first == i) {
+                                    commonModifier.background(
+                                        MaterialTheme.colorScheme.secondaryContainer
+                                    )
+                                } else {
+                                    commonModifier
+                                }.clickable {
+                                    // TODO: Replace Toast by local SnackBar
+                                    val timePair = Section.PAIRS[i]
+                                    toast.setText("${timePair.first} - ${timePair.second}")
+                                    toast.show()
+                                }
+
+                            Column(
+                                modifier = modifier1,
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = (i + 1).toString(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight()
+                    )
+                }
+            }
+
             Divider(Modifier.offset(y = 30.dp))
 
             // Current section proportion indicator
@@ -72,54 +131,21 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
                 if (section.first > 0 || (section.first == 0 && section.second > 0))
                     Divider(modifier = Modifier.layout { measurable, constraints ->
                         val paddingTop = 30.dp.toPx()
-                        val paddingStart = 30.dp.toPx()
+                        val paddingStart = 30.dp.roundToPx()
 
-                        val cellHeight = (constraints.maxHeight - paddingTop) / 12
-                        val y = if (section.second < 0) {
+                        val cellHeight: Float = (constraints.maxHeight - paddingTop) / 12
+                        val y: Int = if (section.second < 0) {
                             paddingTop + cellHeight * section.first
                         } else {
                             paddingTop + cellHeight * section.first + cellHeight * section.second
-                        }
+                        }.roundToInt()
                         val placeable =
-                            measurable.measure(constraints.copy(maxWidth = constraints.maxWidth - paddingStart.roundToInt()))
+                            measurable.measure(constraints.copy(maxWidth = constraints.maxWidth - paddingStart))
+
                         layout(placeable.width, placeable.height) {
-                            placeable.placeRelative(paddingStart.roundToInt(), y.roundToInt())
+                            placeable.placeRelative(paddingStart, y)
                         }
                     }, color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
-            }
-
-            // Left section bar
-            Row(
-                modifier = Modifier
-                    .width(30.dp)
-                    .padding(top = 31.dp)
-                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
-            ) {
-                Column(Modifier.weight(1f)) {
-                    val modifier1 = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                    for (i in 1..12) {
-                        Column(
-                            modifier = if (highlight && section.second >= 0 && section.first == i - 1)
-                                modifier1.background(
-                                    MaterialTheme.colorScheme.secondaryContainer
-                                ) else modifier1,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = i.toString(),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-                Divider(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                )
             }
         }
     }
@@ -181,7 +207,7 @@ fun ClassScheduleRowItem(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(31.dp),
+                .height(30.dp),
             contentAlignment = Alignment.Center
         ) {
             if (leftDivider) {

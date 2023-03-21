@@ -67,6 +67,11 @@ fun IJhNavHost(
                         navOptions { launchSingleTop = true }
                     )
                 }
+            },
+            onNavigateToAbout = {
+                navController.navigateToAbout(
+                    navOptions { launchSingleTop = true }
+                )
             }
         )
 
@@ -80,9 +85,12 @@ fun IJhNavHost(
         )
 
         classScheduleScreen(
-            sharedViewModelStoreOwner
-        ) {
-            navController.popBackStack()
-        }
+            sharedViewModelStoreOwner,
+            navController::popBackStack,
+        )
+
+        aboutScreen(
+            navController::popBackStack
+        )
     }
 }

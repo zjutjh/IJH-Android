@@ -80,7 +80,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
             Surface(
                 modifier = Modifier
                     .width(30.dp)
-                    .padding(top = 31.dp),
+                    .padding(top = 30.dp),
                 color = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f)
             ) {
                 Row {
@@ -132,12 +132,13 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
                     Divider(modifier = Modifier.layout { measurable, constraints ->
                         val paddingTop = 30.dp.toPx()
                         val paddingStart = 30.dp.roundToPx()
+                        val width = 1.dp.toPx()
 
                         val cellHeight: Float = (constraints.maxHeight - paddingTop) / 12
                         val y: Int = if (section.second < 0) {
                             paddingTop + cellHeight * section.first
                         } else {
-                            paddingTop + cellHeight * section.first + cellHeight * section.second
+                            paddingTop + cellHeight * section.first + (cellHeight - width) * section.second
                         }.roundToInt()
                         val placeable =
                             measurable.measure(constraints.copy(maxWidth = constraints.maxWidth - paddingStart))
@@ -309,7 +310,9 @@ fun ClassScheduleColumnItem(
             )
 
             Badge(
-                modifier = Modifier.align(Alignment.TopEnd),
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 1.dp),
             ) {
                 Text(
                     text = courses.size.toString(),

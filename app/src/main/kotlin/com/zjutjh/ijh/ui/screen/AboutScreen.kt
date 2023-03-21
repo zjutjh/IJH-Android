@@ -19,7 +19,6 @@ import com.zjutjh.ijh.R
 import com.zjutjh.ijh.ui.component.BackIconButton
 import com.zjutjh.ijh.ui.component.IJhScaffold
 
-
 @Composable
 fun AboutRoute(
     onNavigateBack: () -> Unit,

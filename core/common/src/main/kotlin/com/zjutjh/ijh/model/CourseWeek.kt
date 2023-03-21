@@ -58,8 +58,11 @@ data class CourseWeek(
             }
             if (singles.isNotEmpty() && ranges.isNotEmpty())
                 append(", ")
-            ranges.forEach {
-                append(it.toString())
+            ranges.forEachIndexed { index, i ->
+                if (index != 0) {
+                    append(", ")
+                }
+                append(i.toString())
             }
         }
 

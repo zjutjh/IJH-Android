@@ -14,11 +14,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
@@ -348,19 +350,14 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
                 verticalArrangement = Arrangement.Center
             ) {
 
-                Box(
+                CourseAndTeacherNameTextColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f + (span * 0.5f)),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = course.name,
-                        style = MaterialTheme.typography.labelSmall,
-                        textAlign = TextAlign.Center,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
+                    courseName = course.name,
+                    teacherName = course.teacherName,
+                )
+
                 Divider()
                 Box(
                     modifier = Modifier
@@ -378,6 +375,77 @@ private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span
             }
         }
     }
+}
+
+/**
+ * Adaptive text column.
+ */
+@Composable
+private fun CourseAndTeacherNameTextColumn(
+    modifier: Modifier = Modifier,
+    courseName: String,
+    teacherName: String,
+) {
+    Layout(
+        modifier = modifier,
+        content =
+        {
+            Text(
+                text = courseName,
+                style = MaterialTheme.typography.labelSmall,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = teacherName,
+                style = MaterialTheme.typography.labelSmall,
+                fontStyle = FontStyle.Italic,
+                textAlign = TextAlign.Center,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        measurePolicy = { measurables, constraints ->
+            val singleLineHeight = 16.sp.roundToPx()
+            val above = measurables[0]
+            val below = measurables[1]
+
+            var aboveHeight = above.minIntrinsicHeight(constraints.maxWidth)
+            var belowHeight = below.minIntrinsicHeight(constraints.maxWidth)
+            var sumHeight = aboveHeight + belowHeight
+            while (sumHeight > constraints.maxHeight) {
+                if (aboveHeight > belowHeight && aboveHeight > singleLineHeight) {
+                    aboveHeight -= singleLineHeight
+                } else if (belowHeight > 0) {
+                    belowHeight -= singleLineHeight
+                } else {
+                    // Only one line left
+                    break
+                }
+                sumHeight = aboveHeight + belowHeight
+            }
+
+            val abovePlaceable =
+                above.measure(constraints.copy(minHeight = aboveHeight, maxHeight = aboveHeight))
+            val belowPlaceable =
+                if (belowHeight > 0)
+                    below.measure(
+                        constraints.copy(
+                            minHeight = belowHeight,
+                            maxHeight = belowHeight
+                        )
+                    )
+                else null
+            layout(constraints.maxWidth, constraints.maxHeight) {
+                if (belowPlaceable == null) {
+                    abovePlaceable.placeRelative(0, (constraints.maxHeight - abovePlaceable.height) / 2)
+                } else {
+                    val y = (constraints.maxHeight - abovePlaceable.height - belowPlaceable.height) / 2
+                    abovePlaceable.placeRelative(0, y)
+                    belowPlaceable.placeRelative(0, y + abovePlaceable.height)
+                }
+            }
+        }
+    )
 }
 
 /**

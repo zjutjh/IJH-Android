@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -50,7 +49,6 @@ private fun AboutScreen(
             )
             Text(
                 text = "${BuildConfig.BUILD_TYPE}|v${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})",
-                fontFamily = FontFamily.Monospace,
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.outline,
             )

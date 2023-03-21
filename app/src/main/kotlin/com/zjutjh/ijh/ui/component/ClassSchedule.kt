@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -155,7 +156,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
 }
 
 @Composable
-fun ClassScheduleRow(
+private fun ClassScheduleRow(
     modifier: Modifier = Modifier,
     startPadding: Dp,
     content: @Composable () -> Unit
@@ -187,7 +188,7 @@ fun ClassScheduleRow(
 }
 
 @Composable
-fun ClassScheduleRowItem(
+private fun ClassScheduleRowItem(
     modifier: Modifier = Modifier,
     title: String,
     courses: List<Course>,
@@ -235,7 +236,7 @@ fun ClassScheduleRowItem(
 }
 
 @Composable
-fun ClassScheduleColumn(
+private fun ClassScheduleColumn(
     modifier: Modifier = Modifier,
     courses: List<Course>,
 ) {
@@ -289,7 +290,7 @@ fun ClassScheduleColumn(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClassScheduleColumnItem(
+private fun ClassScheduleColumnItem(
     courseStack: CourseStack,
     onClick: (List<Course>) -> Unit
 ) {
@@ -391,32 +392,36 @@ private fun CourseAndTeacherNameTextColumn(
         content =
         {
             Text(
+                modifier = Modifier.layoutId(0),
                 text = courseName,
                 style = MaterialTheme.typography.labelSmall,
+                lineHeight = 16.0.sp,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
+                modifier = Modifier.layoutId(1),
                 text = teacherName,
                 style = MaterialTheme.typography.labelSmall,
                 fontStyle = FontStyle.Italic,
+                lineHeight = 16.0.sp,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis
             )
         },
         measurePolicy = { measurables, constraints ->
-            val singleLineHeight = 16.sp.roundToPx()
-            val above = measurables[0]
-            val below = measurables[1]
+            val lineHeight = 16.0.sp.toPx()
+            val above = measurables.find { it.layoutId == 0 }!!
+            val below = measurables.find { it.layoutId == 1 }!!
 
-            var aboveHeight = above.minIntrinsicHeight(constraints.maxWidth)
-            var belowHeight = below.minIntrinsicHeight(constraints.maxWidth)
+            var aboveHeight: Float = above.minIntrinsicHeight(constraints.maxWidth).toFloat()
+            var belowHeight: Float = below.minIntrinsicHeight(constraints.maxWidth).toFloat()
             var sumHeight = aboveHeight + belowHeight
             while (sumHeight > constraints.maxHeight) {
-                if (aboveHeight > belowHeight && aboveHeight > singleLineHeight) {
-                    aboveHeight -= singleLineHeight
-                } else if (belowHeight > 0) {
-                    belowHeight -= singleLineHeight
+                if (aboveHeight - belowHeight >= lineHeight && aboveHeight >= lineHeight * 2) {
+                    aboveHeight -= lineHeight
+                } else if (belowHeight >= lineHeight) {
+                    belowHeight -= lineHeight
                 } else {
                     // Only one line left
                     break
@@ -424,22 +429,28 @@ private fun CourseAndTeacherNameTextColumn(
                 sumHeight = aboveHeight + belowHeight
             }
 
+            var height = aboveHeight.roundToInt()
             val abovePlaceable =
-                above.measure(constraints.copy(minHeight = aboveHeight, maxHeight = aboveHeight))
+                above.measure(constraints.copy(minHeight = height, maxHeight = height))
             val belowPlaceable =
-                if (belowHeight > 0)
+                if (belowHeight >= lineHeight) {
+                    height = belowHeight.roundToInt()
                     below.measure(
                         constraints.copy(
-                            minHeight = belowHeight,
-                            maxHeight = belowHeight
+                            minHeight = height,
+                            maxHeight = height
                         )
                     )
-                else null
+                } else null
             layout(constraints.maxWidth, constraints.maxHeight) {
                 if (belowPlaceable == null) {
-                    abovePlaceable.placeRelative(0, (constraints.maxHeight - abovePlaceable.height) / 2)
+                    abovePlaceable.placeRelative(
+                        0,
+                        (constraints.maxHeight - abovePlaceable.height) / 2
+                    )
                 } else {
-                    val y = (constraints.maxHeight - abovePlaceable.height - belowPlaceable.height) / 2
+                    val y =
+                        (constraints.maxHeight - abovePlaceable.height - belowPlaceable.height) / 2
                     abovePlaceable.placeRelative(0, y)
                     belowPlaceable.placeRelative(0, y + abovePlaceable.height)
                 }
@@ -451,7 +462,7 @@ private fun CourseAndTeacherNameTextColumn(
 /**
  * For better hashing, the total number of colors should be a prime number.
  */
-val courseColors = listOf(
+private val courseColors = listOf(
     RainbowPink,
     RainbowPeach,
     RainbowLightGreen,

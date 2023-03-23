@@ -69,7 +69,7 @@ fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourses: List<Course>) {
                 }
             },
             text = {
-                var state by remember { mutableStateOf(0) }
+                var state by remember { mutableStateOf(chosenCourses.size - 1) }
                 Column {
                     ScrollableTabRow(selectedTabIndex = state) {
                         chosenCourses.forEachIndexed { index, course ->

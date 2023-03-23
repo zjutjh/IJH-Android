@@ -232,9 +232,10 @@ private fun ClassScheduleTopBar(
                     }
                     Text(
                         modifier = Modifier
-                            .widthIn(min = 85.dp)
+                            .widthIn(min = 86.dp)
                             .clickable(onClick = ::openPicker),
                         text = stringResource(id = R.string.unit_week, termWeek.week),
+                        style = MaterialTheme.typography.titleLarge,
                         textAlign = TextAlign.Center,
                     )
                     // Next week button

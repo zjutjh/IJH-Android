@@ -26,6 +26,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +56,7 @@ fun ClassScheduleRoute(
     val refreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
     ClassScheduleScreen(
-        startYear = startYear ?: 2019,
+        startYear = startYear ?: 2020,
         courses = courses ?: emptyList(),
         termView = termView,
         currentTermWeek = termState.first,
@@ -232,10 +233,11 @@ private fun ClassScheduleTopBar(
                     }
                     Text(
                         modifier = Modifier
-                            .widthIn(min = 86.dp)
+                            .widthIn(min = 68.dp)
                             .clickable(onClick = ::openPicker),
                         text = stringResource(id = R.string.unit_week, termWeek.week),
-                        style = MaterialTheme.typography.titleLarge,
+                        fontFamily = FontFamily.Monospace,
+                        style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
                     )
                     // Next week button

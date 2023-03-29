@@ -12,6 +12,7 @@ import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.toTermDayState
 import com.zjutjh.ijh.util.LoadResult
 import com.zjutjh.ijh.util.asLoadResultStateFlow
+import com.zjutjh.ijh.util.isLoading
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -52,7 +53,7 @@ class HomeViewModel @Inject constructor(
     private val _refreshState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val refreshState: StateFlow<Boolean> = _refreshState.asStateFlow()
 
-    val loginState: StateFlow<LoadResult<Boolean>> = weJhUserRepository.userStream
+    val loginState: StateFlow<LoadResult<Boolean>> = weJhUserRepository.sessionStream
         .map { it != null }
         .distinctUntilChanged()
         .flowOn(Dispatchers.Default)
@@ -77,7 +78,7 @@ class HomeViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val coursesState: StateFlow<LoadResult<List<Course>>> = termDayState
-        .drop(1)
+        .dropWhile(LoadResult<*>::isLoading)
         .distinctUntilChanged(LoadResult<*>::isEqual)
         .flatMapLatest { state ->
             if (state is LoadResult.Ready && state.data != null) {
@@ -108,13 +109,14 @@ class HomeViewModel @Inject constructor(
                     try {
                         weJhUserRepository.renewSession()
                         Log.i("Home", "WeJH Session renewed.")
-                    } catch (e : Exception) {
+                    } catch (e: Exception) {
                         Log.e("Home", "Failed to renew WeJH Session: $e")
                     }
                 }
             }
             // Subscribe latest login state, and trigger refresh.
             loginState
+                .dropWhile(LoadResult<*>::isLoading)
                 .collectLatest {
                     refreshAll(this)
                 }

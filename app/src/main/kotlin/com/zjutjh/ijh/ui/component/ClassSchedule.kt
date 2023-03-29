@@ -15,13 +15,16 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
@@ -29,6 +32,7 @@ import com.zjutjh.ijh.model.Section
 import com.zjutjh.ijh.ui.theme.*
 import com.zjutjh.ijh.util.CourseStack
 import kotlinx.coroutines.delay
+import java.lang.Integer.min
 import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDateTime
@@ -387,6 +391,10 @@ private fun CourseAndTeacherNameTextColumn(
     courseName: String,
     teacherName: String,
 ) {
+    val textStyle = MaterialTheme.typography.labelSmall
+    val density = LocalDensity.current
+    val fontFamily = LocalFontFamilyResolver.current
+
     Layout(
         modifier = modifier,
         content =
@@ -394,54 +402,64 @@ private fun CourseAndTeacherNameTextColumn(
             Text(
                 modifier = Modifier.layoutId(0),
                 text = courseName,
-                style = MaterialTheme.typography.labelSmall,
-                lineHeight = 16.0.sp,
+                style = textStyle,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 modifier = Modifier.layoutId(1),
                 text = teacherName,
-                style = MaterialTheme.typography.labelSmall,
+                style = textStyle,
                 fontStyle = FontStyle.Italic,
-                lineHeight = 16.0.sp,
                 textAlign = TextAlign.Center,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         },
         measurePolicy = { measurables, constraints ->
-            val lineHeight = 16.0.sp.toPx()
-            val above = measurables.find { it.layoutId == 0 }!!
-            val below = measurables.find { it.layoutId == 1 }!!
+            val paragraphConstraint = Constraints(maxWidth = constraints.maxWidth)
+            var p1 = Paragraph(courseName, textStyle, paragraphConstraint, density, fontFamily)
+            var p2: Paragraph? =
+                Paragraph(teacherName, textStyle, paragraphConstraint, density, fontFamily)
 
-            var aboveHeight: Float = above.minIntrinsicHeight(constraints.maxWidth).toFloat()
-            var belowHeight: Float = below.minIntrinsicHeight(constraints.maxWidth).toFloat()
-            var sumHeight = aboveHeight + belowHeight
-            while (sumHeight > constraints.maxHeight) {
-                if (aboveHeight - belowHeight >= lineHeight && aboveHeight >= lineHeight * 2) {
-                    aboveHeight -= lineHeight
-                } else if (belowHeight >= lineHeight) {
-                    belowHeight -= lineHeight
+            while (p1.height + (p2?.height ?: 0f) > constraints.maxHeight) {
+                if (p1.lineCount > 1 && p1.lineCount > (p2?.lineCount ?: 0)) {
+                    p1 = Paragraph(
+                        courseName,
+                        textStyle,
+                        paragraphConstraint,
+                        density,
+                        fontFamily,
+                        maxLines = p1.lineCount - 1,
+                        ellipsis = true
+                    )
+                } else if (p2 != null) {
+                    p2 = if (p2.lineCount > 1)
+                        Paragraph(
+                            courseName,
+                            textStyle,
+                            paragraphConstraint,
+                            density,
+                            fontFamily,
+                            maxLines = p1.lineCount - 1,
+                            ellipsis = true
+                        ) else null
                 } else {
-                    // Only one line left
+                    // Only one line remains.
                     break
                 }
-                sumHeight = aboveHeight + belowHeight
             }
 
-            var height = aboveHeight.roundToInt()
-            val abovePlaceable =
-                above.measure(constraints.copy(minHeight = height, maxHeight = height))
-            val belowPlaceable =
-                if (belowHeight >= lineHeight) {
-                    height = belowHeight.roundToInt()
-                    below.measure(
-                        constraints.copy(
-                            minHeight = height,
-                            maxHeight = height
-                        )
-                    )
-                } else null
+            val h1 = min(p1.height.roundToInt(), constraints.maxHeight)
+            val abovePlaceable = measurables.find { it.layoutId == 0 }!!.measure(
+                constraints.copy(minHeight = h1, maxHeight = h1)
+            )
+            val belowPlaceable = if (p2 == null) null else {
+                val h2 = p2.height.roundToInt()
+                measurables.find { it.layoutId == 1 }?.measure(
+                    constraints.copy(minHeight = h2, maxHeight = h2)
+                )
+            }
+
             layout(constraints.maxWidth, constraints.maxHeight) {
                 if (belowPlaceable == null) {
                     abovePlaceable.placeRelative(

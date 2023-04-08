@@ -42,6 +42,9 @@ import com.zjutjh.ijh.ui.component.ClassSchedule
 import com.zjutjh.ijh.ui.model.TermWeekState
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,7 +60,7 @@ fun ClassScheduleRoute(
 
     ClassScheduleScreen(
         startYear = startYear ?: 2020,
-        courses = courses ?: emptyList(),
+        courses = courses ?: persistentListOf(),
         termView = termView,
         currentTermWeek = termState.first,
         selectedTermWeek = termState.second,
@@ -73,7 +76,7 @@ fun ClassScheduleRoute(
 @Composable
 private fun ClassScheduleScreen(
     startYear: Int,
-    courses: List<Course>,
+    courses: ImmutableList<Course>,
     termView: Boolean,
     currentTermWeek: TermWeekState?,
     selectedTermWeek: TermWeekState?,
@@ -509,7 +512,7 @@ private fun TopBarPreview() {
 @Preview
 @Composable
 private fun ClassScheduleScreenPreview() {
-    val courses = CourseRepositoryMock.getCourses()
+    val courses = CourseRepositoryMock.getCourses().toImmutableList()
     IJhTheme {
         ClassScheduleScreen(2019, courses, false, null,
             null, false, {}, {}, {}, { _, _ -> }) {}

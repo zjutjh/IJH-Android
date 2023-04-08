@@ -31,6 +31,9 @@ import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Section
 import com.zjutjh.ijh.ui.theme.*
 import com.zjutjh.ijh.util.CourseStack
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
 import java.lang.Integer.min
 import java.time.DayOfWeek
@@ -42,7 +45,11 @@ import kotlin.math.roundToInt
 import kotlin.time.toKotlinDuration
 
 @Composable
-fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highlight: Boolean) {
+fun ClassSchedule(
+    modifier: Modifier = Modifier,
+    courses: ImmutableList<Course>,
+    highlight: Boolean
+) {
     val locale = remember { LocaleListCompat.getDefault()[0]!! }
     val context = LocalContext.current
     val toast = remember {
@@ -76,7 +83,7 @@ fun ClassSchedule(modifier: Modifier = Modifier, courses: List<Course>, highligh
                 DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
                     ClassScheduleRowItem(
                         title = dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
-                        courses = courses.filter { it.dayOfWeek == dayOfWeek },
+                        courses = courses.filter { it.dayOfWeek == dayOfWeek }.toImmutableList(),
                         leftDivider = index == 0,
                         highlight = highlight && dayOfWeek == today,
                     )
@@ -195,10 +202,24 @@ private fun ClassScheduleRow(
 private fun ClassScheduleRowItem(
     modifier: Modifier = Modifier,
     title: String,
-    courses: List<Course>,
+    courses: ImmutableList<Course>,
     leftDivider: Boolean = false,
     highlight: Boolean = false,
 ) {
+    val elements: ImmutableList<CourseStack> = remember(courses) {
+        CourseStack.stackConflict(courses)
+    }
+
+    var chosenCourses: ImmutableList<Course> by remember(courses) { mutableStateOf(persistentListOf()) }
+    var openDialog by remember { mutableStateOf(false) }
+
+    if (openDialog) {
+        CourseDetailsDialog(
+            onConfirm = { openDialog = false },
+            chosenCourses = chosenCourses
+        )
+    }
+
     Column(
         modifier = if (highlight) {
             val colorFrom = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f)
@@ -233,57 +254,49 @@ private fun ClassScheduleRowItem(
                 textAlign = TextAlign.Center
             )
         }
-        ClassScheduleColumn(
-            courses = courses,
-        )
+
+        ClassScheduleColumn(courses = elements) {
+            elements.forEachIndexed { index, courseStack ->
+                ClassScheduleColumnItem(
+                    Modifier.layoutId(index),
+                    courseStack,
+                ) {
+                    chosenCourses = it
+                    openDialog = true
+                }
+            }
+        }
     }
 }
 
 @Composable
 private fun ClassScheduleColumn(
     modifier: Modifier = Modifier,
-    courses: List<Course>,
+    courses: ImmutableList<CourseStack>,
+    content: @Composable () -> Unit,
 ) {
-    val elements: List<CourseStack> = remember(courses) {
-        CourseStack.stackConflict(courses)
-    }
-
-    var chosenCourses by remember(courses) { mutableStateOf(emptyList<Course>()) }
-    var openDialog by remember { mutableStateOf(false) }
-
-    if (openDialog) {
-        CourseDetailsDialog(
-            onConfirm = { openDialog = false },
-            chosenCourses = chosenCourses
-        )
-    }
-
     Layout(
         modifier = modifier.fillMaxHeight(),
-        content = {
-            elements.forEach { courses ->
-                ClassScheduleColumnItem(courses) {
-                    chosenCourses = it
-                    openDialog = true
-                }
-            }
-        },
+        content = content,
     ) { measurables, constraints ->
         val cellHeight = constraints.minHeight / 12f
 
-        val placeables = measurables.mapIndexed { index, measurable ->
-            val element = elements[index]
+        val placeables = measurables.map { measurable ->
+            val element = courses[measurable.layoutId as Int]
             val height =
                 ((element.end - element.start + 1) * cellHeight).roundToInt()
-
-            measurable.measure(constraints.copy(minHeight = height, maxHeight = height))
+            val yPosition = ((element.start - 1) * cellHeight).roundToInt()
+            measurable.measure(
+                constraints.copy(
+                    minHeight = height,
+                    maxHeight = height
+                )
+            ) to yPosition
         }
 
         layout(constraints.maxWidth, constraints.minHeight) {
-            placeables.forEachIndexed { index, placeable ->
-                val element = elements[index]
-                val yPosition = ((element.start - 1) * cellHeight).roundToInt()
-                placeable.placeRelative(0, yPosition)
+            placeables.forEach { placeable ->
+                placeable.first.placeRelative(0, placeable.second)
             }
         }
     }
@@ -295,21 +308,23 @@ private fun ClassScheduleColumn(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ClassScheduleColumnItem(
+    modifier: Modifier = Modifier,
     courseStack: CourseStack,
-    onClick: (List<Course>) -> Unit
+    onClick: (ImmutableList<Course>) -> Unit
 ) {
     val span = courseStack.end - courseStack.start
     val courses = courseStack.courses
 
     if (courses.size == 1) {
         ScheduleCardContent(
+            modifier = modifier,
             courses = courses,
             onClick = { onClick(courses) },
             span = span
         )
     } else if (courseStack.courses.size > 1) {
         // Conflict
-        Box {
+        Box(modifier = modifier) {
             ScheduleCardContent(
                 courses = courses,
                 onClick = { onClick(courses) },
@@ -331,14 +346,19 @@ private fun ClassScheduleColumnItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ScheduleCardContent(courses: List<Course>, onClick: () -> Unit, span: Int) {
+private fun ScheduleCardContent(
+    modifier: Modifier = Modifier,
+    courses: ImmutableList<Course>,
+    onClick: () -> Unit,
+    span: Int
+) {
     ElevatedCard(
-        modifier = Modifier.padding(horizontal = 4.dp, vertical = 3.dp),
+        modifier = modifier.padding(horizontal = 4.dp, vertical = 3.dp),
         elevation = CardDefaults.elevatedCardElevation(3.dp),
         onClick = onClick,
         shape = MaterialTheme.shapes.extraSmall
     ) {
-        val course = remember(courses) { courses.last() }
+        val course = courses.last()
         val colorNumber = remember(course) {
             course.coloringHashCode().rem(courseColors.size.toUInt()).toInt()
         }
@@ -507,6 +527,6 @@ private val courseColors = listOf(
 private fun ClassSchedulePreview() {
     IJhTheme {
         val courses = CourseRepositoryMock.getCourses()
-        ClassSchedule(courses = courses, highlight = true)
+        ClassSchedule(courses = courses.toImmutableList(), highlight = true)
     }
 }

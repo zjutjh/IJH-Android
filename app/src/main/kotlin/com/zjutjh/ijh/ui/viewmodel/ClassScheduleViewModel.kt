@@ -12,6 +12,8 @@ import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.TermWeekState
 import com.zjutjh.ijh.ui.model.toTermDayState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -59,7 +61,7 @@ class ClassScheduleViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val coursesState: StateFlow<List<Course>?> = termState
+    val coursesState: StateFlow<ImmutableList<Course>?> = termState
         .dropWhile { (l, r) -> l == null && r == null }
         .flatMapLatest { state ->
             val termState = state.second ?: state.first
@@ -73,7 +75,7 @@ class ClassScheduleViewModel @Inject constructor(
                 courses.first
             } else {
                 courses.first.filter { course -> course.weeks.contains(courses.second) }
-            }
+            }.toImmutableList()
         }
         .flowOn(Dispatchers.Default)
         .stateIn(

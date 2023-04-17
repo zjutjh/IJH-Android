@@ -41,8 +41,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
         freeCompilerArgs = freeCompilerArgs + "-opt-in=kotlin.RequiresOptIn"
@@ -51,7 +51,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.4'
+        kotlinCompilerExtensionVersion '1.4.5'
     }
     packagingOptions {
         resources {
@@ -62,8 +62,8 @@ android {
 
 dependencies {
     // Androidx Core & UI
-    implementation "androidx.core:core:1.9.0"
-    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation 'androidx.core:core:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.0'
     implementation "androidx.core:core-animation:1.0.0-beta01"
     implementation 'androidx.activity:activity-compose:1.7.0'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
@@ -73,7 +73,7 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation "androidx.compose.animation:animation:$compose_version"
     implementation 'androidx.compose.material3:material3:1.1.0-beta02'
-    implementation 'androidx.compose.material:material-icons-extended:1.4.0'
+    implementation 'androidx.compose.material:material-icons-extended:1.4.1'
     implementation 'androidx.core:core-splashscreen:1.0.0'
     implementation 'androidx.profileinstaller:profileinstaller:1.3.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'

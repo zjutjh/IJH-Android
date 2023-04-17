@@ -81,9 +81,12 @@ fun ClassSchedule(
                 val today = dateTime.dayOfWeek
 
                 DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
+                    val dayCourses = remember (courses) {
+                        courses.filter { it.dayOfWeek == dayOfWeek }.toImmutableList()
+                    }
                     ClassScheduleRowItem(
                         title = dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
-                        courses = courses.filter { it.dayOfWeek == dayOfWeek }.toImmutableList(),
+                        courses = dayCourses,
                         leftDivider = index == 0,
                         highlight = highlight && dayOfWeek == today,
                     )
@@ -255,14 +258,17 @@ private fun ClassScheduleRowItem(
             )
         }
 
-        ClassScheduleColumn(courses = elements) {
-            elements.forEachIndexed { index, courseStack ->
-                ClassScheduleColumnItem(
-                    Modifier.layoutId(index),
-                    courseStack,
-                ) {
-                    chosenCourses = it
-                    openDialog = true
+        // Enforce group recompose
+        key (elements) {
+            ClassScheduleColumn(courses = elements) {
+                elements.forEachIndexed { index, courseStack ->
+                    ClassScheduleColumnItem(
+                        Modifier.layoutId(index),
+                        courseStack,
+                    ) {
+                        chosenCourses = it
+                        openDialog = true
+                    }
                 }
             }
         }

@@ -119,37 +119,47 @@ private fun ClassScheduleScreen(
         onSelectTerm = onSelectTerm,
         onBackClick = onNavigateBack
     ) { paddingValues ->
-        Layout(
+        MainContainer(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState()),
-            content = {
-                Box(contentAlignment = Alignment.TopCenter) {
-                    ClassSchedule(
-                        modifier = Modifier.padding(10.dp),
-                        courses = courses,
-                        highlight = highlight,
-                    )
-
+        ) {
+            Box(contentAlignment = Alignment.TopCenter) {
+                ClassSchedule(
+                    modifier = Modifier.padding(10.dp),
+                    courses = courses,
+                    highlight = highlight,
+                )
+                key(refreshing) {
                     PullRefreshIndicator(
                         refreshing = refreshing,
                         state = pullRefreshState,
                         scale = true
                     )
                 }
-            },
-        ) { measurables, constraints ->
-            val placeables = measurables.map { measurable ->
-                measurable.measure(constraints.copy(maxHeight = constraints.minHeight))
-            }
-            layout(constraints.maxWidth, constraints.minHeight) {
-                placeables.forEach {
-                    it.placeRelative(0, 0)
-                }
             }
         }
+    }
+}
 
+@Composable
+private fun MainContainer(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
+) {
+    Layout(
+        modifier = modifier,
+        content = content,
+    ) { measurables, constraints ->
+        val placeables = measurables.map { measurable ->
+            measurable.measure(constraints.copy(maxHeight = constraints.minHeight))
+        }
+        layout(constraints.maxWidth, constraints.minHeight) {
+            placeables.forEach {
+                it.placeRelative(0, 0)
+            }
+        }
     }
 }
 

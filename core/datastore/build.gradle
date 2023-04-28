@@ -1,9 +1,9 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.protobuf'
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
+    id 'com.google.protobuf'
 }
 
 android {
@@ -22,17 +22,6 @@ android {
     }
 }
 
-dependencies {
-    implementation project(':core:common')
-
-    implementation "androidx.datastore:datastore:1.0.0"
-    implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
-
-    // Dependency injection (Hilt)
-    implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
-}
-
 protobuf {
     protoc {
         artifact = "com.google.protobuf:protoc:$protobuf_version"
@@ -41,7 +30,7 @@ protobuf {
     // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
     // for more information.
     generateProtoTasks {
-        all().each { task ->
+        all().configureEach { task ->
             task.builtins {
                 java {
                     option 'lite'
@@ -52,4 +41,15 @@ protobuf {
             }
         }
     }
+}
+
+dependencies {
+    implementation project(':core:common')
+
+    implementation "androidx.datastore:datastore:1.0.0"
+    implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
+
+    // Dependency injection (Hilt)
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
 }

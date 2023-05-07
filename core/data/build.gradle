@@ -20,10 +20,10 @@ android {
 }
 
 dependencies {
-    implementation project(':core:common')
-    implementation project(":core:network")
-    implementation project(":core:datastore")
-    implementation project(":core:database")
+    project(':core:common')
+    project(":core:network")
+    project(":core:datastore")
+    project(":core:database")
 
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
 

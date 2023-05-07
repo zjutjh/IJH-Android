@@ -41,8 +41,8 @@ secrets {
 }
 
 dependencies {
-    implementation project(':core:common')
-    implementation project(":core:datastore")
+    project(':core:common')
+    project(":core:datastore")
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"

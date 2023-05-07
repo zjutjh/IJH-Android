@@ -28,7 +28,7 @@ ksp {
 }
 
 dependencies {
-    project(":core:common")
+    implementation project(":core:common")
 
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"

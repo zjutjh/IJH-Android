@@ -44,7 +44,7 @@ protobuf {
 }
 
 dependencies {
-    project(':core:common')
+    implementation project(':core:common')
 
     implementation "androidx.datastore:datastore:1.0.0"
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"

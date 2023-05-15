@@ -84,7 +84,7 @@ dependencies {
     implementation project(":core:data")
     implementation project(":core:common")
 
-    implementation "com.squareup.moshi:moshi:1.14.0"
+    implementation "com.squareup.moshi:moshi:1.15.0"
 
     // Dependency injection (Hilt)
     implementation "com.google.dagger:hilt-android:$hilt_version"

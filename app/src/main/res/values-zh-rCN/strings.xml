@@ -68,4 +68,5 @@
     <string name="yxy_account">易校园账号</string>
     <string name="about">关于</string>
     <string name="about_text">客户端由 [dev] 开发，服务由 [serv] 提供。</string>
+    <string name="app_widget_schedule_description">今日课程</string>
 </resources>

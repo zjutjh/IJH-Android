@@ -48,9 +48,9 @@ fun HomeRoute(
     val termDayState by viewModel.termDayState.collectAsStateWithLifecycle()
     val coursesLastSyncState by viewModel.courseLastSyncState.collectAsStateWithLifecycle()
 
-    val isLoggedIn = when (val state = loginState) {
-        is LoadResult.Loading -> null
-        is LoadResult.Ready -> state.data
+    val isLoggedIn = when (loginState) {
+        null -> false
+        else -> true
     }
 
     val courses = when (val state = coursesState) {

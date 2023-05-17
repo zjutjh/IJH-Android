@@ -13,13 +13,26 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.IJh.Starting"
+        android:theme="@style/Theme.IJh"
         tools:targetApi="tiramisu">
+        <receiver
+            android:name=".widget.ScheduleWidgetReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/app_widget_schedule" />
+        </receiver>
+
         <profileable android:shell="true" />
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:theme="@style/Theme.IJh.Starting"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

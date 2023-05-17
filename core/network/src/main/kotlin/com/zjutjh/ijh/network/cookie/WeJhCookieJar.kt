@@ -4,6 +4,7 @@ import android.util.Log
 import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
 import com.zjutjh.ijh.datastore.model.localSession
 import com.zjutjh.ijh.datastore.model.sessionOrNull
+import com.zjutjh.ijh.network.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -73,6 +74,6 @@ class WeJhCookieJar @Inject constructor(private val local: WeJhPreferenceDataSou
 
     companion object {
         const val COOKIE_NAME = "wejh-session"
-        const val COOKIE_DOMAIN = "wejh.zjutjh.com"
+        const val COOKIE_DOMAIN = BuildConfig.WE_JH_COOKIE_DOMAIN
     }
 }

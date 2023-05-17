@@ -117,7 +117,8 @@ fun ScheduleCard(
         AnimatedContent(
             modifier = Modifier.fillMaxWidth(),
             targetState = courses,
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
+            label = "Loading",
         ) {
             if (it == null) {
                 Column(

@@ -7,6 +7,7 @@ import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.data.repository.WeJhInfoRepository
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.Session
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.toTermDayState
@@ -53,13 +54,13 @@ class HomeViewModel @Inject constructor(
     private val _refreshState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val refreshState: StateFlow<Boolean> = _refreshState.asStateFlow()
 
-    val loginState: StateFlow<LoadResult<Boolean>> = weJhUserRepository.sessionStream
-        .map { it != null }
+    val loginState: StateFlow<Session?> = weJhUserRepository.sessionStream
         .distinctUntilChanged()
         .flowOn(Dispatchers.Default)
-        .asLoadResultStateFlow(
+        .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
+            initialValue = null,
         )
 
     private val termLocalRefreshChannel: MutableStateFlow<Unit> = MutableStateFlow(Unit)
@@ -98,7 +99,7 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch(Dispatchers.Default) {
             // Check session state
-            val session = weJhUserRepository.sessionStream.first()
+            val session = loginState.first()
             if (session != null) {
                 val duration = Duration.between(ZonedDateTime.now(), session.expiresAt)
                 Log.v("Home", "WeJH Session state: $duration; Negative: ${duration.isNegative}.")
@@ -116,7 +117,6 @@ class HomeViewModel @Inject constructor(
             }
             // Subscribe latest login state, and trigger refresh.
             loginState
-                .dropWhile(LoadResult<*>::isLoading)
                 .collectLatest {
                     refreshAll(this)
                 }
@@ -148,7 +148,7 @@ class HomeViewModel @Inject constructor(
         val term = refreshTerm()
 
         val isLoggedIn = loginState.value
-        if (isLoggedIn is LoadResult.Ready && isLoggedIn.data) {
+        if (isLoggedIn != null) {
             if (term != null) {
                 refreshCourse(term.first, term.second)
             }

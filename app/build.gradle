@@ -65,7 +65,7 @@ dependencies {
     // Androidx Core & UI
     implementation 'androidx.core:core-ktx:1.10.1'
     implementation "androidx.core:core-animation:1.0.0-beta01"
-    implementation 'androidx.activity:activity-compose:1.7.1'
+    implementation 'androidx.activity:activity-compose:1.7.2'
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"

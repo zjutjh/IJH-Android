@@ -48,6 +48,54 @@ data class ZfClassTable(
     )
 }
 
+
+/**
+ * @throws CourseParseException
+ */
+fun ZfClassTable.LessonsTable.parseWeekString(): CourseWeek {
+    val singles: ArrayList<Int> = ArrayList()
+    val ranges: ArrayList<CourseWeek.WeekRange> = ArrayList()
+    try {
+        for (time in week.split(',')) {
+            var evenWeek: Boolean? = null
+            val clearTime = if (time.endsWith('周')) {
+                time.substring(0, time.length - 1)
+            } else if (time.endsWith("周(单)")) {
+                evenWeek = false
+                time.substring(0, time.length - 4)
+            } else if (time.endsWith("周(双)")) {
+                evenWeek = true
+                time.substring(0, time.length - 4)
+            } else {
+                time
+            }
+            val section = clearTime.split('-')
+            when (section.size) {
+                // Single week
+                1 -> singles.add(clearTime.toInt())
+                2 -> {
+                    val start = section[0].toInt()
+                    val end = section[1].toInt()
+                    ranges.add(
+                        CourseWeek.WeekRange(
+                            start,
+                            end,
+                            evenWeek,
+                        )
+                    )
+                }
+
+                else -> throw CourseParseException("Invalid week section format.")
+            }
+        }
+    } catch (e: NumberFormatException) {
+        throw CourseParseException("Fail to parse week numbers.")
+    }
+
+    return CourseWeek(ranges = ranges, singles = singles)
+}
+
+
 /**
  * @throws CourseParseException
  */
@@ -70,6 +118,6 @@ fun ZfClassTable.LessonsTable.asExternalModel(): Course {
         dayOfWeek = DayOfWeek.of(weekday.toInt()),
         sectionStart = section[0].toInt(),
         sectionEnd = section[1].toInt(),
-        weeks = CourseWeek.parseFromZfWeekString(week)
+        weeks = parseWeekString()
     )
 }

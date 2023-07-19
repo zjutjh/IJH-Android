@@ -9,15 +9,17 @@ import com.zjutjh.ijh.datastore.converter.toZonedDateTime
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.network.ZfDataSource
-import dagger.hilt.android.scopes.ActivityRetainedScoped
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import java.time.ZonedDateTime
 import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Default impl of [CourseRepository]
  */
-@ActivityRetainedScoped
+@Singleton
 class CourseRepositoryImpl @Inject constructor(
     private val zfDataSource: ZfDataSource,
     private val localPreference: WeJhPreferenceDataSource,
@@ -38,7 +40,7 @@ class CourseRepositoryImpl @Inject constructor(
         val old = dao.getCourses(year, term).first()
 
         val classTable = zfDataSource.getClassTable(year.toString(), term.value).lessonsTable
-        if (classTable != null && classTable.isNotEmpty()) {
+        if (!classTable.isNullOrEmpty()) {
             val new = classTable.map { it.asLocalModel(year, term) }
 
             if (old.isEmpty())
@@ -57,7 +59,7 @@ class CourseRepositoryImpl @Inject constructor(
         val toDelete = old.toMutableList()
         val toInsert = new.toMutableList()
 
-        toDelete.removeIf {delete ->
+        toDelete.removeIf { delete ->
             val index = toInsert.indexOfFirst { delete.equalsIgnoreId(it) }
             if (index != -1) {
                 toInsert.removeAt(index)

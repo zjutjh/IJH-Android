@@ -2,9 +2,9 @@ package com.zjutjh.ijh.data.model
 
 import com.zjutjh.ijh.database.model.CourseEntity
 import com.zjutjh.ijh.exception.CourseParseException
-import com.zjutjh.ijh.model.CourseWeek
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.network.model.ZfClassTable
+import com.zjutjh.ijh.network.model.parseWeekString
 import java.time.DayOfWeek
 
 fun ZfClassTable.LessonsTable.asLocalModel(year: Int, term: Term): CourseEntity {
@@ -28,7 +28,7 @@ fun ZfClassTable.LessonsTable.asLocalModel(year: Int, term: Term): CourseEntity 
         dayOfWeek = DayOfWeek.of(weekday.toInt()),
         sectionStart = section[0].toInt(),
         sectionEnd = section[1].toInt(),
-        weeks = CourseWeek.parseFromZfWeekString(week)
+        weeks = parseWeekString()
     )
 }
 

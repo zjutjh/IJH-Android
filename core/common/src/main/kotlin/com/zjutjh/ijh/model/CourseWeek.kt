@@ -1,6 +1,5 @@
 package com.zjutjh.ijh.model
 
-import com.zjutjh.ijh.exception.CourseParseException
 import java.text.ParseException
 
 data class CourseWeek(
@@ -73,52 +72,6 @@ data class CourseWeek(
     fun serialize(): String = Serializer.serialize(this)
 
     companion object {
-
-        /**
-         * @throws CourseParseException
-         */
-        fun parseFromZfWeekString(week: String): CourseWeek {
-            val singles: ArrayList<Int> = ArrayList()
-            val ranges: ArrayList<WeekRange> = ArrayList()
-            try {
-                for (time in week.split(',')) {
-                    var evenWeek: Boolean? = null
-                    val clearTime = if (time.endsWith('周')) {
-                        time.substring(0, time.length - 1)
-                    } else if (time.endsWith("周(单)")) {
-                        evenWeek = false
-                        time.substring(0, time.length - 4)
-                    } else if (time.endsWith("周(双)")) {
-                        evenWeek = true
-                        time.substring(0, time.length - 4)
-                    } else {
-                        time
-                    }
-                    val section = clearTime.split('-')
-                    when (section.size) {
-                        // Single week
-                        1 -> singles.add(clearTime.toInt())
-                        2 -> {
-                            val start = section[0].toInt()
-                            val end = section[1].toInt()
-                            ranges.add(
-                                WeekRange(
-                                    start,
-                                    end,
-                                    evenWeek,
-                                )
-                            )
-                        }
-                        else -> throw CourseParseException("Invalid week section format.")
-                    }
-                }
-            } catch (e: NumberFormatException) {
-                throw CourseParseException("Fail to parse week numbers.")
-            }
-
-            return CourseWeek(ranges = ranges, singles = singles)
-        }
-
         fun default(): CourseWeek =
             CourseWeek(
                 emptyList(),
@@ -222,55 +175,69 @@ data class CourseWeek(
                         'E' -> setE()
                         else -> throw ParseException("Unexpected character get.", index)
                     }
+
                     State.S -> when (value) {
                         in '0'..'9' -> {
                             v1 = v1 * 10 + value.digitToInt()
                         }
+
                         'S' -> {
                             postS()
                             setS()
                         }
+
                         'R' -> {
                             postS()
                             setR()
                         }
+
                         'O' -> {
                             postS()
                             setO()
                         }
+
                         'E' -> {
                             postS()
                             setE()
                         }
+
                         else -> throw ParseException("Unexpected character get.", index)
                     }
+
                     State.R1 -> when (value) {
                         in '0'..'9' -> {
                             v1 = v1 * 10 + value.digitToInt()
                         }
+
                         '-' -> state = State.R2
                         else -> throw ParseException("Unexpected character get.", index)
                     }
+
                     State.R2 -> when (value) {
                         in '0'..'9' -> {
                             v2 = v2 * 10 + value.digitToInt()
                         }
+
                         'S' -> {
                             postR()
                             setS()
                         }
+
                         'R' -> {
                             postR()
                             setR()
                         }
+
                         'O' -> {
                             postR()
                             setO()
                         }
+
                         'E' -> {
                             postR()
                             setE()
                         }
+
                         else -> throw ParseException("Unexpected character get.", index)
                     }
                 }

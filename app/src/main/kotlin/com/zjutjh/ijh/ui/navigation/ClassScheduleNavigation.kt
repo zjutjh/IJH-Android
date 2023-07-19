@@ -9,7 +9,7 @@ import com.zjutjh.ijh.ui.screen.ClassScheduleRoute
 import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
 import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
 
-private const val classScheduleRoute = "classSchedule"
+private const val CLASS_SCHEDULE_ROUTE = "classSchedule"
 
 @OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.classScheduleScreen(
@@ -17,13 +17,13 @@ fun NavGraphBuilder.classScheduleScreen(
     onNavigateBack: () -> Unit,
 ) {
     fun onBack() {
-        mappingOwner.remove(classScheduleRoute)
+        mappingOwner.remove(CLASS_SCHEDULE_ROUTE)
         onNavigateBack()
     }
 
-    composable(classScheduleRoute) {
+    composable(CLASS_SCHEDULE_ROUTE) {
         val vm = remember {
-            mappingOwner.provider(classScheduleRoute)[ClassScheduleViewModel::class.java]
+            mappingOwner.provider(CLASS_SCHEDULE_ROUTE)[ClassScheduleViewModel::class.java]
         }
         ClassScheduleRoute(
             viewModel = vm,
@@ -37,8 +37,8 @@ suspend fun NavController.navigateToClassSchedule(
     mappingOwner: ViewModelStoreMappingOwner,
     navOptions: NavOptions? = null
 ) {
-    val vm = mappingOwner.provider(classScheduleRoute)[ClassScheduleViewModel::class.java]
+    val vm = mappingOwner.provider(CLASS_SCHEDULE_ROUTE)[ClassScheduleViewModel::class.java]
 
     vm.preload()
-    this.navigate(classScheduleRoute, navOptions)
+    this.navigate(CLASS_SCHEDULE_ROUTE, navOptions)
 }

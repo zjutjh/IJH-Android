@@ -7,12 +7,13 @@ plugins {
 
 android {
     namespace 'com.zjutjh.ijh'
-    compileSdk 34
+    compileSdk compile_sdk
 
     defaultConfig {
         applicationId "com.zjutjh.ijh"
-        minSdk 28
-        targetSdk 33
+        minSdk min_sdk
+        targetSdk target_sdk
+
         versionCode 1
         versionName '0.1.0'
 
@@ -52,7 +53,7 @@ android {
         viewBinding true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.7'
+        kotlinCompilerExtensionVersion '1.5.3'
     }
     packagingOptions {
         resources {

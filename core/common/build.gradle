@@ -2,12 +2,13 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
 }
+
 android {
     namespace 'com.zjutjh.ijh.common'
-    compileSdk 33
+    compileSdk compile_sdk
 
     defaultConfig {
-        minSdk 28
+        minSdk min_sdk
     }
 
     compileOptions {

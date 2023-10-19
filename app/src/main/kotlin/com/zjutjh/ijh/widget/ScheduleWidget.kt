@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
+// TODO: Unfinished yet
 class ScheduleWidget : GlanceAppWidget() {
 
     @EntryPoint

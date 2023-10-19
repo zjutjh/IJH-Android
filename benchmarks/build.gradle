@@ -5,10 +5,10 @@ plugins {
 
 android {
     namespace = "com.zjutjh.ijh.benchmarks"
-    compileSdk 33
+    compileSdk compile_sdk
 
     defaultConfig {
-        minSdk 28
+        minSdk min_sdk
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

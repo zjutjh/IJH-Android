@@ -1,13 +1,13 @@
 package com.zjutjh.ijh.ui.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.navigation.*
-import com.google.accompanist.navigation.animation.composable
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.composable
 import com.zjutjh.ijh.ui.screen.HomeRoute
 
 const val homeRoute = "home"
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.homeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,

@@ -1,30 +1,33 @@
 package com.zjutjh.ijh.ui.navigation
 
-import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
 import kotlinx.coroutines.launch
 
 private const val ANIM_DURATION: Int = 300
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun IJhNavHost(
     modifier: Modifier = Modifier,
     sharedViewModelStoreOwner: ViewModelStoreMappingOwner,
-    navController: NavHostController = rememberAnimatedNavController(),
+    navController: NavHostController = rememberNavController(),
     startDestination: String = homeRoute
 ) {
     val scope = rememberCoroutineScope()
 
-    AnimatedNavHost(
+    NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = startDestination,

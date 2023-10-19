@@ -1,17 +1,17 @@
 package com.zjutjh.ijh.ui.navigation
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.remember
-import androidx.navigation.*
-import com.google.accompanist.navigation.animation.composable
+import androidx.navigation.NavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
+import androidx.navigation.compose.composable
 import com.zjutjh.ijh.ui.screen.ClassScheduleRoute
 import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
 import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
 
 private const val CLASS_SCHEDULE_ROUTE = "classSchedule"
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.classScheduleScreen(
     mappingOwner: ViewModelStoreMappingOwner,
     onNavigateBack: () -> Unit,

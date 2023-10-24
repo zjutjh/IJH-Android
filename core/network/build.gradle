@@ -13,6 +13,8 @@ android {
 
     defaultConfig {
         minSdk min_sdk
+
+        consumerProguardFiles "consumer-rules.pro"
     }
 
     buildTypes {

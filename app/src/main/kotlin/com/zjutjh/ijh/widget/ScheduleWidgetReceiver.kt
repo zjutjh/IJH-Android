@@ -33,7 +33,7 @@ class ScheduleWidgetReceiver : GlanceAppWidgetReceiver() {
         // Enter relevant functionality for when the first widget is created
         val manager = WorkManager.getInstance(context)
         val request = PeriodicWorkRequestBuilder<ScheduleWidgetUpdateWorker>(
-            Duration.ofHours(1), Duration.ofMinutes(15)
+            Duration.ofHours(6), Duration.ofMinutes(30)
         ).setConstraints(
             Constraints(requiresBatteryNotLow = true, requiresDeviceIdle = true)
         ).build()

@@ -14,8 +14,25 @@ import com.zjutjh.ijh.ui.model.toTermDayState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -44,10 +61,15 @@ class ClassScheduleViewModel @Inject constructor(
 
     private val _selectedTermDayState = MutableStateFlow<TermWeekState?>(null)
 
-    // Switch between term view and week view
+    /**
+     * State of term-week view switcher
+     */
     private val _termView = MutableStateFlow(false)
     val termView = _termView.asStateFlow()
 
+    /**
+     * Term state pair, first is current term day, second is selected term week
+     */
     val termState: StateFlow<Pair<TermDayState?, TermWeekState?>> = localTermDayState
         .distinctUntilChanged()
         .combine(_selectedTermDayState) { localTermDayState, selectedTermDayState ->
@@ -62,19 +84,21 @@ class ClassScheduleViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val coursesState: StateFlow<ImmutableList<Course>?> = termState
-        .dropWhile { (l, r) -> l == null && r == null }
+        .dropWhile { (l, r) -> l == null && r == null } // Drop initial null value
         .flatMapLatest { state ->
-            val termState = state.second ?: state.first
+            val termState = state.second ?: state.first // Selected state have higher priority
             if (termState != null) {
                 courseRepository.getCourses(termState.year, termState.term)
-                    .map { it to termState.week }
+                    .map { it to termState.week } // Save week number for further filtering
             } else flowOf(Pair(emptyList(), 1))
         }
-        .combine(_termView) { courses, termView ->
+        .combine(_termView) { pair, termView ->
+            // Switch between term view and week view
             if (termView) {
-                courses.first
+                pair.first
             } else {
-                courses.first.filter { course -> course.weeks.contains(courses.second) }
+                // Week view
+                pair.first.filter { pair.second in it.weeks }
             }.toImmutableList()
         }
         .flowOn(Dispatchers.Default)
@@ -126,7 +150,7 @@ class ClassScheduleViewModel @Inject constructor(
         if (refresh) refresh(termWeekState.year, termWeekState.term)
     }
 
-    fun unselectTerm() {
+    fun clearSelection() {
         _selectedTermDayState.value = null
     }
 

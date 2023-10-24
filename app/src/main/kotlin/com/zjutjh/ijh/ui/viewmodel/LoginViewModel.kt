@@ -15,12 +15,17 @@ import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.WeJhUserRepository
 import com.zjutjh.ijh.exception.ApiResponseException
 import com.zjutjh.ijh.exception.HttpStatusException
-import com.zjutjh.ijh.exception.UnauthorizedException
 import com.zjutjh.ijh.exception.WeJhApiExceptions
 import com.zjutjh.ijh.ui.model.CancellableLoadingState
 import com.zjutjh.ijh.ui.util.DismissibleSnackbarVisuals
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import javax.inject.Inject
@@ -73,12 +78,14 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
                     _uiState.loading = CancellableLoadingState.READY
                 }
             }
+
             CancellableLoadingState.CANCELLABLE -> {
                 viewModelScope.launch {
                     currentJob?.cancelAndJoin()
                     _uiState.loading = CancellableLoadingState.READY
                 }
             }
+
             else -> Unit
         }
     }
@@ -92,36 +99,41 @@ class LoginViewModel @Inject constructor(private val weJhUserRepository: WeJhUse
                         _uiState.passwordUiState = PasswordUiState.INVALID
                         showDismissibleSnackbar(context.getString(R.string.invalid_inputs))
                     }
+
                     WeJhApiExceptions.USER_NOT_FOUND -> {
                         _uiState.usernameUiState = UsernameUiState.UNKNOWN
                         showDismissibleSnackbar(context.getString(R.string.unknown_user))
                     }
+
                     WeJhApiExceptions.WRONG_PASSWORD -> {
                         _uiState.passwordUiState = PasswordUiState.WRONG
                         showDismissibleSnackbar(context.getString(R.string.wrong_password))
                     }
+
                     else -> {
                         Log.w("Login", "code: ${t.code}, msg: ${t.message}")
                         showDismissibleSnackbar("${t.message} (${t.code})")
                     }
                 }
             }
+
             is JsonDataException -> {
                 Log.e("JsonParsing", t.localizedMessage ?: t.toString())
                 showDismissibleSnackbar(context.getString(R.string.error_response))
             }
+
             is HttpStatusException -> {
                 showDismissibleSnackbar(context.getString(R.string.unexpected_http_status, t.code))
             }
-            is UnauthorizedException -> {
-                showDismissibleSnackbar(context.getString(R.string.authentication_exception))
-            }
+
             is SocketTimeoutException -> {
                 showDismissibleSnackbar(context.getString(R.string.request_timeout))
             }
+
             is UnknownHostException -> {
                 showDismissibleSnackbar(context.getString(R.string.network_error))
             }
+
             else -> {
                 Log.e("Login", "Error: $t")
                 showDismissibleSnackbar(context.getString(R.string.unknown_error))

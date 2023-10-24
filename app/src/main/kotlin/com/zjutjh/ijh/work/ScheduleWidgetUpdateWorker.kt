@@ -1,11 +1,13 @@
 package com.zjutjh.ijh.work
 
 import android.content.Context
+import android.util.Log
 import androidx.glance.appwidget.updateAll
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkerParameters
-import com.zjutjh.ijh.exception.UnauthorizedException
+import com.zjutjh.ijh.exception.ApiResponseException
+import com.zjutjh.ijh.exception.WeJhApiExceptions
 import com.zjutjh.ijh.widget.ScheduleWidget
 import com.zjutjh.ijh.widget.ScheduleWidgetReceiver
 import dagger.hilt.android.EntryPointAccessors
@@ -51,11 +53,25 @@ class ScheduleWidgetUpdateWorker(
             ScheduleWidget().updateAll(context)
 
             Result.success()
-        } catch (e: UnauthorizedException) {
+        } catch (e: ApiResponseException) {
             // Not logged in, stop the worker
+            ScheduleWidget().updateAll(context)
+
+            when (e.code) {
+                WeJhApiExceptions.NOT_LOGGED_IN -> {
+                    Log.e("ScheduleWidget", "Not logged in.")
+
+                }
+
+                else -> {
+                    Log.e("ScheduleWidget", "Failed to sync: $e")
+                }
+            }
             Result.failure()
-        } catch (_: Exception) {
-            Result.retry()
+        } catch (e: Exception) {
+            Log.e("ScheduleWidget", "Failed to sync: $e")
+            ScheduleWidget().updateAll(context)
+            Result.failure()
         }
     }
 }

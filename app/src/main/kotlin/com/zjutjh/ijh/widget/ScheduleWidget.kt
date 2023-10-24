@@ -18,13 +18,16 @@ import androidx.glance.background
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
+import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
-import androidx.glance.text.Text
+import androidx.glance.material3.ColorProviders
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.ui.component.shortTime
 import com.zjutjh.ijh.ui.model.toTermDayState
+import com.zjutjh.ijh.ui.theme.DarkColorScheme
+import com.zjutjh.ijh.ui.theme.LightColorScheme
 import com.zjutjh.ijh.work.ScheduleWidgetUpdateWorker
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.Flow
@@ -65,24 +68,29 @@ class ScheduleWidget : GlanceAppWidget() {
         val courses by coursesFlow.collectAsState(null)
         val syncTime by syncTimeFlow.collectAsState(null)
 
-        GlanceTheme {
+        GlanceTheme(ColorProviders(LightColorScheme, DarkColorScheme)) {
             Box(
                 modifier = GlanceModifier
                     .fillMaxSize()
-                    .padding(10.dp)
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(GlanceTheme.colors.background)
                     .appWidgetBackground()
+                    .padding(10.dp)
             ) {
                 if (courses != null) {
                     Column {
-                        if (syncTime != null) {
-                            Row {
-                                Button(text = "Update", onClick = onUpdate)
-                                Text("Last sync: ${syncTime!!.toLocalTime()}")
-                            }
+                        Row(modifier = GlanceModifier.fillMaxWidth()) {
+                            if (syncTime != null)
+                                GText(
+                                    text = "Last sync: ${syncTime!!.toLocalTime()}",
+                                )
+                            else
+                                GText(text = "Never")
+
+                            Spacer(GlanceModifier.defaultWeight())
+                            Button(text = "Update", onClick = onUpdate, maxLines = 1)
                         }
                         if (courses!!.isEmpty()) {
-                            Text("No course.")
+                            GText("No course.")
                         } else {
                             Column(
                                 modifier = GlanceModifier
@@ -96,7 +104,7 @@ class ScheduleWidget : GlanceAppWidget() {
                         }
                     }
                 } else {
-                    Text("Not login")
+                    GText("Loading")
                 }
             }
         }
@@ -109,8 +117,10 @@ class ScheduleWidget : GlanceAppWidget() {
                 .fillMaxWidth()
                 .padding(10.dp)
         ) {
-            Text("${course.name}-${course.teacherName}")
-            Text("${course.shortTime()} | ${course.place}")
+            GText("${course.name}-${course.teacherName}")
+            GText("${course.shortTime()} | ${course.place}")
         }
     }
+
+
 }

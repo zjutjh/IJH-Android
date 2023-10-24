@@ -20,6 +20,13 @@ class CourseRepositoryMock : CourseRepository {
 
     override fun getCourses(year: Int, term: Term): Flow<List<Course>> = flowOf(getCourses())
 
+    override fun getCourses(
+        year: Int,
+        term: Term,
+        week: Int,
+        dayOfWeek: DayOfWeek
+    ): Flow<List<Course>> = flowOf(getCourses())
+
     override suspend fun sync(year: Int, term: Term) = Unit
 
     companion object {

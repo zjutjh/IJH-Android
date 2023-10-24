@@ -12,6 +12,7 @@ import com.zjutjh.ijh.network.ZfDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.time.DayOfWeek
 import java.time.ZonedDateTime
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,6 +29,17 @@ class CourseRepositoryImpl @Inject constructor(
 
     override fun getCourses(year: Int, term: Term): Flow<List<Course>> =
         dao.getCourses(year, term).map { it.map(CourseEntity::asExternalModel) }
+
+    override fun getCourses(
+        year: Int,
+        term: Term,
+        week: Int,
+        dayOfWeek: DayOfWeek
+    ): Flow<List<Course>> =
+        dao.getCourses(year, term).map { entities ->
+            entities.map(CourseEntity::asExternalModel)
+                .filter { it.dayOfWeek == dayOfWeek && week in it.weeks }
+        }
 
     override val lastSyncTimeStream: Flow<ZonedDateTime?> =
         localPreference.data.map {
@@ -54,7 +66,9 @@ class CourseRepositoryImpl @Inject constructor(
         localPreference.setCoursesLastSyncTime(ZonedDateTime.now())
     }
 
-    // Insert new or updated elements and delete outdated elements
+    /**
+     * Insert new or updated elements and delete outdated elements
+     */
     private suspend fun updateCourses(old: List<CourseEntity>, new: List<CourseEntity>) {
         val toDelete = old.toMutableList()
         val toInsert = new.toMutableList()

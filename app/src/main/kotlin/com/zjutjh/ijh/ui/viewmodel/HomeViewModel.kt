@@ -85,8 +85,7 @@ class HomeViewModel @Inject constructor(
             if (state is LoadResult.Ready && state.data != null) {
                 val day = state.data
                 if (day.isInTerm) {
-                    courseRepository.getCourses(day.year, day.term)
-                        .map { it.filterToday(day) }
+                    courseRepository.getCourses(day.year, day.term, day.week, day.dayOfWeek)
                 } else flowOf(emptyList())
             } else flowOf(emptyList())
         }
@@ -122,11 +121,6 @@ class HomeViewModel @Inject constructor(
                 }
         }
     }
-
-    private fun List<Course>.filterToday(day: TermDayState): List<Course> =
-        this.filter {
-            (day.dayOfWeek == it.dayOfWeek) && (day.week in it.weeks)
-        }
 
     /**
      * Sync with upstream

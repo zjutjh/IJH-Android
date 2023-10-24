@@ -7,5 +7,9 @@ import kotlinx.coroutines.flow.Flow
 interface WeJhInfoRepository {
     val infoStream: Flow<WeJhInfo?>
 
+    /**
+     * Sync WeJhInfo from network to local
+     * @return Pair(year, term)
+     */
     suspend fun sync(): Pair<Int, Term>
 }

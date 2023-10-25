@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.data.repository.WeJhInfoRepository
 import com.zjutjh.ijh.work.ScheduleWidgetUpdater
+import com.zjutjh.ijh.work.WidgetRefreshWorker
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -46,6 +47,8 @@ class ScheduleWidgetReceiver : GlanceAppWidgetReceiver() {
             request
         )
 
+        WidgetRefreshWorker.enqueue<ScheduleWidget>(context)
+
         Log.i("ScheduleWidget", "Updater enqueued.")
     }
 
@@ -54,6 +57,9 @@ class ScheduleWidgetReceiver : GlanceAppWidgetReceiver() {
         // Enter relevant functionality for when the last widget is disabled
         val manager = WorkManager.getInstance(context)
         manager.cancelUniqueWork(ScheduleWidgetUpdater.PERIODIC_UNIQUE_NAME)
+
+        WidgetRefreshWorker.cancel<ScheduleWidget>(context)
+
         Log.i("ScheduleWidget", "Updater canceled.")
     }
 }

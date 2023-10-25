@@ -1,6 +1,7 @@
 package com.zjutjh.ijh.widget
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,6 +21,7 @@ import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.updateAll
 import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -51,6 +53,8 @@ import java.time.format.DateTimeFormatter
 class ScheduleWidget : GlanceAppWidget() {
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        Log.d("ScheduleWidget", "provideGlance called.")
+
         val entryPoint =
             EntryPointAccessors.fromApplication<ScheduleWidgetReceiver.Repositories>(context)
 
@@ -58,6 +62,7 @@ class ScheduleWidget : GlanceAppWidget() {
             .map { it?.toTermDayState() }
         val coursesFlow = dayStateFlow.flatMapLatest {
             it ?: return@flatMapLatest flowOf(null)
+
             entryPoint.courseRepository
                 .getCourses(it.year, it.term, it.week, it.dayOfWeek)
         }
@@ -67,6 +72,9 @@ class ScheduleWidget : GlanceAppWidget() {
                 it ?: return@map null
                 DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(it.withZoneSameInstant(ZoneId.systemDefault()))
             }
+
+        // Force update, or the widget will not show data when it is first created
+        updateAll(context)
 
         provideContent {
             val termDay by dayStateFlow.collectAsState(initial = null)

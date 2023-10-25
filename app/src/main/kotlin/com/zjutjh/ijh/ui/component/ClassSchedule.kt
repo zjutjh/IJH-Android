@@ -4,10 +4,33 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -29,7 +52,26 @@ import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Section
-import com.zjutjh.ijh.ui.theme.*
+import com.zjutjh.ijh.ui.theme.Blue0
+import com.zjutjh.ijh.ui.theme.Blue5
+import com.zjutjh.ijh.ui.theme.Cyan0
+import com.zjutjh.ijh.ui.theme.Desert
+import com.zjutjh.ijh.ui.theme.Green0
+import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.ui.theme.Orange0
+import com.zjutjh.ijh.ui.theme.Purple3
+import com.zjutjh.ijh.ui.theme.RainbowChampagne
+import com.zjutjh.ijh.ui.theme.RainbowCoral
+import com.zjutjh.ijh.ui.theme.RainbowLavender
+import com.zjutjh.ijh.ui.theme.RainbowLightBlue
+import com.zjutjh.ijh.ui.theme.RainbowLightGreen
+import com.zjutjh.ijh.ui.theme.RainbowLime
+import com.zjutjh.ijh.ui.theme.RainbowOrange
+import com.zjutjh.ijh.ui.theme.RainbowPeach
+import com.zjutjh.ijh.ui.theme.RainbowPink
+import com.zjutjh.ijh.ui.theme.RainbowViolet
+import com.zjutjh.ijh.ui.theme.Red0
+import com.zjutjh.ijh.ui.theme.Red2
 import com.zjutjh.ijh.util.CourseStack
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -40,7 +82,6 @@ import java.time.DayOfWeek
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.TextStyle
-import java.util.*
 import kotlin.math.roundToInt
 import kotlin.time.toKotlinDuration
 
@@ -80,8 +121,8 @@ fun ClassSchedule(
             ) {
                 val today = dateTime.dayOfWeek
 
-                DayOfWeek.values().forEachIndexed { index, dayOfWeek ->
-                    val dayCourses = remember (courses) {
+                DayOfWeek.entries.forEachIndexed { index, dayOfWeek ->
+                    val dayCourses = remember(courses) {
                         courses.filter { it.dayOfWeek == dayOfWeek }.toImmutableList()
                     }
                     ClassScheduleRowItem(
@@ -259,7 +300,7 @@ private fun ClassScheduleRowItem(
         }
 
         // Enforce group recompose
-        key (elements) {
+        key(elements) {
             ClassScheduleColumn(courses = elements) {
                 elements.forEachIndexed { index, courseStack ->
                     ClassScheduleColumnItem(

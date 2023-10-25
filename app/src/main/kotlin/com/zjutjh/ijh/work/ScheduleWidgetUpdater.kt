@@ -12,11 +12,10 @@ import com.zjutjh.ijh.widget.ScheduleWidget
 import com.zjutjh.ijh.widget.ScheduleWidgetReceiver
 import dagger.hilt.android.EntryPointAccessors
 
-class ScheduleWidgetUpdateWorker(
+class ScheduleWidgetUpdater(
     private val context: Context,
     workerParameters: WorkerParameters
-) :
-    CoroutineWorker(context, workerParameters) {
+) : CoroutineWorker(context, workerParameters) {
     companion object {
         // Periodic work and one time work should have different unique names.
         const val UNIQUE_NAME = "ScheduleWidgetUpdater"
@@ -24,7 +23,7 @@ class ScheduleWidgetUpdateWorker(
 
         fun enqueue(context: Context, force: Boolean = false) {
             val manager = androidx.work.WorkManager.getInstance(context)
-            val request = androidx.work.OneTimeWorkRequestBuilder<ScheduleWidgetUpdateWorker>()
+            val request = androidx.work.OneTimeWorkRequestBuilder<ScheduleWidgetUpdater>()
                 .build()
 
             var policy = ExistingWorkPolicy.KEEP
@@ -45,17 +44,13 @@ class ScheduleWidgetUpdateWorker(
         EntryPointAccessors.fromApplication<ScheduleWidgetReceiver.Repositories>(context)
 
     override suspend fun doWork(): Result {
-        return try {
+        val result = try {
             val info = entryPoint.weJhInfoRepository.sync()
             entryPoint.courseRepository.sync(info.first, info.second)
-
-            // Notify all existing widgets to update
-            ScheduleWidget().updateAll(context)
 
             Result.success()
         } catch (e: ApiResponseException) {
             // Not logged in, stop the worker
-            ScheduleWidget().updateAll(context)
 
             when (e.code) {
                 WeJhApiExceptions.NOT_LOGGED_IN -> {
@@ -67,11 +62,18 @@ class ScheduleWidgetUpdateWorker(
                     Log.e("ScheduleWidget", "Failed to sync: $e")
                 }
             }
+
             Result.failure()
         } catch (e: Exception) {
             Log.e("ScheduleWidget", "Failed to sync: $e")
-            ScheduleWidget().updateAll(context)
+
             Result.failure()
         }
+
+        // Notify widgets to update
+        ScheduleWidget().updateAll(context)
+
+        return result
     }
+
 }

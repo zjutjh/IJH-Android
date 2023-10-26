@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import com.zjutjh.ijh.data.repository.CourseRepository
 import com.zjutjh.ijh.data.repository.WeJhInfoRepository
 import com.zjutjh.ijh.work.ScheduleWidgetUpdater
+import com.zjutjh.ijh.work.enqueueWidgetRefresh
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -31,7 +32,6 @@ class ScheduleWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-
         // Enter relevant functionality for when the first widget is created
         val manager = WorkManager.getInstance(context)
         val request = PeriodicWorkRequestBuilder<ScheduleWidgetUpdater>(
@@ -45,6 +45,8 @@ class ScheduleWidgetReceiver : GlanceAppWidgetReceiver() {
             ExistingPeriodicWorkPolicy.KEEP,
             request
         )
+
+        manager.enqueueWidgetRefresh<ScheduleWidget>()
 
         Log.i("ScheduleWidget", "Updater enqueued.")
     }

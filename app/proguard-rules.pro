@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep default constuctors of wiget classes
+-keepnames class com.zjutjh.ijh.widget.* extends androidx.glance.appwidget.GlanceAppWidget
+-keepclassmembers class com.zjutjh.ijh.widget.* extends androidx.glance.appwidget.GlanceAppWidget {
+    public <init>();
+}

@@ -7,11 +7,14 @@ import androidx.glance.appwidget.updateAll
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 /**
  * This worker is used to refresh the widget periodically.
@@ -27,33 +30,6 @@ class WidgetRefreshWorker(
         inline fun <reified T : GlanceAppWidget> getUniqueWorkName() =
             WidgetRefreshWorker::class.java.simpleName + "_" + T::class.java.simpleName
 
-        /**
-         * Enqueue a [WidgetRefreshWorker] for the given [GlanceAppWidget].
-         * Do nothing if the worker is already enqueued.
-         * Default refresh interval is 15 minutes.
-         */
-        inline fun <reified T : GlanceAppWidget> enqueue(context: Context) {
-            val manager = WorkManager.getInstance(context)
-            val request = PeriodicWorkRequestBuilder<WidgetRefreshWorker>(
-                Duration.ofMinutes(15), Duration.ofMinutes(5)
-            ).setConstraints(
-                Constraints(requiresBatteryNotLow = true)
-            ).setInputData(
-                workDataOf(INPUT_CLASS_NAME to T::class.java.name)
-            )
-                .build()
-
-            manager.enqueueUniquePeriodicWork(
-                getUniqueWorkName<T>(),
-                ExistingPeriodicWorkPolicy.KEEP,
-                request
-            )
-        }
-
-        inline fun <reified T : GlanceAppWidget> cancel(context: Context) {
-            val manager = WorkManager.getInstance(context)
-            manager.cancelUniqueWork(getUniqueWorkName<T>())
-        }
     }
 
     /**
@@ -78,5 +54,43 @@ class WidgetRefreshWorker(
             Result.failure()
         }
     }
+}
 
+inline fun <reified T : GlanceAppWidget> WorkManager.enqueueWidgetRefresh(force: Boolean = false) {
+    enqueueUniqueWork(
+        WidgetRefreshWorker.getUniqueWorkName<T>(),
+        if (force) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP,
+        OneTimeWorkRequestBuilder<WidgetRefreshWorker>()
+            .setInitialDelay(1, TimeUnit.SECONDS)
+            .setInputData(
+                workDataOf(WidgetRefreshWorker.INPUT_CLASS_NAME to T::class.java.name)
+            )
+            .build()
+    )
+}
+
+/**
+ * Enqueue a [WidgetRefreshWorker] for the given [GlanceAppWidget].
+ * Do nothing if the worker is already enqueued.
+ * Default refresh interval is 15 minutes.
+ */
+inline fun <reified T : GlanceAppWidget> WorkManager.enqueuePeriodicWidgetRefresh() {
+    val request = PeriodicWorkRequestBuilder<WidgetRefreshWorker>(
+        Duration.ofMinutes(15), Duration.ofMinutes(5)
+    ).setConstraints(
+        Constraints(requiresBatteryNotLow = true)
+    ).setInputData(
+        workDataOf(WidgetRefreshWorker.INPUT_CLASS_NAME to T::class.java.name)
+    )
+        .build()
+
+    enqueueUniquePeriodicWork(
+        WidgetRefreshWorker.getUniqueWorkName<T>(),
+        ExistingPeriodicWorkPolicy.KEEP,
+        request
+    )
+}
+
+inline fun <reified T : GlanceAppWidget> WorkManager.cancelPeriodicWidgetRefresh() {
+    cancelUniqueWork(WidgetRefreshWorker.getUniqueWorkName<T>())
 }

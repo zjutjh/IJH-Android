@@ -178,8 +178,6 @@ class ScheduleWidget : GlanceAppWidget() {
                                 }
                             }
                         }
-                    } else {
-                        GText(context.getString(R.string.loading))
                     }
                 }
             }

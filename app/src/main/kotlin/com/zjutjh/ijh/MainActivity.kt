@@ -12,9 +12,12 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.work.WorkManager
 import com.zjutjh.ijh.ui.IJhApp
 import com.zjutjh.ijh.ui.theme.IJhTheme
 import com.zjutjh.ijh.util.ViewModelStoreMappingOwner
+import com.zjutjh.ijh.widget.ScheduleWidget
+import com.zjutjh.ijh.work.enqueueWidgetRefresh
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,6 +62,9 @@ class MainActivity : ComponentActivity() {
 
         // Make system bars inside the application's layout scope
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Update widget
+        WorkManager.getInstance(this).enqueueWidgetRefresh<ScheduleWidget>()
 
         setContent {
             IJhTheme {

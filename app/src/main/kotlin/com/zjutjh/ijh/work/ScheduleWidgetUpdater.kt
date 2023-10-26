@@ -12,6 +12,11 @@ import com.zjutjh.ijh.widget.ScheduleWidget
 import com.zjutjh.ijh.widget.ScheduleWidgetReceiver
 import dagger.hilt.android.EntryPointAccessors
 
+/**
+ * Worker that syncs data and updates widgets.
+ *
+ * **Note** On some devices, periodic update will work only when auto launch is enabled.
+ */
 class ScheduleWidgetUpdater(
     private val context: Context,
     workerParameters: WorkerParameters

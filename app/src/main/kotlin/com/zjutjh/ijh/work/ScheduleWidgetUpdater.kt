@@ -48,6 +48,7 @@ class ScheduleWidgetUpdater(
             val info = entryPoint.weJhInfoRepository.sync()
             entryPoint.courseRepository.sync(info.first, info.second)
 
+            Log.i("ScheduleWidget", "Synced.")
             Result.success()
         } catch (e: ApiResponseException) {
             // Not logged in, stop the worker
@@ -59,13 +60,13 @@ class ScheduleWidgetUpdater(
                 }
 
                 else -> {
-                    Log.e("ScheduleWidget", "Failed to sync: $e")
+                    Log.e("ScheduleWidget", "Failed to sync.", e)
                 }
             }
 
             Result.failure()
         } catch (e: Exception) {
-            Log.e("ScheduleWidget", "Failed to sync: $e")
+            Log.e("ScheduleWidget", "Failed to sync", e)
 
             Result.failure()
         }

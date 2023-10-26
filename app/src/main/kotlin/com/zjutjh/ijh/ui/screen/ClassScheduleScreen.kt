@@ -152,11 +152,14 @@ private fun ClassScheduleScreen(
                 .verticalScroll(rememberScrollState()),
         ) {
             Box(contentAlignment = Alignment.TopCenter) {
-                ClassSchedule(
-                    modifier = Modifier.padding(10.dp),
-                    courses = courses,
-                    highlight = highlight,
-                )
+                // Force recompose when courses changed
+                key(courses) {
+                    ClassSchedule(
+                        modifier = Modifier.padding(10.dp),
+                        courses = courses,
+                        highlight = highlight,
+                    )
+                }
                 key(refreshing) {
                     PullRefreshIndicator(
                         refreshing = refreshing,

@@ -30,17 +30,18 @@ class WidgetRefreshWorker(
         /**
          * Enqueue a [WidgetRefreshWorker] for the given [GlanceAppWidget].
          * Do nothing if the worker is already enqueued.
-         * Default refresh interval is 20 minutes.
+         * Default refresh interval is 15 minutes.
          */
         inline fun <reified T : GlanceAppWidget> enqueue(context: Context) {
             val manager = WorkManager.getInstance(context)
             val request = PeriodicWorkRequestBuilder<WidgetRefreshWorker>(
-                Duration.ofMinutes(20), Duration.ofMinutes(5)
+                Duration.ofMinutes(15), Duration.ofMinutes(5)
             ).setConstraints(
-                Constraints(requiresBatteryNotLow = true, requiresDeviceIdle = true)
+                Constraints(requiresBatteryNotLow = true)
             ).setInputData(
                 workDataOf(INPUT_CLASS_NAME to T::class.java.name)
-            ).build()
+            )
+                .build()
 
             manager.enqueueUniquePeriodicWork(
                 getUniqueWorkName<T>(),
@@ -70,6 +71,7 @@ class WidgetRefreshWorker(
 
             obj.updateAll(context)
 
+            Log.i("WidgetRefreshWorker", "Widget refreshed: $className")
             Result.success()
         } catch (e: Exception) {
             Log.e("WidgetRefreshWorker", "Error when refreshing widget.", e)

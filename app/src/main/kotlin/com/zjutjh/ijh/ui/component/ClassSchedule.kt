@@ -120,7 +120,6 @@ fun ClassSchedule(
                 startPadding = 30.dp,
             ) {
                 val today = dateTime.dayOfWeek
-
                 DayOfWeek.entries.forEachIndexed { index, dayOfWeek ->
                     val dayCourses = remember(courses) {
                         courses.filter { it.dayOfWeek == dayOfWeek }.toImmutableList()
@@ -133,6 +132,7 @@ fun ClassSchedule(
                     )
                 }
             }
+
 
             // Left section bar
             Surface(

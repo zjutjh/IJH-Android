@@ -1,5 +1,4 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -29,9 +28,7 @@
             android:layout_height="20dp"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="16dp"
-            android:foregroundTint="?attr/colorOnBackground"
-            android:src="@drawable/baseline_autorenew_24"
-            app:tint="?attr/colorOnBackground" />
+            android:src="@drawable/baseline_autorenew_24" />
     </LinearLayout>
 
     <FrameLayout
@@ -40,23 +37,5 @@
         android:layout_margin="5dp"
         android:background="?attr/colorOutline" />
 
-
-    <!--    <FrameLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="50dp"-->
-    <!--        android:layout_margin="10dp"-->
-    <!--        android:background="?attr/colorPrimaryContainer" />-->
-
-    <!--    <FrameLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="50dp"-->
-    <!--        android:layout_margin="10dp"-->
-    <!--        android:background="?attr/colorSecondaryContainer" />-->
-
-    <!--    <FrameLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="50dp"-->
-    <!--        android:layout_margin="10dp"-->
-    <!--        android:background="?attr/colorSecondaryContainer" />-->
 
 </LinearLayout>

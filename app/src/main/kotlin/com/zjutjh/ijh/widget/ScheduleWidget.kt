@@ -37,11 +37,11 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.TextAlign
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.model.Course
-import com.zjutjh.ijh.ui.component.shortTime
 import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.model.toTermDayState
 import com.zjutjh.ijh.ui.theme.DarkColorScheme
 import com.zjutjh.ijh.ui.theme.LightColorScheme
+import com.zjutjh.ijh.util.shortTime
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
@@ -103,6 +103,7 @@ class ScheduleWidget : GlanceAppWidget() {
             ) {
 
                 Column {
+                    // Header
                     Row(
                         modifier = GlanceModifier.fillMaxWidth(),
                         verticalAlignment = Alignment.Vertical.CenterVertically
@@ -146,7 +147,7 @@ class ScheduleWidget : GlanceAppWidget() {
                         Spacer(GlanceModifier.defaultWeight())
 
                         IconButton(
-                            provider = ImageProvider(R.drawable.baseline_autorenew_24),
+                            provider = ImageProvider(R.drawable.baseline_autorenew_white_24),
                             actionRunCallback<UpdateAction>()
                         )
                     }
@@ -166,11 +167,16 @@ class ScheduleWidget : GlanceAppWidget() {
                     // Content
                     if (courses != null) {
                         if (courses.isEmpty()) {
-                            GText(
-                                context.getString(R.string.nothing_to_do),
+                            Box(
                                 modifier = GlanceModifier.fillMaxSize(),
-                                textAlign = TextAlign.Center
-                            )
+                                contentAlignment = Alignment.Center
+                            ) {
+                                GText(
+                                    context.getString(R.string.nothing_to_do),
+                                    modifier = GlanceModifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         } else {
                             LazyColumn {
                                 items(courses) {

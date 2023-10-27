@@ -15,7 +15,7 @@ android {
         targetSdk target_sdk
 
         versionCode 1
-        versionName '0.1.0-alpha.01'
+        versionName '0.1.0-alpha'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

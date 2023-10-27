@@ -5,14 +5,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.util.detailedTime
 
 @Composable
 fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourse: Course) {
@@ -69,7 +81,7 @@ fun CourseDetailsDialog(onConfirm: () -> Unit, chosenCourses: List<Course>) {
                 }
             },
             text = {
-                var state by remember { mutableStateOf(chosenCourses.size - 1) }
+                var state by remember { mutableIntStateOf(chosenCourses.size - 1) }
                 Column {
                     ScrollableTabRow(selectedTabIndex = state) {
                         chosenCourses.forEachIndexed { index, course ->

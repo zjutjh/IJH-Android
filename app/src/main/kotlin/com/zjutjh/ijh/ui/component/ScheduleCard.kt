@@ -1,23 +1,46 @@
 package com.zjutjh.ijh.ui.component
 
-import android.content.res.Configuration.*
+import android.content.Context
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.CalendarViewWeek
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,20 +48,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.core.os.LocaleListCompat
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
-import com.zjutjh.ijh.model.Section
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.model.TermDayState
 import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.util.shortTime
 import com.zjutjh.ijh.util.toLocalizedString
 import java.time.DayOfWeek
 import java.time.Duration
-import java.time.format.DateTimeFormatter
+import java.util.Locale
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ScheduleCard(
     courses: List<Course>?,
@@ -49,69 +70,45 @@ fun ScheduleCard(
 ) {
     val context = LocalContext.current
 
-    OutlinedCard(
+    val subtitle = remember(termDay, lastSyncDuration) {
+        prompt(context, termDay, lastSyncDuration)
+    }
+
+    Card(
         modifier = modifier,
     ) {
-        Column(Modifier.padding(top = 12.dp, start = 24.dp, end = 24.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+        Row(
+            Modifier
+                .padding(top = 12.dp, start = 24.dp, end = 24.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column {
+                // Title
                 Text(
                     text = stringResource(id = R.string.schedule),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
-                IconButton(
-                    onClick = onCalendarClick
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CalendarViewWeek,
-                        contentDescription = stringResource(
-                            id = R.string.calendar
-                        )
+                // Subtitle
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+
+            IconButton(
+                onClick = onCalendarClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CalendarViewWeek,
+                    contentDescription = stringResource(
+                        id = R.string.calendar
                     )
-                }
+                )
             }
-
-            Divider()
-            Spacer(modifier = Modifier.height(4.dp))
-
-            val prompt = remember(termDay, lastSyncDuration) {
-                buildString {
-                    if (termDay != null) {
-                        if (termDay.isInTerm) {
-                            append(
-                                context.getString(
-                                    R.string.unit_week,
-                                    termDay.week
-                                )
-                            )
-                        } else {
-                            append(
-                                context.getString(R.string.during_vacation)
-                            )
-                        }
-                    } else {
-                        append(
-                            context.getString(R.string.unknown)
-                        )
-                    }
-                    append(" | ")
-                    if (lastSyncDuration != null) {
-                        append(lastSyncDuration.toLocalizedString(context))
-                    } else {
-                        append(context.getString(R.string.never))
-                    }
-                }
-            }
-
-            Text(
-                text = prompt,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.outline
-            )
         }
 
         AnimatedContent(
@@ -135,22 +132,61 @@ fun ScheduleCard(
                 }
             } else if (it.isEmpty()) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp),
+                    modifier = Modifier.padding(vertical = 24.dp),
                     textAlign = TextAlign.Center,
                     text = stringResource(id = R.string.nothing_to_do)
                 )
             } else {
                 CoursesCard(
+                    modifier = Modifier.padding(16.dp),
                     courses = it,
-                    modifier = Modifier.padding(16.dp)
                 )
             }
         }
     }
 }
 
+private fun prompt(context: Context, termDay: TermDayState?, lastSyncDuration: Duration?) =
+    buildString {
+        val separator = " | "
+        if (termDay != null) {
+            if (termDay.isInTerm) {
+                append(
+                    termDay.dayOfWeek.getDisplayName(
+                        java.time.format.TextStyle.SHORT,
+                        Locale.getDefault()
+                    )
+                )
+                append(separator)
+                append(
+                    context.getString(
+                        R.string.unit_week,
+                        termDay.week
+                    )
+                )
+            } else {
+                append(
+                    context.getString(R.string.during_vacation)
+                )
+            }
+        } else {
+            append(
+                context.getString(R.string.unknown)
+            )
+        }
+        append(separator)
+        if (lastSyncDuration != null) {
+            append(lastSyncDuration.toLocalizedString(context))
+        } else {
+            append(context.getString(R.string.never))
+        }
+    }
+
 @Composable
-fun CoursesCard(courses: List<Course>, modifier: Modifier = Modifier) {
+fun CoursesCard(
+    modifier: Modifier = Modifier,
+    courses: List<Course>,
+) {
     var openDialog by remember { mutableStateOf(false) }
     var chosenCourse: Course by remember {
         mutableStateOf(Course.default())
@@ -209,27 +245,6 @@ private fun CourseListItem(course: Course, onClick: () -> Unit, modifier: Modifi
         )
     }
 
-}
-
-fun Course.shortTime(): String {
-    val (start, _) = Section.PAIRS[sectionStart - 1]
-    val (_, end) = Section.PAIRS[sectionEnd - 1]
-
-    val formatter = DateTimeFormatter.ofPattern("HH:mm")
-    return "${start.format(formatter)} - ${end.format(formatter)} | $sectionStart-$sectionEnd"
-}
-
-fun Course.detailedTime(): String {
-    val (start, _) = Section.PAIRS[sectionStart - 1]
-    val (_, end) = Section.PAIRS[sectionEnd - 1]
-
-    val startTime = start.format(Section.TIME_FORMATTER)
-    val endTime = end.format(Section.TIME_FORMATTER)
-
-    val locale = LocaleListCompat.getDefault()[0]
-
-    val dayOfWeek = dayOfWeek.getDisplayName(java.time.format.TextStyle.SHORT, locale)
-    return "${dayOfWeek}($sectionStart-$sectionEnd) | $startTime-$endTime"
 }
 
 @Composable
@@ -304,6 +319,22 @@ private fun ScheduleSurfacePreview() {
 @Preview
 @Composable
 private fun ScheduleSurfaceEmptyPreview() {
+    IJhTheme {
+        Surface {
+            ScheduleCard(
+                modifier = Modifier.padding(10.dp),
+                courses = emptyList(),
+                onCalendarClick = {},
+                termDay = null,
+                lastSyncDuration = Duration.ofDays(1),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ScheduleSurfaceLoadingPreview() {
     IJhTheme {
         Surface {
             ScheduleCard(

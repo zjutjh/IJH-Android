@@ -36,7 +36,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ClassScheduleViewModel @Inject constructor(
+class CourseCalendarViewModel @Inject constructor(
     weJhInfoRepository: WeJhInfoRepository,
     weJhUserRepository: WeJhUserRepository,
     private val courseRepository: CourseRepository,

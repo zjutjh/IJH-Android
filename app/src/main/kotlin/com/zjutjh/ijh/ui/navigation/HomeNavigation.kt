@@ -11,14 +11,14 @@ const val homeRoute = "home"
 fun NavGraphBuilder.homeScreen(
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToClassSchedule: () -> Unit,
+    onNavigateToCalendar: () -> Unit,
     onNavigateToAbout: () -> Unit,
 ) {
     composable(homeRoute) {
         HomeRoute(
             onNavigateToLogin = onNavigateToLogin,
             onNavigateToProfile = onNavigateToProfile,
-            onNavigateToClassSchedule = onNavigateToClassSchedule,
+            onNavigateToCalendar = onNavigateToCalendar,
             onNavigateToAbout = onNavigateToAbout,
         )
     }

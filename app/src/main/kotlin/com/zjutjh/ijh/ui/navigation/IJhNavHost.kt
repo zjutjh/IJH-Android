@@ -63,9 +63,9 @@ fun IJhNavHost(
                     navOptions { launchSingleTop = true }
                 )
             },
-            onNavigateToClassSchedule = {
+            onNavigateToCalendar = {
                 scope.launch {
-                    navController.navigateToClassSchedule(
+                    navController.navigateToCourseCalendar(
                         sharedViewModelStoreOwner,
                         navOptions { launchSingleTop = true }
                     )
@@ -87,7 +87,7 @@ fun IJhNavHost(
             navController::popBackStack
         )
 
-        classScheduleScreen(
+        courseCalendarScreen(
             sharedViewModelStoreOwner,
             navController::popBackStack,
         )

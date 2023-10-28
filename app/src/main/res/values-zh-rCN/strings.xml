@@ -9,7 +9,6 @@
     <string name="course">课程</string>
     <string name="time">时间</string>
     <string name="place">地点</string>
-    <string name="today_class_schedule">今日课程安排</string>
     <string name="username">用户名</string>
     <string name="password">密码</string>
     <string name="input_username">输入用户名</string>
@@ -55,7 +54,6 @@
     <string name="credits">学分</string>
     <string name="last_sync">上次同步：</string>
     <string name="calendar">日历</string>
-    <string name="class_schedule">课程表</string>
     <string name="conflict_courses">冲突课程</string>
     <string name="course_details">课程详情</string>
     <string name="during_vacation">放假中</string>

@@ -8,7 +8,6 @@
     <string name="course">Course</string>
     <string name="time">Time</string>
     <string name="place">Place</string>
-    <string name="today_class_schedule">Today\'s class schedule.</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="input_username">Input username</string>
@@ -54,7 +53,6 @@
     <string name="credits">Credits</string>
     <string name="last_sync">Last sync:</string>
     <string name="calendar">Calendar</string>
-    <string name="class_schedule">Class Schedule</string>
     <string name="conflict_courses">Conflict courses</string>
     <string name="course_details">Course details</string>
     <string name="during_vacation">During vacation</string>

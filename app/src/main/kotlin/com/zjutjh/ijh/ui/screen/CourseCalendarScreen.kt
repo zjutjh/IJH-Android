@@ -64,18 +64,18 @@ import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.component.BackIconButton
-import com.zjutjh.ijh.ui.component.ClassSchedule
+import com.zjutjh.ijh.ui.component.CourseCalendar
 import com.zjutjh.ijh.ui.model.TermWeekState
 import com.zjutjh.ijh.ui.theme.IJhTheme
-import com.zjutjh.ijh.ui.viewmodel.ClassScheduleViewModel
+import com.zjutjh.ijh.ui.viewmodel.CourseCalendarViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 @Composable
-fun ClassScheduleRoute(
-    viewModel: ClassScheduleViewModel = hiltViewModel(),
+fun CourseCalendarRoute(
+    viewModel: CourseCalendarViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
 ) {
     val startYear by viewModel.startYear.collectAsStateWithLifecycle()
@@ -84,7 +84,7 @@ fun ClassScheduleRoute(
     val courses by viewModel.coursesState.collectAsStateWithLifecycle()
     val refreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
 
-    ClassScheduleScreen(
+    CourseCalendarScreen(
         startYear = startYear ?: 2020,
         courses = courses ?: persistentListOf(),
         termView = termView,
@@ -100,7 +100,7 @@ fun ClassScheduleRoute(
 }
 
 @Composable
-private fun ClassScheduleScreen(
+private fun CourseCalendarScreen(
     startYear: Int,
     courses: ImmutableList<Course>,
     termView: Boolean,
@@ -133,7 +133,7 @@ private fun ClassScheduleScreen(
 
     val pullRefreshState = rememberPullRefreshState(refreshing = refreshing, onRefresh = onRefresh)
 
-    ClassScheduleScaffold(
+    CourseCalendarScaffold(
         modifier = Modifier.pullRefresh(pullRefreshState),
         startYear = startYear,
         currentTermWeek = currentTermWeek,
@@ -154,7 +154,7 @@ private fun ClassScheduleScreen(
             Box(contentAlignment = Alignment.TopCenter) {
                 // Force recompose when courses changed
                 key(courses) {
-                    ClassSchedule(
+                    CourseCalendar(
                         modifier = Modifier.padding(10.dp),
                         courses = courses,
                         highlight = highlight,
@@ -193,7 +193,7 @@ private fun MainContainer(
 }
 
 @Composable
-private fun ClassScheduleScaffold(
+private fun CourseCalendarScaffold(
     modifier: Modifier = Modifier,
     startYear: Int,
     currentTermWeek: TermWeekState?,
@@ -209,7 +209,7 @@ private fun ClassScheduleScaffold(
     Scaffold(
         modifier = modifier,
         topBar = {
-            ClassScheduleTopBar(
+            CourseCalendarTopBar(
                 startYear,
                 currentTermWeek,
                 selectedTermWeek,
@@ -228,7 +228,7 @@ private fun ClassScheduleScaffold(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ClassScheduleTopBar(
+private fun CourseCalendarTopBar(
     startYear: Int,
     currentTermWeek: TermWeekState?,
     selectedTermWeek: TermWeekState?,
@@ -537,7 +537,7 @@ fun WeekPicker(
 @Composable
 private fun TopBarPreview() {
     IJhTheme {
-        ClassScheduleTopBar(
+        CourseCalendarTopBar(
             2019, null, null,
             termView = false,
             revocable = true,
@@ -550,10 +550,10 @@ private fun TopBarPreview() {
 
 @Preview
 @Composable
-private fun ClassScheduleScreenPreview() {
+private fun CourseCalendarScreenPreview() {
     val courses = CourseRepositoryMock.getCourses().toImmutableList()
     IJhTheme {
-        ClassScheduleScreen(2019, courses, false, null,
+        CourseCalendarScreen(2019, courses, false, null,
             null, false, {}, {}, {}, { _, _ -> }) {}
     }
 }

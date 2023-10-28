@@ -86,7 +86,7 @@ import kotlin.math.roundToInt
 import kotlin.time.toKotlinDuration
 
 @Composable
-fun ClassSchedule(
+fun CourseCalendar(
     modifier: Modifier = Modifier,
     courses: ImmutableList<Course>,
     highlight: Boolean
@@ -116,7 +116,7 @@ fun ClassSchedule(
 
     Surface(modifier = modifier) {
         Box {
-            ClassScheduleRow(
+            CourseCalendarRow(
                 startPadding = 30.dp,
             ) {
                 val today = dateTime.dayOfWeek
@@ -124,7 +124,7 @@ fun ClassSchedule(
                     val dayCourses = remember(courses) {
                         courses.filter { it.dayOfWeek == dayOfWeek }.toImmutableList()
                     }
-                    ClassScheduleRowItem(
+                    CourseCalendarRowItem(
                         title = dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
                         courses = dayCourses,
                         leftDivider = index == 0,
@@ -211,7 +211,7 @@ fun ClassSchedule(
 }
 
 @Composable
-private fun ClassScheduleRow(
+private fun CourseCalendarRow(
     modifier: Modifier = Modifier,
     startPadding: Dp,
     content: @Composable () -> Unit
@@ -243,7 +243,7 @@ private fun ClassScheduleRow(
 }
 
 @Composable
-private fun ClassScheduleRowItem(
+private fun CourseCalendarRowItem(
     modifier: Modifier = Modifier,
     title: String,
     courses: ImmutableList<Course>,
@@ -301,9 +301,9 @@ private fun ClassScheduleRowItem(
 
         // Enforce group recompose
         key(elements) {
-            ClassScheduleColumn(courses = elements) {
+            CourseCalendarColumn(courses = elements) {
                 elements.forEachIndexed { index, courseStack ->
-                    ClassScheduleColumnItem(
+                    CourseCalendarColumnItem(
                         Modifier.layoutId(index),
                         courseStack,
                     ) {
@@ -317,7 +317,7 @@ private fun ClassScheduleRowItem(
 }
 
 @Composable
-private fun ClassScheduleColumn(
+private fun CourseCalendarColumn(
     modifier: Modifier = Modifier,
     courses: ImmutableList<CourseStack>,
     content: @Composable () -> Unit,
@@ -354,7 +354,7 @@ private fun ClassScheduleColumn(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ClassScheduleColumnItem(
+private fun CourseCalendarColumnItem(
     modifier: Modifier = Modifier,
     courseStack: CourseStack,
     onClick: (ImmutableList<Course>) -> Unit
@@ -363,7 +363,7 @@ private fun ClassScheduleColumnItem(
     val courses = courseStack.courses
 
     if (courses.size == 1) {
-        ScheduleCardContent(
+        CalendarElement(
             modifier = modifier,
             courses = courses,
             onClick = { onClick(courses) },
@@ -372,7 +372,7 @@ private fun ClassScheduleColumnItem(
     } else if (courseStack.courses.size > 1) {
         // Conflict
         Box(modifier = modifier) {
-            ScheduleCardContent(
+            CalendarElement(
                 courses = courses,
                 onClick = { onClick(courses) },
                 span = span
@@ -393,7 +393,7 @@ private fun ClassScheduleColumnItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ScheduleCardContent(
+private fun CalendarElement(
     modifier: Modifier = Modifier,
     courses: ImmutableList<Course>,
     onClick: () -> Unit,
@@ -571,9 +571,9 @@ private val courseColors = listOf(
 
 @Preview
 @Composable
-private fun ClassSchedulePreview() {
+private fun CourseCalendarPreview() {
     IJhTheme {
         val courses = CourseRepositoryMock.getCourses()
-        ClassSchedule(courses = courses.toImmutableList(), highlight = true)
+        CourseCalendar(courses = courses.toImmutableList(), highlight = true)
     }
 }

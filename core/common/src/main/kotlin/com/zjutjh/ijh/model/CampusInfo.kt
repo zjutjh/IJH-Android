@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.ZonedDateTime
 
 @Stable
-data class WeJhInfo(
+data class CampusInfo(
     val term: Term,
     val year: Int,
     val termStartDate: LocalDate,

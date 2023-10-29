@@ -5,12 +5,9 @@ import com.zjutjh.ijh.network.service.WeJhZfService
 import com.zjutjh.ijh.network.service.request.GetClassTableBody
 import javax.inject.Inject
 
-/**
- * Data source proxy of ZF service
- */
-class ZfDataSource @Inject constructor(private val service: WeJhZfService) {
+class CourseNetworkDataSource @Inject constructor(private val service: WeJhZfService) {
 
-    suspend fun getClassTable(year: String, term: String): ZfClassTable = service.getClassTable(
+    suspend fun getZfClassTable(year: String, term: String): ZfClassTable = service.getClassTable(
         GetClassTableBody(year, term)
     )
 }

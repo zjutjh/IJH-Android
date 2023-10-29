@@ -12,6 +12,7 @@ message WeJhPreference {
 
   optional uint64 courses_last_sync_time = 4;
 
+  // Campus info
   message Info {
     uint32 year = 1;
     uint32 term = 2;

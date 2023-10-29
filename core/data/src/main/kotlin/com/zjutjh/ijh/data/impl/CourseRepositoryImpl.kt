@@ -9,7 +9,7 @@ import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
 import com.zjutjh.ijh.datastore.converter.toZonedDateTime
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Term
-import com.zjutjh.ijh.network.ZfDataSource
+import com.zjutjh.ijh.network.CourseNetworkDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -23,7 +23,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class CourseRepositoryImpl @Inject constructor(
-    private val zfDataSource: ZfDataSource,
+    private val networkDataSource: CourseNetworkDataSource,
     private val localPreference: WeJhPreferenceDataSource,
     private val dao: CourseDao,
 ) : CourseRepository {
@@ -52,7 +52,7 @@ class CourseRepositoryImpl @Inject constructor(
     override suspend fun sync(year: Int, term: Term) {
         val old = dao.getCourses(year, term).first()
 
-        val classTable = zfDataSource.getClassTable(year.toString(), term.value).lessonsTable
+        val classTable = networkDataSource.getZfClassTable(year.toString(), term.value).lessonsTable
         if (!classTable.isNullOrEmpty()) {
             val new = classTable.map { it.asLocalModel(year, term) }
 

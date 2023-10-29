@@ -1,7 +1,7 @@
 package com.zjutjh.ijh.ui.model
 
+import com.zjutjh.ijh.model.CampusInfo
 import com.zjutjh.ijh.model.Term
-import com.zjutjh.ijh.model.WeJhInfo
 import java.time.DayOfWeek
 import java.time.LocalDate
 
@@ -29,7 +29,7 @@ class TermDayState(
     }
 }
 
-fun WeJhInfo.toTermDayState(): TermDayState {
+fun CampusInfo.toTermDayState(): TermDayState {
     val date = LocalDate.now()
     val duration = date.toEpochDay() - termStartDate.toEpochDay()
     val week: Long = duration / 7L + 1L

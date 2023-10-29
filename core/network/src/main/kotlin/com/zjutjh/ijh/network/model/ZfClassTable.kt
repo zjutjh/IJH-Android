@@ -7,6 +7,9 @@ import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.CourseWeek
 import java.time.DayOfWeek
 
+/**
+ * **Note:** Due to Zf class table is network-only model, so omit the `Network` prefix.
+ */
 @JsonClass(generateAdapter = true)
 data class ZfClassTable(
     val info: Info,

@@ -3,8 +3,8 @@ package com.zjutjh.ijh.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zjutjh.ijh.data.CampusInfoRepository
 import com.zjutjh.ijh.data.CourseRepository
-import com.zjutjh.ijh.data.WeJhInfoRepository
 import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Session
@@ -26,7 +26,7 @@ import kotlin.time.toKotlinDuration
 class HomeViewModel @Inject constructor(
     weJhUserRepository: WeJhUserRepository,
     private val courseRepository: CourseRepository,
-    private val weJhInfoRepository: WeJhInfoRepository,
+    private val campusInfoRepository: CampusInfoRepository,
 ) : ViewModel() {
 
     private val timerFlow: Flow<Unit> = flow {
@@ -66,7 +66,7 @@ class HomeViewModel @Inject constructor(
     private val termLocalRefreshChannel: MutableStateFlow<Unit> = MutableStateFlow(Unit)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val termDayState: StateFlow<LoadResult<TermDayState?>> = weJhInfoRepository.infoStream
+    val termDayState: StateFlow<LoadResult<TermDayState?>> = campusInfoRepository.infoStream
         .combine(termLocalRefreshChannel) { t1, _ -> t1 }
         .mapLatest {
             it?.toTermDayState()
@@ -155,7 +155,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun refreshTerm(): Pair<Int, Term>? {
-        runCatching { weJhInfoRepository.sync() }
+        runCatching { campusInfoRepository.sync() }
             .fold({
                 Log.i("Home", "Sync WeJhInfo succeed.")
                 return it

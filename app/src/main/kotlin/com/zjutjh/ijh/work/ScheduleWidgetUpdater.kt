@@ -50,7 +50,7 @@ class ScheduleWidgetUpdater(
 
     override suspend fun doWork(): Result {
         val result = try {
-            val info = entryPoint.weJhInfoRepository.sync()
+            val info = entryPoint.campusInfoRepository.sync()
             entryPoint.courseRepository.sync(info.first, info.second)
 
             Log.i("ScheduleWidget", "Synced.")

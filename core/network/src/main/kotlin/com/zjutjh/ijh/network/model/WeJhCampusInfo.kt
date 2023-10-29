@@ -2,16 +2,16 @@ package com.zjutjh.ijh.network.model
 
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
-import com.zjutjh.ijh.model.WeJhInfo
+import com.zjutjh.ijh.model.CampusInfo
 import com.zjutjh.ijh.model.toTerm
 import java.time.LocalDate
 import java.time.ZonedDateTime
 
 /**
- * WeJH system Info
+ * WeJH campus info
  */
 @JsonClass(generateAdapter = true)
-data class NetworkWeJhInfo(
+data class WeJhCampusInfo(
     @Json(name = "is_begin")
     val isBegin: Boolean,
     val term: String,
@@ -22,8 +22,8 @@ data class NetworkWeJhInfo(
     val schoolBusUrl: String,
 )
 
-fun NetworkWeJhInfo.asExternalModel(): WeJhInfo =
-    WeJhInfo(
+fun WeJhCampusInfo.asExternalModel(): CampusInfo =
+    CampusInfo(
         term = term.toTerm(),
         year = termYear.toInt(),
         termStartDate = LocalDate.parse(termStartDate),

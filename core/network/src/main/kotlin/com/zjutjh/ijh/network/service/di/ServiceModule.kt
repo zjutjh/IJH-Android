@@ -3,7 +3,7 @@ package com.zjutjh.ijh.network.service.di
 import com.zjutjh.ijh.network.BuildConfig
 import com.zjutjh.ijh.network.di.DefaultOkHttpClient
 import com.zjutjh.ijh.network.di.WeJhAuthorizedOkHttpClient
-import com.zjutjh.ijh.network.service.WeJhService
+import com.zjutjh.ijh.network.service.WeJhBasicService
 import com.zjutjh.ijh.network.service.WeJhUserService
 import com.zjutjh.ijh.network.service.WeJhZfService
 import dagger.Module
@@ -30,7 +30,7 @@ object ServiceModule {
 
     @Provides
     @Singleton
-    fun provideWeJhService(@DefaultOkHttpClient client: OkHttpClient): WeJhService =
+    fun provideWeJhService(@DefaultOkHttpClient client: OkHttpClient): WeJhBasicService =
         retrofitWeJhServiceBuilder()
             .client(client)
             .build()

@@ -1,6 +1,6 @@
-package com.zjutjh.ijh.data.repository.mock
+package com.zjutjh.ijh.data.mock
 
-import com.zjutjh.ijh.data.repository.WeJhUserRepository
+import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.Session
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf

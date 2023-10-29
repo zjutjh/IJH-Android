@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.squareup.moshi.JsonDataException
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.repository.WeJhUserRepository
+import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.exception.ApiResponseException
 import com.zjutjh.ijh.exception.HttpStatusException
 import com.zjutjh.ijh.exception.WeJhApiExceptions

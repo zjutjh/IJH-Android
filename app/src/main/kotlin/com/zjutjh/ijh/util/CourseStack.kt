@@ -9,6 +9,9 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * Course stack is a data structure to store courses that have time conflict.
+ */
 @Stable
 class CourseStack(
     course: Course,

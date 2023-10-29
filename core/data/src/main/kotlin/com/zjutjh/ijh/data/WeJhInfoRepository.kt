@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.data.repository
+package com.zjutjh.ijh.data
 
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.model.WeJhInfo

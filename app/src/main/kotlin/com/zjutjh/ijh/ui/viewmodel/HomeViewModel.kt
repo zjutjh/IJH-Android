@@ -3,9 +3,9 @@ package com.zjutjh.ijh.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zjutjh.ijh.data.repository.CourseRepository
-import com.zjutjh.ijh.data.repository.WeJhInfoRepository
-import com.zjutjh.ijh.data.repository.WeJhUserRepository
+import com.zjutjh.ijh.data.CourseRepository
+import com.zjutjh.ijh.data.WeJhInfoRepository
+import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Session
 import com.zjutjh.ijh.model.Term

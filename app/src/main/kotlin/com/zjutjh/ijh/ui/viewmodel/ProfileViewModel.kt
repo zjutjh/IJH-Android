@@ -2,7 +2,7 @@ package com.zjutjh.ijh.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zjutjh.ijh.data.repository.WeJhUserRepository
+import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.WeJhUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted

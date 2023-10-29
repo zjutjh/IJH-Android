@@ -21,8 +21,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.zjutjh.ijh.R
-import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
+import com.zjutjh.ijh.data.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.model.TermDayState
@@ -89,18 +89,20 @@ fun ScheduleCard(
                 Text(
                     text = stringResource(id = R.string.schedule),
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
                 )
                 // Subtitle
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.outline,
+                    maxLines = 1,
                 )
             }
 
-            IconButton(
-                onClick = onCalendarClick
+            FilledIconButton(
+                onClick = onCalendarClick,
             ) {
                 Icon(
                     imageVector = Icons.Default.CalendarViewWeek,

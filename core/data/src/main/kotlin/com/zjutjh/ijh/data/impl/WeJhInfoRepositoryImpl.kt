@@ -1,5 +1,6 @@
-package com.zjutjh.ijh.data.repository
+package com.zjutjh.ijh.data.impl
 
+import com.zjutjh.ijh.data.WeJhInfoRepository
 import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
 import com.zjutjh.ijh.datastore.converter.asExternalModel
 import com.zjutjh.ijh.datastore.model.infoOrNull

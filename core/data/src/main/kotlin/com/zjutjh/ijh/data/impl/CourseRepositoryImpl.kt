@@ -1,7 +1,8 @@
-package com.zjutjh.ijh.data.repository
+package com.zjutjh.ijh.data.impl
 
-import com.zjutjh.ijh.data.model.asLocalModel
-import com.zjutjh.ijh.data.model.equalsIgnoreId
+import com.zjutjh.ijh.data.CourseRepository
+import com.zjutjh.ijh.data.converter.asLocalModel
+import com.zjutjh.ijh.data.converter.equalsIgnoreId
 import com.zjutjh.ijh.database.dao.CourseDao
 import com.zjutjh.ijh.database.model.CourseEntity
 import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource

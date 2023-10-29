@@ -23,7 +23,7 @@ fun Modifier.verticalScrollbar(
 
     val alpha by animateFloatAsState(
         targetValue = targetAlpha,
-        animationSpec = tween(durationMillis = duration)
+        animationSpec = tween(durationMillis = duration), label = "scrollbarTransition"
     )
 
     val color = MaterialTheme.colorScheme.outline

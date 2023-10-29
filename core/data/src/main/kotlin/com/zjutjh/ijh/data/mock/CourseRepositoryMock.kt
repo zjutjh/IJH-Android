@@ -1,6 +1,6 @@
-package com.zjutjh.ijh.data.repository.mock
+package com.zjutjh.ijh.data.mock
 
-import com.zjutjh.ijh.data.repository.CourseRepository
+import com.zjutjh.ijh.data.CourseRepository
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.CourseWeek
 import com.zjutjh.ijh.model.Term

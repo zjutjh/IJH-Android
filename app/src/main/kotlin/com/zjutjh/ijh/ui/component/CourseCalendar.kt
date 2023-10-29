@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.os.LocaleListCompat
-import com.zjutjh.ijh.data.repository.mock.CourseRepositoryMock
+import com.zjutjh.ijh.data.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Section
 import com.zjutjh.ijh.ui.theme.Blue0

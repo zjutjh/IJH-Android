@@ -1,4 +1,4 @@
-package com.zjutjh.ijh.data.model
+package com.zjutjh.ijh.data.converter
 
 import com.zjutjh.ijh.datastore.model.WeJhPreferenceKt
 import com.zjutjh.ijh.model.toTerm

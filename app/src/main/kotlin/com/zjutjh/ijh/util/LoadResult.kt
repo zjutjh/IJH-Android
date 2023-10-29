@@ -1,10 +1,17 @@
 package com.zjutjh.ijh.util
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 
 sealed interface LoadResult<out T> {
-    object Loading : LoadResult<Nothing>
+    data object Loading : LoadResult<Nothing>
     class Ready<T>(val data: T) : LoadResult<T>
 
     fun <T> isEqual(v: LoadResult<T>): Boolean =

@@ -4,6 +4,7 @@ import com.zjutjh.ijh.network.BuildConfig
 import com.zjutjh.ijh.network.di.DefaultOkHttpClient
 import com.zjutjh.ijh.network.di.WeJhAuthorizedOkHttpClient
 import com.zjutjh.ijh.network.service.WeJhBasicService
+import com.zjutjh.ijh.network.service.WeJhCardService
 import com.zjutjh.ijh.network.service.WeJhUserService
 import com.zjutjh.ijh.network.service.WeJhZfService
 import dagger.Module
@@ -24,14 +25,12 @@ object ServiceModule {
         Retrofit.Builder()
             .addConverterFactory(MoshiConverterFactory.create())
 
-    private fun retrofitWeJhServiceBuilder(): Retrofit.Builder =
-        retrofitCommonBuilder()
-            .baseUrl(BuildConfig.WE_JH_API_BASE_URL)
 
     @Provides
     @Singleton
-    fun provideWeJhService(@DefaultOkHttpClient client: OkHttpClient): WeJhBasicService =
-        retrofitWeJhServiceBuilder()
+    fun provideWeJhBasicService(@DefaultOkHttpClient client: OkHttpClient): WeJhBasicService =
+        retrofitCommonBuilder()
+            .baseUrl(BuildConfig.WE_JH_API_BASE_URL)
             .client(client)
             .build()
             .create()
@@ -42,7 +41,7 @@ object ServiceModule {
     fun provideWeJhUserService(
         @WeJhAuthorizedOkHttpClient client: OkHttpClient
     ): WeJhUserService =
-        retrofitWeJhServiceBuilder()
+        retrofitCommonBuilder()
             .baseUrl(BuildConfig.WE_JH_API_BASE_URL + "user/")
             .client(client)
             .build()
@@ -55,6 +54,17 @@ object ServiceModule {
     ): WeJhZfService =
         retrofitCommonBuilder()
             .baseUrl(BuildConfig.WE_JH_API_BASE_URL + "func/zf/")
+            .client(client)
+            .build()
+            .create()
+
+    @Provides
+    @Singleton
+    fun provideWeJhCardService(
+        @WeJhAuthorizedOkHttpClient client: OkHttpClient
+    ): WeJhCardService =
+        retrofitCommonBuilder()
+            .baseUrl(BuildConfig.WE_JH_API_BASE_URL + "func/card/")
             .client(client)
             .build()
             .create()

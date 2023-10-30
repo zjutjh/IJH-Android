@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.CampusInfoRepository
+import com.zjutjh.ijh.data.CardInfoRepository
 import com.zjutjh.ijh.data.CourseRepository
 import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
@@ -27,6 +28,7 @@ class HomeViewModel @Inject constructor(
     weJhUserRepository: WeJhUserRepository,
     private val courseRepository: CourseRepository,
     private val campusInfoRepository: CampusInfoRepository,
+    private val cardInfoRepository: CardInfoRepository,
 ) : ViewModel() {
 
     private val timerFlow: Flow<Unit> = flow {
@@ -95,9 +97,24 @@ class HomeViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000)
         )
 
+    val cardBalanceState: StateFlow<Pair<String, Duration>?> = cardInfoRepository.balanceStream
+        .distinctUntilChanged()
+        .combine(timerFlow) { t, _ -> t }
+        .map {
+            if (it == null) null else {
+                Pair(it.first, Duration.between(it.second, ZonedDateTime.now()))
+            }
+        }
+        .flowOn(Dispatchers.Default)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = null
+        )
+
     init {
         viewModelScope.launch(Dispatchers.Default) {
-            // Check session state
+            // Check session state, renew if needed. TODO: move to application scope
             val session = loginState.first()
             if (session != null) {
                 val duration = Duration.between(ZonedDateTime.now(), session.expiresAt)
@@ -110,15 +127,14 @@ class HomeViewModel @Inject constructor(
                         weJhUserRepository.renewSession()
                         Log.i("Home", "WeJH Session renewed.")
                     } catch (e: Exception) {
-                        Log.e("Home", "Failed to renew WeJH Session: $e")
+                        Log.e("Home", "Failed to renew WeJH Session.", e)
                     }
                 }
             }
             // Subscribe latest login state, and trigger refresh.
-            loginState
-                .collectLatest {
-                    refreshAll(this)
-                }
+            loginState.collectLatest {
+                refreshAll(this)
+            }
         }
     }
 
@@ -146,6 +162,7 @@ class HomeViewModel @Inject constructor(
             if (term != null) {
                 refreshCourse(term.first, term.second)
             }
+            refreshCard()
         }
 
         Log.i("Home", "Synchronization complete.")
@@ -160,7 +177,7 @@ class HomeViewModel @Inject constructor(
                 Log.i("Home", "Sync WeJhInfo succeed.")
                 return it
             }) {
-                Log.e("Home", "Sync WeJhInfo failed: $it")
+                Log.e("Home", "Sync WeJhInfo failed.", it)
                 // Run local refresh when failed
                 termLocalRefreshChannel.emit(Unit)
                 if (termDayState.value is LoadResult.Ready) {
@@ -179,7 +196,17 @@ class HomeViewModel @Inject constructor(
         }.fold({
             Log.i("Home", "Sync Courses succeed.")
         }) {
-            Log.e("Home", "Sync Courses failed: $it")
+            Log.e("Home", "Sync Courses failed.", it)
+        }
+    }
+
+    private suspend fun refreshCard() {
+        runCatching {
+            cardInfoRepository.sync()
+        }.fold({
+            Log.i("Home", "Sync Card succeed.")
+        }) {
+            Log.e("Home", "Sync Card failed.", it)
         }
     }
 

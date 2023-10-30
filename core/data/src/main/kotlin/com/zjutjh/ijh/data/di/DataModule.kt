@@ -1,9 +1,11 @@
 package com.zjutjh.ijh.data.di
 
 import com.zjutjh.ijh.data.CampusInfoRepository
+import com.zjutjh.ijh.data.CardInfoRepository
 import com.zjutjh.ijh.data.CourseRepository
 import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.data.impl.CampusInfoRepositoryImpl
+import com.zjutjh.ijh.data.impl.CardInfoRepositoryImpl
 import com.zjutjh.ijh.data.impl.CourseRepositoryImpl
 import com.zjutjh.ijh.data.impl.WeJhUserRepositoryImpl
 import dagger.Binds
@@ -23,4 +25,7 @@ interface DataModule {
 
     @Binds
     fun bindWeJhInfoRepository(impl: CampusInfoRepositoryImpl): CampusInfoRepository
+
+    @Binds
+    fun bindCardInfoRepository(impl: CardInfoRepositoryImpl): CardInfoRepository
 }

@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import com.zjutjh.ijh.datastore.converter.asLocalModel
 import com.zjutjh.ijh.datastore.model.LocalSession
 import com.zjutjh.ijh.datastore.model.WeJhPreference
+import com.zjutjh.ijh.datastore.model.WeJhPreferenceKt
 import com.zjutjh.ijh.datastore.model.copy
 import com.zjutjh.ijh.model.CampusInfo
 import com.zjutjh.ijh.model.WeJhUser
@@ -58,7 +59,7 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
             }
         }
 
-    suspend fun setInfo(info: WeJhPreference.Info) =
+    private suspend fun setInfo(info: WeJhPreference.Info) =
         dataStore.updateData {
             it.copy {
                 this.info = info
@@ -88,4 +89,25 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
                 clearSession()
             }
         }
+
+    private suspend fun setCard(card: WeJhPreference.Card) =
+        dataStore.updateData {
+            it.copy {
+                this.card = card
+            }
+        }
+
+    suspend fun setCard(balance: String, syncTime: ZonedDateTime) =
+        setCard(WeJhPreferenceKt.card {
+            this.balance = balance
+            lastSyncTime = syncTime.toEpochSecond()
+        })
+
+    suspend fun deleteCard() =
+        dataStore.updateData {
+            it.copy {
+                clearCard()
+            }
+        }
+
 }

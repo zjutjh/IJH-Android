@@ -12,6 +12,8 @@ message WeJhPreference {
 
   optional uint64 courses_last_sync_time = 4;
 
+  optional Card card = 5;
+
   // Campus info
   message Info {
     uint32 year = 1;
@@ -19,6 +21,11 @@ message WeJhPreference {
     uint64 term_start_date = 3;
     uint64 last_sync_time = 4;
     string school_bus_url = 5;
+  }
+
+  message Card {
+    string balance = 1;
+    uint64 last_sync_time = 2;
   }
 
   message User {

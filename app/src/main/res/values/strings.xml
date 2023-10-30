@@ -37,8 +37,8 @@
     <string name="collapse">Collapse</string>
     <string name="day_ago">" day(s) ago"</string>
     <string name="hour_ago">" hour(s) ago"</string>
-    <string name="minute_ago">" minute(s) ago"</string>
-    <string name="second_ago">" second(s) ago"</string>
+    <string name="minute_ago">" min ago"</string>
+    <string name="second_ago">" sec ago"</string>
     <string name="just">Just</string>
     <string name="never">Never</string>
     <string name="loading">Loading…</string>
@@ -71,4 +71,7 @@
     <string name="service_url" translatable="false">https://github.com/zjutjh/WeJH-Go</string>
     <string name="project_url" translatable="false">https://github.com/I-Info/IJH-Android</string>
     <string name="app_widget_schedule_description">Schedule</string>
+    <string name="more">More</string>
+    <string name="balance">Balance</string>
+    <string name="campus_card">Campus Card</string>
 </resources>

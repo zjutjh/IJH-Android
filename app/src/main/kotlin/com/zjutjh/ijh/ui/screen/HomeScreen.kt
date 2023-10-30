@@ -52,6 +52,7 @@ import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Term
+import com.zjutjh.ijh.ui.component.CampusCardInfoCard
 import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.model.TermDayState
@@ -76,6 +77,7 @@ fun HomeRoute(
     val coursesState by viewModel.coursesState.collectAsStateWithLifecycle()
     val termDayState by viewModel.termDayState.collectAsStateWithLifecycle()
     val coursesLastSyncState by viewModel.courseLastSyncState.collectAsStateWithLifecycle()
+    val cardBalanceState by viewModel.cardBalanceState.collectAsStateWithLifecycle()
 
     val isLoggedIn = when (loginState) {
         null -> false
@@ -98,6 +100,7 @@ fun HomeRoute(
         courses = courses,
         termDay = termDay,
         coursesLastSyncDuration = coursesLastSyncState,
+        cardBalance = cardBalanceState,
         onRefresh = viewModel::refreshAll,
         onNavigateToLogin = onNavigateToLogin,
         onNavigateToProfile = onNavigateToProfile,
@@ -113,6 +116,7 @@ private fun HomeScreen(
     courses: List<Course>?,
     termDay: TermDayState?,
     coursesLastSyncDuration: Duration?,
+    cardBalance: Pair<String, Duration>?,
     onRefresh: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -139,15 +143,20 @@ private fun HomeScreen(
         Column(
             modifier = Modifier.padding(paddingValues)
         ) {
-
+            val modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .fillMaxWidth()
             ScheduleCard(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
+                modifier = modifier,
                 courses = courses,
                 termDay = termDay,
-                onCalendarClick = onNavigateToCalendar,
+                onButtonClick = onNavigateToCalendar,
                 lastSyncDuration = coursesLastSyncDuration,
+            )
+            CampusCardInfoCard(
+                modifier = modifier,
+                balance = cardBalance?.first,
+                lastSyncDuration = cardBalance?.second
             )
         }
 
@@ -339,31 +348,15 @@ private fun HomeScreenPreview() {
         HomeScreen(
             refreshing = false,
             isLoggedIn = true,
-            courses,
-            termDay,
-            Duration.ofDays(1),
-            {},
-            {},
-            {},
-            {}) {}
-    }
-}
-
-@Preview(heightDp = 400)
-@Composable
-private fun HomeScrollPreview() {
-    val courses = CourseRepositoryMock.getCourses()
-    val termDay = TermDayState(2023, Term.FIRST, 1, true, DayOfWeek.MONDAY)
-    IJhTheme {
-        HomeScreen(
-            refreshing = false,
-            isLoggedIn = true,
-            courses,
-            termDay,
-            Duration.ofDays(1),
-            {},
-            {},
-            {},
-            {}) {}
+            courses = courses,
+            termDay = termDay,
+            coursesLastSyncDuration = Duration.ofDays(1),
+            cardBalance = "123" to Duration.ofDays(2),
+            onRefresh = ::emptyFun,
+            onNavigateToAbout = ::emptyFun,
+            onNavigateToCalendar = ::emptyFun,
+            onNavigateToLogin = ::emptyFun,
+            onNavigateToProfile = ::emptyFun,
+        )
     }
 }

@@ -67,4 +67,7 @@
     <string name="about">关于</string>
     <string name="about_text">客户端由 [dev] 开发，服务由 [serv] 提供。</string>
     <string name="app_widget_schedule_description">今日课程</string>
+    <string name="more">更多</string>
+    <string name="balance">余额</string>
+    <string name="campus_card">校园卡</string>
 </resources>

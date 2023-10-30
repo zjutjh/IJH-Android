@@ -78,6 +78,7 @@ fun HomeRoute(
     val termDayState by viewModel.termDayState.collectAsStateWithLifecycle()
     val coursesLastSyncState by viewModel.courseLastSyncState.collectAsStateWithLifecycle()
     val cardBalanceState by viewModel.cardBalanceState.collectAsStateWithLifecycle()
+    val cardBalanceLastSyncState by viewModel.cardBalanceLastSyncState.collectAsStateWithLifecycle()
 
     val isLoggedIn = when (loginState) {
         null -> false
@@ -99,8 +100,9 @@ fun HomeRoute(
         isLoggedIn = isLoggedIn,
         courses = courses,
         termDay = termDay,
-        coursesLastSyncDuration = coursesLastSyncState,
+        coursesLastSync = coursesLastSyncState,
         cardBalance = cardBalanceState,
+        cardBalanceLastSync = cardBalanceLastSyncState,
         onRefresh = viewModel::refreshAll,
         onNavigateToLogin = onNavigateToLogin,
         onNavigateToProfile = onNavigateToProfile,
@@ -115,8 +117,9 @@ private fun HomeScreen(
     isLoggedIn: Boolean?,
     courses: List<Course>?,
     termDay: TermDayState?,
-    coursesLastSyncDuration: Duration?,
-    cardBalance: Pair<String, Duration>?,
+    coursesLastSync: Duration?,
+    cardBalance: LoadResult<String?>,
+    cardBalanceLastSync: LoadResult<Duration?>,
     onRefresh: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -151,12 +154,12 @@ private fun HomeScreen(
                 courses = courses,
                 termDay = termDay,
                 onButtonClick = onNavigateToCalendar,
-                lastSyncDuration = coursesLastSyncDuration,
+                lastSync = coursesLastSync,
             )
             CampusCardInfoCard(
                 modifier = modifier,
-                balance = cardBalance?.first,
-                lastSyncDuration = cardBalance?.second
+                balance = cardBalance,
+                lastSync = cardBalanceLastSync,
             )
         }
 
@@ -350,8 +353,9 @@ private fun HomeScreenPreview() {
             isLoggedIn = true,
             courses = courses,
             termDay = termDay,
-            coursesLastSyncDuration = Duration.ofDays(1),
-            cardBalance = "123" to Duration.ofDays(2),
+            coursesLastSync = Duration.ofDays(1),
+            cardBalance = LoadResult.Ready("123"),
+            cardBalanceLastSync = LoadResult.Ready(Duration.ofDays(2)),
             onRefresh = ::emptyFun,
             onNavigateToAbout = ::emptyFun,
             onNavigateToCalendar = ::emptyFun,

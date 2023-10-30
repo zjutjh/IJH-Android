@@ -21,18 +21,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.ui.theme.IJhTheme
+import com.zjutjh.ijh.util.LoadResult
 import com.zjutjh.ijh.util.toLocalizedString
 import java.time.Duration
 
 @Composable
 fun CampusCardInfoCard(
     modifier: Modifier = Modifier,
-    balance: String?,
-    lastSyncDuration: Duration?
+    balance: LoadResult<String?>,
+    lastSync: LoadResult<Duration?>,
 ) {
     val context = LocalContext.current
-    val subtitle = remember(lastSyncDuration) {
-        prompt(context, lastSyncDuration)
+    val subtitle = remember(lastSync) {
+        prompt(context, lastSync)
     }
 
     GlanceCard(
@@ -50,7 +51,7 @@ fun CampusCardInfoCard(
             label = "Loading",
         ) {
             when (it) {
-                null -> Column(
+                is LoadResult.Loading -> Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressIndicator()
@@ -60,11 +61,17 @@ fun CampusCardInfoCard(
                     )
                 }
 
-                else -> {
+                is LoadResult.Ready -> {
+                    val text = if (it.data == null) {
+                        "N/A"
+                    } else {
+                        "¥${it.data}"
+                    }
+
                     Text(
                         modifier = Modifier.padding(vertical = 8.dp),
                         color = MaterialTheme.colorScheme.primary,
-                        text = "¥$it",
+                        text = text,
                         style = MaterialTheme.typography.displaySmall,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
@@ -75,15 +82,21 @@ fun CampusCardInfoCard(
     }
 }
 
-private fun prompt(context: Context, lastSyncDuration: Duration?) =
+private fun prompt(context: Context, lastSyncDuration: LoadResult<Duration?>) =
     buildString {
         val separator = " • "
         append(context.getString(R.string.balance))
         append(separator)
-        if (lastSyncDuration != null) {
-            append(lastSyncDuration.toLocalizedString(context))
-        } else {
-            append(context.getString(R.string.never))
+        when (lastSyncDuration) {
+            is LoadResult.Loading -> append(context.getString(R.string.unknown))
+            is LoadResult.Ready -> {
+                val duration = lastSyncDuration.data
+                if (duration != null) {
+                    append(duration.toLocalizedString(context))
+                } else {
+                    append(context.getString(R.string.never))
+                }
+            }
         }
     }
 
@@ -92,7 +105,10 @@ private fun prompt(context: Context, lastSyncDuration: Duration?) =
 @Composable
 private fun CampusCardInfoCardPreview() {
     IJhTheme {
-        CampusCardInfoCard(balance = "123", lastSyncDuration = Duration.ofDays(1))
+        CampusCardInfoCard(
+            balance = LoadResult.Ready("123"),
+            lastSync = LoadResult.Ready(Duration.ofSeconds(10))
+        )
     }
 }
 
@@ -100,6 +116,6 @@ private fun CampusCardInfoCardPreview() {
 @Composable
 private fun CampusCardInfoCardPreviewEmpty() {
     IJhTheme {
-        CampusCardInfoCard(balance = null, lastSyncDuration = null)
+        CampusCardInfoCard(balance = LoadResult.Loading, lastSync = LoadResult.Loading)
     }
 }

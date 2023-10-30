@@ -19,10 +19,12 @@ class CardInfoRepositoryImpl @Inject constructor(
     private val local: WeJhPreferenceDataSource
 ) : CardInfoRepository {
 
-    override val balanceStream: Flow<Pair<String, ZonedDateTime>?> = local.data.map {
-        it.cardOrNull?.let { card ->
-            Pair(card.balance, card.lastSyncTime.toZonedDateTime())
-        }
+    override val balanceStream: Flow<String?> = local.data.map {
+        it.cardOrNull?.balance
+    }
+
+    override val lastSyncTimeStream: Flow<ZonedDateTime?> = local.data.map {
+        it.cardOrNull?.lastSyncTime?.toZonedDateTime()
     }
 
     override suspend fun sync() {

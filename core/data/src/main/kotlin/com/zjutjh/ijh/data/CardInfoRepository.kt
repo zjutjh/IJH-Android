@@ -8,9 +8,11 @@ import java.util.Date
 interface CardInfoRepository {
 
     /**
-     * [Pair]: balance (Unit: CNY) in string, last sync time
+     * balance (Unit: CNY) in string
      */
-    val balanceStream: Flow<Pair<String, ZonedDateTime>?>
+    val balanceStream: Flow<String?>
+
+    val lastSyncTimeStream: Flow<ZonedDateTime?>
 
     suspend fun sync()
 

@@ -22,7 +22,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build
+        run: ./gradlew assembleRelease
 
       - name: Publish Release
         uses: softprops/action-gh-release@v1

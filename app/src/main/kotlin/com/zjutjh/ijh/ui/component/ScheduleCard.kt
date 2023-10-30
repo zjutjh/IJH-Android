@@ -50,13 +50,13 @@ fun ScheduleCard(
     modifier: Modifier = Modifier,
     courses: List<Course>?,
     termDay: TermDayState?,
-    lastSyncDuration: Duration?,
+    lastSync: Duration?,
     onButtonClick: () -> Unit,
 ) {
     val context = LocalContext.current
 
-    val subtitle = remember(termDay, lastSyncDuration) {
-        prompt(context, termDay, lastSyncDuration)
+    val subtitle = remember(termDay, lastSync) {
+        prompt(context, termDay, lastSync)
     }
 
     GlanceCard(
@@ -226,7 +226,7 @@ private fun ScheduleSurfacePreview() {
                 courses = CourseRepositoryMock.getCourses(),
                 onButtonClick = {},
                 termDay = termDay,
-                lastSyncDuration = Duration.ofDays(2),
+                lastSync = Duration.ofDays(2),
             )
         }
     }
@@ -242,7 +242,7 @@ private fun ScheduleSurfaceEmptyPreview() {
                 courses = emptyList(),
                 onButtonClick = {},
                 termDay = null,
-                lastSyncDuration = Duration.ofDays(1),
+                lastSync = Duration.ofDays(1),
             )
         }
     }
@@ -258,7 +258,7 @@ private fun ScheduleSurfaceLoadingPreview() {
                 courses = null,
                 onButtonClick = {},
                 termDay = null,
-                lastSyncDuration = Duration.ofDays(1),
+                lastSync = Duration.ofDays(1),
             )
         }
     }

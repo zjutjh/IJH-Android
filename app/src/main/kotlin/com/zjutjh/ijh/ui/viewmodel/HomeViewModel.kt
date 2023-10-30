@@ -42,9 +42,7 @@ class HomeViewModel @Inject constructor(
         .distinctUntilChanged()
         .combine(timerFlow) { t1, _ -> t1 }
         .map {
-            if (it == null) null else {
-                Duration.between(it, ZonedDateTime.now())
-            }
+            it?.let { Duration.between(it, ZonedDateTime.now()) }
         }
         .flowOn(Dispatchers.Default)
         .stateIn(
@@ -73,7 +71,6 @@ class HomeViewModel @Inject constructor(
         .mapLatest {
             it?.toTermDayState()
         }
-        .flowOn(Dispatchers.Default)
         .asLoadResultStateFlow(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
@@ -91,26 +88,29 @@ class HomeViewModel @Inject constructor(
                 } else flowOf(emptyList())
             } else flowOf(emptyList())
         }
-        .flowOn(Dispatchers.Default)
         .asLoadResultStateFlow(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000)
         )
 
-    val cardBalanceState: StateFlow<Pair<String, Duration>?> = cardInfoRepository.balanceStream
+    val cardBalanceState: StateFlow<LoadResult<String?>> = cardInfoRepository.balanceStream
         .distinctUntilChanged()
-        .combine(timerFlow) { t, _ -> t }
-        .map {
-            if (it == null) null else {
-                Pair(it.first, Duration.between(it.second, ZonedDateTime.now()))
-            }
-        }
-        .flowOn(Dispatchers.Default)
-        .stateIn(
+        .asLoadResultStateFlow(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = null
         )
+
+    val cardBalanceLastSyncState: StateFlow<LoadResult<Duration?>> =
+        cardInfoRepository.lastSyncTimeStream
+            .distinctUntilChanged()
+            .combine(timerFlow) { t1, _ -> t1 }
+            .map {
+                it?.let { Duration.between(it, ZonedDateTime.now()) }
+            }
+            .asLoadResultStateFlow(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000)
+            )
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
@@ -131,7 +131,7 @@ class HomeViewModel @Inject constructor(
                     }
                 }
             }
-            // Subscribe latest login state, and trigger refresh.
+            //Subscribe latest login state, and trigger refresh.
             loginState.collectLatest {
                 refreshAll(this)
             }
@@ -155,19 +155,25 @@ class HomeViewModel @Inject constructor(
         _refreshState.update { true }
         val timer = scope.async { delay(300L) }
 
-        val term = refreshTerm()
-
         val isLoggedIn = loginState.value
-        if (isLoggedIn != null) {
-            if (term != null) {
-                refreshCourse(term.first, term.second)
+        val tasks = if (isLoggedIn != null) {
+            val task1 = scope.async {
+                val term = refreshTerm()
+                if (term != null) {
+                    refreshCourse(term.first, term.second)
+                }
             }
-            refreshCard()
+            val task2 = scope.async {
+                refreshCard()
+            }
+            mutableListOf(task1, task2)
+        } else {
+            mutableListOf()
         }
 
+        tasks.add(timer)
+        awaitAll(deferreds = tasks.toTypedArray())
         Log.i("Home", "Synchronization complete.")
-
-        timer.await()
         _refreshState.update { false }
     }
 

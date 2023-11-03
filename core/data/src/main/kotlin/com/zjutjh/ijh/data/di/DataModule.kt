@@ -3,10 +3,12 @@ package com.zjutjh.ijh.data.di
 import com.zjutjh.ijh.data.CampusRepository
 import com.zjutjh.ijh.data.CardRepository
 import com.zjutjh.ijh.data.CourseRepository
+import com.zjutjh.ijh.data.ElectricityRepository
 import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.data.impl.CampusRepositoryImpl
 import com.zjutjh.ijh.data.impl.CardRepositoryImpl
 import com.zjutjh.ijh.data.impl.CourseRepositoryImpl
+import com.zjutjh.ijh.data.impl.ElectricityRepositoryImpl
 import com.zjutjh.ijh.data.impl.WeJhUserRepositoryImpl
 import dagger.Binds
 import dagger.Module
@@ -24,8 +26,11 @@ interface DataModule {
     fun bindWeJhUserRepository(impl: WeJhUserRepositoryImpl): WeJhUserRepository
 
     @Binds
-    fun bindWeJhInfoRepository(impl: CampusRepositoryImpl): CampusRepository
+    fun bindCampusRepository(impl: CampusRepositoryImpl): CampusRepository
 
     @Binds
-    fun bindCardInfoRepository(impl: CardRepositoryImpl): CardRepository
+    fun bindCardRepository(impl: CardRepositoryImpl): CardRepository
+
+    @Binds
+    fun bindElectricityRepository(impl: ElectricityRepositoryImpl): ElectricityRepository
 }

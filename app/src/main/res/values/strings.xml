@@ -74,4 +74,6 @@
     <string name="more">More</string>
     <string name="balance">Balance</string>
     <string name="campus_card">Campus Card</string>
+    <string name="dorm_electricity">Dorm Electricity</string>
+    <string name="status">Satus</string>
 </resources>

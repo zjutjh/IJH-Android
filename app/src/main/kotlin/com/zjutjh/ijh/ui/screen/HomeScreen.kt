@@ -51,8 +51,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zjutjh.ijh.R
 import com.zjutjh.ijh.data.mock.CourseRepositoryMock
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.ElectricityBalance
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.component.CampusCardInfoCard
+import com.zjutjh.ijh.ui.component.ElectricityStatusCard
 import com.zjutjh.ijh.ui.component.IJhScaffold
 import com.zjutjh.ijh.ui.component.ScheduleCard
 import com.zjutjh.ijh.ui.model.TermDayState
@@ -79,6 +81,7 @@ fun HomeRoute(
     val coursesLastSyncState by viewModel.courseLastSyncState.collectAsStateWithLifecycle()
     val cardBalanceState by viewModel.cardBalanceState.collectAsStateWithLifecycle()
     val cardBalanceLastSyncState by viewModel.cardBalanceLastSyncState.collectAsStateWithLifecycle()
+    val electricityBalance by viewModel.electricityState.collectAsStateWithLifecycle()
 
     val isLoggedIn = when (loginState) {
         null -> false
@@ -103,6 +106,7 @@ fun HomeRoute(
         coursesLastSync = coursesLastSyncState,
         cardBalance = cardBalanceState,
         cardBalanceLastSync = cardBalanceLastSyncState,
+        electricityBalance = electricityBalance,
         onRefresh = viewModel::refreshAll,
         onNavigateToLogin = onNavigateToLogin,
         onNavigateToProfile = onNavigateToProfile,
@@ -120,6 +124,7 @@ private fun HomeScreen(
     coursesLastSync: Duration?,
     cardBalance: LoadResult<String?>,
     cardBalanceLastSync: LoadResult<Duration?>,
+    electricityBalance: LoadResult<ElectricityBalance?>,
     onRefresh: () -> Unit,
     onNavigateToLogin: () -> Unit,
     onNavigateToProfile: () -> Unit,
@@ -161,6 +166,7 @@ private fun HomeScreen(
                 balance = cardBalance,
                 lastSync = cardBalanceLastSync,
             )
+            ElectricityStatusCard(modifier = modifier, balance = electricityBalance)
         }
 
         PullRefreshIndicator(
@@ -347,6 +353,14 @@ private fun NavigationDrawerPreview() {
 private fun HomeScreenPreview() {
     val courses = CourseRepositoryMock.getCourses()
     val termDay = TermDayState(2023, Term.FIRST, 1, true, DayOfWeek.MONDAY)
+    val electricityBalance = ElectricityBalance(
+        total = 200f,
+        totalAmount = 100f,
+        subsidy = 100f,
+        subsidyAmount = 50f,
+        surplus = 100f,
+        surplusAmount = 50f
+    )
     IJhTheme {
         HomeScreen(
             refreshing = false,
@@ -356,6 +370,7 @@ private fun HomeScreenPreview() {
             coursesLastSync = Duration.ofDays(1),
             cardBalance = LoadResult.Ready("123"),
             cardBalanceLastSync = LoadResult.Ready(Duration.ofDays(2)),
+            electricityBalance = LoadResult.Ready(electricityBalance),
             onRefresh = ::emptyFun,
             onNavigateToAbout = ::emptyFun,
             onNavigateToCalendar = ::emptyFun,

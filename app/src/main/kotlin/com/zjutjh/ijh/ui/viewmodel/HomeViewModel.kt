@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.zjutjh.ijh.data.CampusRepository
 import com.zjutjh.ijh.data.CardRepository
 import com.zjutjh.ijh.data.CourseRepository
+import com.zjutjh.ijh.data.ElectricityRepository
 import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
+import com.zjutjh.ijh.model.ElectricityBalance
 import com.zjutjh.ijh.model.Session
 import com.zjutjh.ijh.model.Term
 import com.zjutjh.ijh.ui.model.TermDayState
@@ -29,6 +31,7 @@ class HomeViewModel @Inject constructor(
     private val courseRepository: CourseRepository,
     private val campusRepository: CampusRepository,
     private val cardRepository: CardRepository,
+    private val electricityRepository: ElectricityRepository,
 ) : ViewModel() {
 
     private val timerFlow: Flow<Unit> = flow {
@@ -79,7 +82,7 @@ class HomeViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     val coursesState: StateFlow<LoadResult<List<Course>>> = termDayState
         .dropWhile(LoadResult<*>::isLoading)
-        .distinctUntilChanged(LoadResult<*>::isEqual)
+        .distinctUntilChanged()
         .flatMapLatest { state ->
             if (state is LoadResult.Ready && state.data != null) {
                 val day = state.data
@@ -111,6 +114,11 @@ class HomeViewModel @Inject constructor(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000)
             )
+
+    private val _electricityState: MutableStateFlow<LoadResult<ElectricityBalance?>> =
+        MutableStateFlow(LoadResult.Loading)
+    val electricityState: StateFlow<LoadResult<ElectricityBalance?>> =
+        _electricityState.asStateFlow()
 
     init {
         viewModelScope.launch(Dispatchers.Default) {
@@ -166,7 +174,8 @@ class HomeViewModel @Inject constructor(
             val task2 = scope.async {
                 refreshCard()
             }
-            mutableListOf(task1, task2)
+            val task3 = scope.async { refreshElectricity() }
+            mutableListOf(task1, task2, task3)
         } else {
             mutableListOf()
         }
@@ -216,4 +225,17 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private suspend fun refreshElectricity() {
+        runCatching {
+            electricityRepository.getBalance()
+        }.fold({ balance ->
+            _electricityState.emit(LoadResult.Ready(balance))
+            Log.i("Home", "Sync Electricity succeed.")
+        }) {
+            _electricityState.update { state ->
+                if (state is LoadResult.Loading) LoadResult.Ready(null) else state
+            }
+            Log.e("Home", "Sync Electricity failed.", it)
+        }
+    }
 }

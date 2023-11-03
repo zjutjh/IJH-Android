@@ -70,4 +70,6 @@
     <string name="more">更多</string>
     <string name="balance">余额</string>
     <string name="campus_card">校园卡</string>
+    <string name="dorm_electricity">寝室电费</string>
+    <string name="status">状态</string>
 </resources>

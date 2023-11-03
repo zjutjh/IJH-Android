@@ -15,25 +15,32 @@ import kotlinx.coroutines.flow.stateIn
 import kotlin.coroutines.CoroutineContext
 
 @Stable
-sealed interface LoadResult<out T> {
-    data object Loading : LoadResult<Nothing>
-    class Ready<T>(val data: T) : LoadResult<T>
+sealed class LoadResult<out T> {
+    data object Loading : LoadResult<Nothing>()
+    class Ready<T>(val data: T) : LoadResult<T>()
 
-    fun <T> isEqual(v: LoadResult<T>): Boolean =
-        if (this is Ready && v is Ready) {
-            this.data == v.data
-        } else this is Loading && v is Loading
-
-    fun <R> isEqual(v: LoadResult<R>, areEquivalent: (left: T, right: R) -> Boolean): Boolean =
-        if (this is Ready && v is Ready) {
-            areEquivalent(this.data, v.data)
-        } else this is Loading && v is Loading
+    override fun equals(other: Any?): Boolean {
+        if (other !is LoadResult<*>) {
+            return false
+        }
+        return when (this) {
+            is Loading -> other is Loading
+            is Ready<*> -> other is Ready<*> && this.data == other.data
+        }
+    }
 
     fun <R> map(transform: (T) -> R): LoadResult<R> =
         when (this) {
             is Loading -> Loading
             is Ready -> Ready(transform(data))
         }
+
+    override fun hashCode(): Int {
+        return when (this) {
+            is Loading -> javaClass.hashCode()
+            is Ready<*> -> data.hashCode()
+        }
+    }
 }
 
 fun <T> LoadResult<T>.isLoading(): Boolean = this is LoadResult.Loading

@@ -1,9 +1,9 @@
 package com.zjutjh.ijh.network.cookie
 
 import android.util.Log
-import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
+import com.zjutjh.ijh.datastore.IJhPreferenceDataSource
 import com.zjutjh.ijh.datastore.model.localSession
-import com.zjutjh.ijh.datastore.model.sessionOrNull
+import com.zjutjh.ijh.datastore.model.weJhSessionOrNull
 import com.zjutjh.ijh.network.BuildConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,14 +21,19 @@ import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * To simplify the cookie/session management, we use a cookie jar bind to the [IJhPreferenceDataSource].
+ * Although theoretically no other data sources are allowed in the network module.
+ * Therefore, we strictly enforce that only [CookieJar] can access local data sources.
+ */
 @Singleton
-class WeJhCookieJar @Inject constructor(private val local: WeJhPreferenceDataSource) :
+class WeJhCookieJar @Inject constructor(private val local: IJhPreferenceDataSource) :
     CookieJar {
 
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     private val tokenFlow: StateFlow<String?> = local.data
-        .map { it.sessionOrNull?.token ?: String() }
+        .map { it.weJhSessionOrNull?.token ?: String() }
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,

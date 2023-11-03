@@ -2,9 +2,10 @@ package com.zjutjh.ijh.datastore
 
 import androidx.datastore.core.DataStore
 import com.zjutjh.ijh.datastore.converter.asLocalModel
+import com.zjutjh.ijh.datastore.model.IJhPreference
+import com.zjutjh.ijh.datastore.model.IJhPreferenceKt
 import com.zjutjh.ijh.datastore.model.LocalSession
-import com.zjutjh.ijh.datastore.model.WeJhPreference
-import com.zjutjh.ijh.datastore.model.WeJhPreferenceKt
+import com.zjutjh.ijh.datastore.model.LocalWeJhUser
 import com.zjutjh.ijh.datastore.model.copy
 import com.zjutjh.ijh.model.CampusInfo
 import com.zjutjh.ijh.model.WeJhUser
@@ -12,34 +13,34 @@ import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 import javax.inject.Inject
 
-class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataStore<WeJhPreference>) {
+class IJhPreferenceDataSource @Inject constructor(private val dataStore: DataStore<IJhPreference>) {
 
-    val data: Flow<WeJhPreference> = dataStore.data
+    val data: Flow<IJhPreference> = dataStore.data
 
-    suspend fun setUser(user: WeJhUser) {
+    suspend fun setWeJhUser(user: WeJhUser) {
         dataStore.updateData {
             it.copy {
-                this.user = user.asLocalModel()
+                this.weJhUser = user.asLocalModel()
             }
         }
     }
 
-    suspend fun setUser(user: WeJhPreference.User) {
+    suspend fun setWeJhUser(user: LocalWeJhUser) {
         dataStore.updateData {
-            it.copy { this.user = user }
+            it.copy { this.weJhUser = user }
         }
     }
 
-    suspend fun updateUser(transform: suspend (WeJhPreference.User) -> WeJhPreference.User) =
+    suspend fun updateWeJhUser(transform: suspend (LocalWeJhUser) -> LocalWeJhUser) =
         dataStore.updateData {
-            it.copy { this.user = transform(it.user) }
+            it.copy { this.weJhUser = transform(it.weJhUser) }
         }
 
 
-    suspend fun deleteUser() {
+    suspend fun deleteWeJhUser() {
         dataStore.updateData {
             it.copy {
-                clearUser()
+                clearWeJhUser()
             }
         }
     }
@@ -47,7 +48,7 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
     suspend fun setCoursesLastSyncTime(time: ZonedDateTime) {
         dataStore.updateData {
             it.copy {
-                coursesLastSyncTime = time.toEpochSecond()
+                coursesSyncTime = time.toEpochSecond()
             }
         }
     }
@@ -55,42 +56,42 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
     suspend fun deleteCoursesLastSyncTime() =
         dataStore.updateData {
             it.copy {
-                clearCoursesLastSyncTime()
+                clearCoursesSyncTime()
             }
         }
 
-    private suspend fun setInfo(info: WeJhPreference.Info) =
+    private suspend fun setCampus(info: IJhPreference.Campus) =
         dataStore.updateData {
             it.copy {
-                this.info = info
+                this.campus = info
             }
         }
 
-    suspend fun setInfo(info: CampusInfo) =
-        setInfo(info.asLocalModel())
+    suspend fun setCampus(info: CampusInfo) =
+        setCampus(info.asLocalModel())
 
-    suspend fun deleteInfo() =
+    suspend fun deleteCampus() =
         dataStore.updateData {
             it.copy {
-                clearInfo()
+                clearCampus()
             }
         }
 
     suspend fun setSession(session: LocalSession) =
         dataStore.updateData {
             it.copy {
-                this.session = session
+                this.weJhSession = session
             }
         }
 
     suspend fun deleteSession() =
         dataStore.updateData {
             it.copy {
-                clearSession()
+                clearWeJhSession()
             }
         }
 
-    private suspend fun setCard(card: WeJhPreference.Card) =
+    private suspend fun setCard(card: IJhPreference.Card) =
         dataStore.updateData {
             it.copy {
                 this.card = card
@@ -98,9 +99,9 @@ class WeJhPreferenceDataSource @Inject constructor(private val dataStore: DataSt
         }
 
     suspend fun setCard(balance: String, syncTime: ZonedDateTime) =
-        setCard(WeJhPreferenceKt.card {
+        setCard(IJhPreferenceKt.card {
             this.balance = balance
-            lastSyncTime = syncTime.toEpochSecond()
+            this.syncTime = syncTime.toEpochSecond()
         })
 
     suspend fun deleteCard() =

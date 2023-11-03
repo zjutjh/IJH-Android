@@ -3,11 +3,11 @@ package com.zjutjh.ijh.data.converter
 import com.zjutjh.ijh.database.model.CourseEntity
 import com.zjutjh.ijh.exception.CourseParseException
 import com.zjutjh.ijh.model.Term
-import com.zjutjh.ijh.network.model.ZfClassTable
+import com.zjutjh.ijh.network.model.NetworkClassTable
 import com.zjutjh.ijh.network.model.parseWeekString
 import java.time.DayOfWeek
 
-fun ZfClassTable.LessonsTable.asLocalModel(year: Int, term: Term): CourseEntity {
+fun NetworkClassTable.LessonsTable.asLocalModel(year: Int, term: Term): CourseEntity {
     val section = sections.split('-')
     if (section.size != 2) {
         throw CourseParseException("Invalid class section format.")

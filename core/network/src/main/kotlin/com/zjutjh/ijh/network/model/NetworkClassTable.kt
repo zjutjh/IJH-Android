@@ -11,7 +11,7 @@ import java.time.DayOfWeek
  * **Note:** Due to Zf class table is network-only model, so omit the `Network` prefix.
  */
 @JsonClass(generateAdapter = true)
-data class ZfClassTable(
+data class NetworkClassTable(
     val info: Info,
     val lessonsTable: List<LessonsTable>?,
     val practiceLessons: List<PracticeLesson>?,
@@ -55,7 +55,7 @@ data class ZfClassTable(
 /**
  * @throws CourseParseException
  */
-fun ZfClassTable.LessonsTable.parseWeekString(): CourseWeek {
+fun NetworkClassTable.LessonsTable.parseWeekString(): CourseWeek {
     val singles: ArrayList<Int> = ArrayList()
     val ranges: ArrayList<CourseWeek.WeekRange> = ArrayList()
     try {
@@ -102,7 +102,7 @@ fun ZfClassTable.LessonsTable.parseWeekString(): CourseWeek {
 /**
  * @throws CourseParseException
  */
-fun ZfClassTable.LessonsTable.asExternalModel(): Course {
+fun NetworkClassTable.LessonsTable.asExternalModel(): Course {
     val section = sections.split('-')
     if (section.size != 2) {
         throw CourseParseException("Invalid class section format.")

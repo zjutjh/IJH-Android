@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import javax.inject.Inject
 
-class CardInfoDataSource @Inject constructor(private val cardService: WeJhCardService) {
+class CardNetworkDataSource @Inject constructor(private val cardService: WeJhCardService) {
 
     suspend fun getBalance(): String = cardService.getBalance()
 

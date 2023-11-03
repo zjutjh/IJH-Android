@@ -1,13 +1,14 @@
 package com.zjutjh.ijh.data.converter
 
-import com.zjutjh.ijh.datastore.model.WeJhPreference
-import com.zjutjh.ijh.datastore.model.WeJhPreferenceKt
+import com.zjutjh.ijh.datastore.model.LocalWeJhUser
+import com.zjutjh.ijh.datastore.model.LocalWeJhUserKt
+import com.zjutjh.ijh.datastore.model.localWeJhUser
 import com.zjutjh.ijh.network.model.NetworkWeJhUser
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
-fun NetworkWeJhUser.asLocalModel(): WeJhPreference.User =
-    WeJhPreferenceKt.user {
+fun NetworkWeJhUser.asLocalModel(): LocalWeJhUser =
+    localWeJhUser {
         uid = this@asLocalModel.id
         username = this@asLocalModel.username
         studentId = this@asLocalModel.studentId
@@ -20,8 +21,8 @@ fun NetworkWeJhUser.asLocalModel(): WeJhPreference.User =
         bind = this@asLocalModel.bind.asLocalModel()
     }
 
-fun NetworkWeJhUser.Bind.asLocalModel(): WeJhPreference.User.Bind =
-    WeJhPreferenceKt.UserKt.bind {
+fun NetworkWeJhUser.Bind.asLocalModel(): LocalWeJhUser.Bind =
+    LocalWeJhUserKt.bind {
         lib = this@asLocalModel.lib
         yxy = this@asLocalModel.yxy
         zf = this@asLocalModel.zf

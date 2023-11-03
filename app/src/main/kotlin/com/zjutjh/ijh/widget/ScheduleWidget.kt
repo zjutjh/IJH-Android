@@ -58,7 +58,7 @@ class ScheduleWidget : GlanceAppWidget() {
         val entryPoint =
             EntryPointAccessors.fromApplication<ScheduleWidgetReceiver.Repositories>(context)
 
-        val dayStateFlow = entryPoint.campusInfoRepository.infoStream
+        val dayStateFlow = entryPoint.campusRepository.infoStream
             .map { it?.toTermDayState() }
         val coursesFlow = dayStateFlow.flatMapLatest {
             it ?: return@flatMapLatest flowOf(null)

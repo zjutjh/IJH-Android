@@ -3,8 +3,8 @@ package com.zjutjh.ijh.network.model
 import org.junit.Assert
 import org.junit.Test
 
-class ZfClassTableUnitTest {
-    private fun table(week: String) =  ZfClassTable.LessonsTable(
+class NetworkClassTableUnitTest {
+    private fun table(week: String) = NetworkClassTable.LessonsTable(
         "紫金港",
         "计算机科学与技术（计算机科学与技术）",
         "2019211300",

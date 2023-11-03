@@ -1,7 +1,7 @@
 package com.zjutjh.ijh.network.service
 
-import com.zjutjh.ijh.network.service.request.LoginBody
-import com.zjutjh.ijh.network.service.response.WeJhUserResult
+import com.squareup.moshi.JsonClass
+import com.zjutjh.ijh.network.model.NetworkWeJhUser
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -15,4 +15,15 @@ interface WeJhUserService {
 
     @POST("login/session")
     suspend fun loginBySession(): WeJhUserResult
+
+    @JsonClass(generateAdapter = true)
+    data class LoginBody(
+        val username: String,
+        val password: String,
+    )
+
+    @JsonClass(generateAdapter = true)
+    data class WeJhUserResult(
+        val user: NetworkWeJhUser,
+    )
 }

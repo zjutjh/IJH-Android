@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import java.time.ZonedDateTime
 import java.util.Date
 
-interface CardInfoRepository {
+interface CardRepository {
 
     /**
      * balance (Unit: CNY) in string

@@ -5,6 +5,7 @@ import com.zjutjh.ijh.network.di.DefaultOkHttpClient
 import com.zjutjh.ijh.network.di.WeJhAuthorizedOkHttpClient
 import com.zjutjh.ijh.network.service.WeJhBasicService
 import com.zjutjh.ijh.network.service.WeJhCardService
+import com.zjutjh.ijh.network.service.WeJhElectricityService
 import com.zjutjh.ijh.network.service.WeJhUserService
 import com.zjutjh.ijh.network.service.WeJhZfService
 import dagger.Module
@@ -65,6 +66,17 @@ object ServiceModule {
     ): WeJhCardService =
         retrofitCommonBuilder()
             .baseUrl(BuildConfig.WE_JH_API_BASE_URL + "func/card/")
+            .client(client)
+            .build()
+            .create()
+
+    @Provides
+    @Singleton
+    fun provideWeJhElectricityService(
+        @WeJhAuthorizedOkHttpClient client: OkHttpClient
+    ): WeJhElectricityService =
+        retrofitCommonBuilder()
+            .baseUrl(BuildConfig.WE_JH_API_BASE_URL + "func/electricity/")
             .client(client)
             .build()
             .create()

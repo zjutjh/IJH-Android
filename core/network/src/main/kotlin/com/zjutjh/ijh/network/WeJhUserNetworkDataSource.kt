@@ -2,7 +2,6 @@ package com.zjutjh.ijh.network
 
 import com.zjutjh.ijh.network.model.NetworkWeJhUser
 import com.zjutjh.ijh.network.service.WeJhUserService
-import com.zjutjh.ijh.network.service.request.LoginBody
 import javax.inject.Inject
 
 class WeJhUserNetworkDataSource @Inject constructor(
@@ -10,7 +9,7 @@ class WeJhUserNetworkDataSource @Inject constructor(
 ) {
 
     suspend fun login(username: String, password: String): NetworkWeJhUser =
-        weJhUserService.login(LoginBody(username, password)).user
+        weJhUserService.login(WeJhUserService.LoginBody(username, password)).user
 
     suspend fun loginBySession(): NetworkWeJhUser =
         weJhUserService.loginBySession().user

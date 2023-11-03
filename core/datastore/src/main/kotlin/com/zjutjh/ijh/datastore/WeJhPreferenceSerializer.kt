@@ -3,22 +3,22 @@ package com.zjutjh.ijh.datastore
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import com.google.protobuf.InvalidProtocolBufferException
-import com.zjutjh.ijh.datastore.model.WeJhPreference
+import com.zjutjh.ijh.datastore.model.IJhPreference
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Inject
 
-class WeJhPreferenceSerializer @Inject constructor() : Serializer<WeJhPreference> {
+class WeJhPreferenceSerializer @Inject constructor() : Serializer<IJhPreference> {
 
-    override val defaultValue: WeJhPreference = WeJhPreference.getDefaultInstance()
+    override val defaultValue: IJhPreference = IJhPreference.getDefaultInstance()
 
-    override suspend fun readFrom(input: InputStream): WeJhPreference =
+    override suspend fun readFrom(input: InputStream): IJhPreference =
         try {
-            WeJhPreference.parseFrom(input)
+            IJhPreference.parseFrom(input)
         } catch (exception: InvalidProtocolBufferException) {
             throw CorruptionException("Cannot read proto.", exception)
         }
 
-    override suspend fun writeTo(t: WeJhPreference, output: OutputStream) =
+    override suspend fun writeTo(t: IJhPreference, output: OutputStream) =
         t.writeTo(output)
 }

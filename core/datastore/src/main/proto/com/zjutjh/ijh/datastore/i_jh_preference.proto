@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+import "com/zjutjh/ijh/datastore/local_session.proto";
+import "com/zjutjh/ijh/datastore/local_we_jh_user.proto";
+
+option java_package = "com.zjutjh.ijh.datastore.model";
+option java_multiple_files = true;
+
+message IJhPreference {
+  optional Campus campus = 1;
+
+  optional LocalWeJhUser we_jh_user = 2;
+  optional LocalSession we_jh_session = 3;
+
+  optional uint64 courses_sync_time = 4;
+
+  optional Card card = 5;
+
+  // Campus info
+  message Campus {
+    uint32 year = 1;
+    uint32 term = 2;
+    uint64 term_start_date = 3;
+    uint64 sync_time = 4;
+    string school_bus_url = 5;
+  }
+
+  message Card {
+    string balance = 1;
+    uint64 sync_time = 2;
+  }
+}

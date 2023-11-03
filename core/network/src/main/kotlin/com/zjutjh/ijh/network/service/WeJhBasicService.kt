@@ -1,6 +1,6 @@
 package com.zjutjh.ijh.network.service
 
-import com.zjutjh.ijh.network.model.WeJhCampusInfo
+import com.zjutjh.ijh.network.model.NetworkCampusInfo
 import retrofit2.http.POST
 
 /**
@@ -8,5 +8,5 @@ import retrofit2.http.POST
  */
 interface WeJhBasicService {
     @POST("info")
-    suspend fun getInfo(): WeJhCampusInfo
+    suspend fun getInfo(): NetworkCampusInfo
 }

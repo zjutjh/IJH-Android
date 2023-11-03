@@ -4,7 +4,7 @@ import com.zjutjh.ijh.model.CampusInfo
 import com.zjutjh.ijh.model.Term
 import kotlinx.coroutines.flow.Flow
 
-interface CampusInfoRepository {
+interface CampusRepository {
     val infoStream: Flow<CampusInfo?>
 
     /**

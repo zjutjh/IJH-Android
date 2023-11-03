@@ -3,7 +3,7 @@ package com.zjutjh.ijh.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zjutjh.ijh.data.CampusInfoRepository
+import com.zjutjh.ijh.data.CampusRepository
 import com.zjutjh.ijh.data.CourseRepository
 import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
@@ -37,7 +37,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CourseCalendarViewModel @Inject constructor(
-    campusInfoRepository: CampusInfoRepository,
+    campusRepository: CampusRepository,
     weJhUserRepository: WeJhUserRepository,
     private val courseRepository: CourseRepository,
 ) : ViewModel() {
@@ -53,7 +53,7 @@ class CourseCalendarViewModel @Inject constructor(
         )
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val localTermDayState = campusInfoRepository.infoStream
+    private val localTermDayState = campusRepository.infoStream
         .mapLatest {
             it?.toTermDayState()
         }

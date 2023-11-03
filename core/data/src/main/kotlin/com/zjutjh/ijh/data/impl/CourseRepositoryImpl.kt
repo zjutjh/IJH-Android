@@ -5,7 +5,7 @@ import com.zjutjh.ijh.data.converter.asLocalModel
 import com.zjutjh.ijh.data.converter.equalsIgnoreId
 import com.zjutjh.ijh.database.dao.CourseDao
 import com.zjutjh.ijh.database.model.CourseEntity
-import com.zjutjh.ijh.datastore.WeJhPreferenceDataSource
+import com.zjutjh.ijh.datastore.IJhPreferenceDataSource
 import com.zjutjh.ijh.datastore.converter.toZonedDateTime
 import com.zjutjh.ijh.model.Course
 import com.zjutjh.ijh.model.Term
@@ -24,7 +24,7 @@ import javax.inject.Singleton
 @Singleton
 class CourseRepositoryImpl @Inject constructor(
     private val networkDataSource: CourseNetworkDataSource,
-    private val localPreference: WeJhPreferenceDataSource,
+    private val localPreference: IJhPreferenceDataSource,
     private val dao: CourseDao,
 ) : CourseRepository {
 
@@ -44,15 +44,15 @@ class CourseRepositoryImpl @Inject constructor(
 
     override val lastSyncTimeStream: Flow<ZonedDateTime?> =
         localPreference.data.map {
-            if (it.hasCoursesLastSyncTime())
-                it.coursesLastSyncTime.toZonedDateTime()
+            if (it.hasCoursesSyncTime())
+                it.coursesSyncTime.toZonedDateTime()
             else null
         }
 
     override suspend fun sync(year: Int, term: Term) {
         val old = dao.getCourses(year, term).first()
 
-        val classTable = networkDataSource.getZfClassTable(year.toString(), term.value).lessonsTable
+        val classTable = networkDataSource.getClassTable(year.toString(), term.value).lessonsTable
         if (!classTable.isNullOrEmpty()) {
             val new = classTable.map { it.asLocalModel(year, term) }
 

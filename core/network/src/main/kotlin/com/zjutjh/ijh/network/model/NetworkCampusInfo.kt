@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
  * WeJH campus info
  */
 @JsonClass(generateAdapter = true)
-data class WeJhCampusInfo(
+data class NetworkCampusInfo(
     @Json(name = "is_begin")
     val isBegin: Boolean,
     val term: String,
@@ -22,7 +22,7 @@ data class WeJhCampusInfo(
     val schoolBusUrl: String,
 )
 
-fun WeJhCampusInfo.asExternalModel(): CampusInfo =
+fun NetworkCampusInfo.asExternalModel(): CampusInfo =
     CampusInfo(
         term = term.toTerm(),
         year = termYear.toInt(),

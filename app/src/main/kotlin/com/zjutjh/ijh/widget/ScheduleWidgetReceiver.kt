@@ -7,7 +7,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.zjutjh.ijh.data.CampusInfoRepository
+import com.zjutjh.ijh.data.CampusRepository
 import com.zjutjh.ijh.data.CourseRepository
 import com.zjutjh.ijh.work.ScheduleWidgetUpdater
 import com.zjutjh.ijh.work.enqueueWidgetRefresh
@@ -25,7 +25,7 @@ class ScheduleWidgetReceiver : GlanceAppWidgetReceiver() {
     @InstallIn(SingletonComponent::class)
     interface Repositories {
         val courseRepository: CourseRepository
-        val campusInfoRepository: CampusInfoRepository
+        val campusRepository: CampusRepository
     }
 
     override val glanceAppWidget = ScheduleWidget()

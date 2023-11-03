@@ -3,8 +3,8 @@ package com.zjutjh.ijh.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zjutjh.ijh.data.CampusInfoRepository
-import com.zjutjh.ijh.data.CardInfoRepository
+import com.zjutjh.ijh.data.CampusRepository
+import com.zjutjh.ijh.data.CardRepository
 import com.zjutjh.ijh.data.CourseRepository
 import com.zjutjh.ijh.data.WeJhUserRepository
 import com.zjutjh.ijh.model.Course
@@ -27,8 +27,8 @@ import kotlin.time.toKotlinDuration
 class HomeViewModel @Inject constructor(
     weJhUserRepository: WeJhUserRepository,
     private val courseRepository: CourseRepository,
-    private val campusInfoRepository: CampusInfoRepository,
-    private val cardInfoRepository: CardInfoRepository,
+    private val campusRepository: CampusRepository,
+    private val cardRepository: CardRepository,
 ) : ViewModel() {
 
     private val timerFlow: Flow<Unit> = flow {
@@ -66,7 +66,7 @@ class HomeViewModel @Inject constructor(
     private val termLocalRefreshChannel: MutableStateFlow<Unit> = MutableStateFlow(Unit)
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val termDayState: StateFlow<LoadResult<TermDayState?>> = campusInfoRepository.infoStream
+    val termDayState: StateFlow<LoadResult<TermDayState?>> = campusRepository.infoStream
         .combine(termLocalRefreshChannel) { t1, _ -> t1 }
         .mapLatest {
             it?.toTermDayState()
@@ -93,7 +93,7 @@ class HomeViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5_000)
         )
 
-    val cardBalanceState: StateFlow<LoadResult<String?>> = cardInfoRepository.balanceStream
+    val cardBalanceState: StateFlow<LoadResult<String?>> = cardRepository.balanceStream
         .distinctUntilChanged()
         .asLoadResultStateFlow(
             scope = viewModelScope,
@@ -101,7 +101,7 @@ class HomeViewModel @Inject constructor(
         )
 
     val cardBalanceLastSyncState: StateFlow<LoadResult<Duration?>> =
-        cardInfoRepository.lastSyncTimeStream
+        cardRepository.lastSyncTimeStream
             .distinctUntilChanged()
             .combine(timerFlow) { t1, _ -> t1 }
             .map {
@@ -178,7 +178,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun refreshTerm(): Pair<Int, Term>? {
-        runCatching { campusInfoRepository.sync() }
+        runCatching { campusRepository.sync() }
             .fold({
                 Log.i("Home", "Sync WeJhInfo succeed.")
                 return it
@@ -208,7 +208,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun refreshCard() {
         runCatching {
-            cardInfoRepository.sync()
+            cardRepository.sync()
         }.fold({
             Log.i("Home", "Sync Card succeed.")
         }) {

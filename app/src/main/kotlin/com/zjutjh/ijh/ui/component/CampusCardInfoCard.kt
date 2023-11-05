@@ -72,7 +72,7 @@ fun CampusCardInfoCard(
                         modifier = Modifier.padding(vertical = 8.dp),
                         color = MaterialTheme.colorScheme.primary,
                         text = text,
-                        style = MaterialTheme.typography.displaySmall,
+                        style = MaterialTheme.typography.headlineLarge,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
                     )

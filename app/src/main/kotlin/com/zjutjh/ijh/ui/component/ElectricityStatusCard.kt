@@ -11,7 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -33,8 +33,11 @@ fun ElectricityStatusCard(
     balance: LoadResult<ElectricityBalance?>,
 ) {
     val context = LocalContext.current
-    val subtitle = remember(balance) {
-        prompt(context, if (balance is LoadResult.Loading) null else LocalDateTime.now())
+    val subtitle = rememberSaveable(balance) {
+        prompt(
+            context,
+            if (balance is LoadResult.Ready && balance.data != null) LocalDateTime.now() else null
+        )
     }
 
     GlanceCard(
@@ -73,7 +76,7 @@ fun ElectricityStatusCard(
                         modifier = Modifier.padding(vertical = 8.dp),
                         color = MaterialTheme.colorScheme.primary,
                         text = text,
-                        style = MaterialTheme.typography.displaySmall,
+                        style = MaterialTheme.typography.headlineLarge,
                         textAlign = TextAlign.Center,
                     )
                 }

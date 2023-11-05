@@ -51,12 +51,12 @@ internal fun GlanceCard(
                     IconText(
                         icon = icon,
                         text = " | $title",
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                     )
                 else Text(
                     text = title,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                 )
@@ -65,7 +65,6 @@ internal fun GlanceCard(
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.outline,
                     maxLines = 1,
                 )
             }

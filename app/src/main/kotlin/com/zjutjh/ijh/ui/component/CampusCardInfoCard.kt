@@ -65,7 +65,7 @@ fun CampusCardInfoCard(
                     val text = if (it.data == null) {
                         "N/A"
                     } else {
-                        "¥${it.data}"
+                        "¥ ${it.data}"
                     }
 
                     Text(

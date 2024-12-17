@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.devtools.ksp'
     id 'com.google.dagger.hilt.android'
-    id 'kotlin-kapt'
     id 'com.google.protobuf'
 }
 
@@ -17,8 +17,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 }
 
@@ -46,10 +46,10 @@ protobuf {
 dependencies {
     implementation project(':core:common')
 
-    implementation "androidx.datastore:datastore:1.0.0"
+    implementation 'androidx.datastore:datastore:1.1.1'
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
 
     // Dependency injection (Hilt)
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    ksp "com.google.dagger:hilt-compiler:$hilt_version"
 }

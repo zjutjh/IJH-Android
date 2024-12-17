@@ -4,7 +4,6 @@ plugins {
     id 'com.google.devtools.ksp'
     id 'com.google.dagger.hilt.android'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
-    id 'kotlin-kapt'
 }
 
 android {
@@ -27,8 +26,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
     buildFeatures {
         buildConfig true
@@ -51,13 +50,13 @@ dependencies {
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
-    implementation "com.squareup.moshi:moshi:1.15.0"
-    ksp "com.squareup.moshi:moshi-kotlin-codegen:1.15.0"
+    implementation 'com.squareup.moshi:moshi:1.15.2'
+    ksp 'com.squareup.moshi:moshi-kotlin-codegen:1.15.2'
 
     implementation "com.google.protobuf:protobuf-kotlin-lite:$protobuf_version"
 
     implementation "com.google.dagger:hilt-android:$hilt_version"
-    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+    ksp "com.google.dagger:hilt-compiler:$hilt_version"
 
     testImplementation 'junit:junit:4.13.2'
 }
